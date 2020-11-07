@@ -2,7 +2,7 @@
 
 assert( $angemeldet ) or exit();
 nur_fuer_dienst(1,3,4);
-need( $exportDB );
+// need( $exportDB );
 
 setWikiHelpTopic( 'foodsoft:updownload' );
 
