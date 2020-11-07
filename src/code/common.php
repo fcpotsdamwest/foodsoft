@@ -49,8 +49,8 @@ global $mysqlheute, $mysqljetzt;
 //  - kann quotiert werden
 //  - in einem Skriptlauf wird garantiert immer dieselbe Zeit verwendet
 $now = explode( ',' , date( 'Y,m,d,H,i,s' ) );
-$mysqlheute = $now[0] . '-' . $now[1] . '-' . $now[2];
-$mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];
+$mysqlheute = $now[0] . '-' . $now[1] . '-' . $now[2];  // 2020-11-15
+$mysqljetzt = $mysqlheute . ' ' . $now[3] . ':' . $now[4] . ':' . $now[5];  // 2020-11-15 12:04:15
 
 // gruppen mit sonderbedeutung merken:
 global $specialgroups;

@@ -154,7 +154,7 @@ if( count( $bestell_id_set ) > 1 ) {
   abrechnung_overview( $abrechnung_id, $bestell_id );
 }
 
-
+/* page head: overview and display options tables */
 open_table( 'layout hfill' );
   open_td( 'left' );
     bestellung_overview( $bestell_id, $gruppen_id );

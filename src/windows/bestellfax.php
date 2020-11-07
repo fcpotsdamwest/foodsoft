@@ -46,9 +46,10 @@ $spalten &= PR_FAXOPTIONS;
 
 $gruppen_id = 0;
 
-// echo "action: [$action]";
 switch( $action ) {
   case 'faxansicht_save':
+    /* persist form values containing supplier related information
+     * a simple way to keep this information up-to-date */
     sql_update( 'lieferanten', $lieferant['id'], array(
       'strasse' => $lieferant_strasse
     , 'ort' => $lieferant_ort
@@ -70,11 +71,13 @@ switch( $action ) {
     break;
 }
 
+/* the POST parameter export=bestellschein triggers a popup with the PDF download */
 get_http_var( 'export', 'w', '' );
 if( $export == 'bestellschein' ) {
   fc_openwindow( 'self', 'window_id=pdf,download=bestellfax' );
 }
 
+/* render the printable version of the order sheet */
 if( isset( $download ) && ( $download == 'bestellfax' ) ) {
   $fc_kundennummer = trim( $fc_kundennummer );
 
