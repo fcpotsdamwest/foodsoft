@@ -463,7 +463,7 @@ function update_preis( $produkt_id ) {
       foreach( array( 'lieferpreis', 'bestellnummer', 'gebindegroesse', 'mwst', 'pfand'
                     , 'liefereinheit', 'verteileinheit', 'lv_faktor' ) as $key ) {
         if( ! isset( $preiseintrag_neu[ $key ] ) ) {
-          continue 2;
+          break 2;
         }
       }
       return sql_insert_produktpreis(

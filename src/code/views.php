@@ -218,7 +218,7 @@ function konto_view( $konto_id = 0, $fieldname = '' ) {
 }
 
 function kontoauszug_view( $konto_id = 0, $auszug_jahr = '', $auszug_nr = '', $fieldname = '' ) {
-  global $input_event_handlers, $window;
+  global $window;
   if( $fieldname ) {
     return "Jahr: ".int_view( $auszug_jahr, $fieldname.'_jahr' )
          . " / Nr.: " .int_view( $auszug_nr, $fieldname.'_nr' );
@@ -1311,15 +1311,11 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
   $netto_summe = 0;
 
   foreach( $produkte as $produkte_row ) {
-    $produkt_id = $produkte_row['produkt_id'];
-
     // preise je V-einheit:
     $nettopreis = $produkte_row['nettopreis'];
 
     $nettolieferpreis = $produkte_row['nettolieferpreis'];
     $lv_faktor = $produkte_row['lv_faktor'];
-
-    $gesamtbestellmenge = $produkte_row['gesamtbestellmenge'];
 
     $gebindegroesse = $produkte_row['gebindegroesse'];
     $kan_verteilmult = $produkte_row['kan_verteilmult'];
@@ -1362,9 +1358,9 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
           mult2string( $gebinde ) .
         '</td>' .
         '<td>' .
-            mult2string( $produkte_row['kan_verteilmult'] * $produkte_row['gebindegroesse'] ) .
+            mult2string( $kan_verteilmult * $gebindegroesse ) .
             '&thinsp;' .
-            $produkte_row['kan_verteileinheit'] .
+            $kan_verteilmult .
         '</td>';
     }
     if( $spalten & PR_COL_LPREIS ) {
@@ -2227,6 +2223,7 @@ function catalogue_acronym_view( $editable ) {
           . "ORDER BY context, acronym") );
   
   // $decoder = function($string) { return html_entity_decode($string, ENT_QUOTES, 'UTF-8' ); };
+  $acronyms_decoded = null;
   foreach( $acronyms as $n => $row )
     foreach( $row as $name => $val )
       $acronyms_decoded[ $n ][ $name ] = html_entity_decode( $val, ENT_QUOTES, 'UTF-8' );

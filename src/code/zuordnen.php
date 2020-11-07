@@ -1331,7 +1331,7 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
     , $mysqlheute
     , "Erstattung Sockeleinlage Gruppe " . $gruppendaten['name']
     ) ) {
-      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage']} Euro wurden erstattet.</div>";
+      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage_gruppe']} Euro wurden erstattet.</div>";
       sql_update( 'bestellgruppen', $gruppen_id, array( 'sockeleinlage' => 0.0 ) );
     } else {
       $problems = $problems . "<div class='warn'>Verbuchen Aenderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
@@ -3968,7 +3968,8 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
  *  oder false falls es keinen gueltigen preis gibt:
  */
 function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
-  return end( sql_produktpreise( $produkt_id, $zeitpunkt ) );
+  $preise = sql_produktpreise( $produkt_id, $zeitpunkt );
+  return end( $preise );
 }
 
 /* sql_aktueller_produktpreis_id:
