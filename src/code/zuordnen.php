@@ -1213,9 +1213,9 @@ function sql_gruppe_offene_bestellungen( $gruppen_id ) {
  *   a HTML snippet contain a sequence of `option` elements
  */
 function optionen_gruppen(
-  $selected = 0
-, $keys = array( 'aktiv' => 'true' )
-, $option_0 = false
+  $selected = 0,
+  $keys = array( 'aktiv' => 'true' ),
+  $option_0 = false
 ) {
   $output='';
   if( $option_0 ) {
@@ -2870,10 +2870,14 @@ function sql_gruppen_transaktion(
 
 
 function sql_bank_transaktion(
-  $konto_id, $auszug_jahr, $auszug_nr
-, $haben, $valuta
-, $dienstkontrollblatt_id, $notiz
-, $konterbuchung_id
+  $konto_id,
+  $auszug_jahr,
+  $auszug_nr,
+  $haben,
+  $valuta,
+  $dienstkontrollblatt_id,
+  $notiz,
+  $konterbuchung_id
 ) {
   global $mysqlheute;
 
@@ -3205,14 +3209,14 @@ define( 'TRANSAKTION_TYP_STORNO', 98 );          // Buchungen, die sich gegensei
 
 
 $selectable_types = array(
-  TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE
-, TRANSAKTION_TYP_ANFANGSGUTHABEN
-, TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN
-, TRANSAKTION_TYP_SPENDE
-, TRANSAKTION_TYP_SONDERAUSGABEN
-, TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN
+  TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE,
+  TRANSAKTION_TYP_ANFANGSGUTHABEN,
+  TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN,
+  TRANSAKTION_TYP_SPENDE,
+  TRANSAKTION_TYP_SONDERAUSGABEN,
+  TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN,
 /// , TRANSAKTION_TYP_VERLUST   // bestellverluste gehen extra!
-, TRANSAKTION_TYP_UMLAGE
+  TRANSAKTION_TYP_UMLAGE,
 );
 
 function transaktion_typ_string( $typ ) {
@@ -4048,8 +4052,16 @@ function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id =
  *  Erzeugt einen Produktpreiseintrag
  */
 function sql_insert_produktpreis (
-  $produkt_id, $lieferpreis, $start, $bestellnummer, $gebindegroesse
-, $mwst, $pfand, $liefereinheit, $verteileinheit, $lv_faktor
+  $produkt_id,
+  $lieferpreis,
+  $start,
+  $bestellnummer,
+  $gebindegroesse,
+  $mwst,
+  $pfand,
+  $liefereinheit,
+  $verteileinheit,
+  $lv_faktor
 ) {
   need( $lieferpreis > 0, "kein gueltiger Lieferpreis" );
   need( $gebindegroesse >= 1, "keine gueltige Gebindegroesse" );
@@ -4224,41 +4236,41 @@ function sql_catalogue_acronym( $context, $acronym ) {
 // mit typen:
 //
 $foodsoft_get_vars = array(
-  'abrechnung_id' => 'u'
-, 'action' => 'w'
-, 'area' => 'w'
-, 'auszug' => '/\d+-\d+/'
-, 'auszug_jahr' => 'u'
-, 'auszug_nr' => 'u'
-, 'auszus_jahr' => 'u'
-, 'bestell_id' => 'u'
-, 'buchung_id' => 'd' /* kann auch negativ sein */
-, 'confirmed' => 'w'
-, 'detail' => 'w'
-, 'download' => 'w'
-, 'faxspalten' => 'u'
-, 'gruppen_id' => 'u'
-, 'id' => 'u'
-, 'id_to' => 'u'
-, 'login' => 'w'
-, 'katalogdatum' => 'w'
-, 'katalogtyp' => 'w'
-, 'konto_id' => 'u'
-, 'lieferanten_id' => 'u'
-, 'meinkonto' => 'u'
-, 'optionen' => 'u'
-, 'options' => 'u'
-, 'orderby' => 'w'
-, 'plan_dienst' => '/^[0-9\/]+$/'
-, 'prev_id' => 'u'
-, 'produkt_id' => 'u'
-, 'ro' => 'u'
-, 'spalten' => 'u'
-, 'state' => 'u'
-, 'transaktion_id' => 'u'
-, 'verpackung_id' => 'u'
-, 'window' => 'W'
-, 'window_id' => 'w'
+  'abrechnung_id' => 'u',
+  'action' => 'w',
+  'area' => 'w',
+  'auszug' => '/\d+-\d+/',
+  'auszug_jahr' => 'u',
+  'auszug_nr' => 'u',
+  'auszus_jahr' => 'u',
+  'bestell_id' => 'u',
+  'buchung_id' => 'd' /* kann auch negativ sein */,
+  'confirmed' => 'w',
+  'detail' => 'w',
+  'download' => 'w',
+  'faxspalten' => 'u',
+  'gruppen_id' => 'u',
+  'id' => 'u',
+  'id_to' => 'u',
+  'login' => 'w',
+  'katalogdatum' => 'w',
+  'katalogtyp' => 'w',
+  'konto_id' => 'u',
+  'lieferanten_id' => 'u',
+  'meinkonto' => 'u',
+  'optionen' => 'u',
+  'options' => 'u',
+  'orderby' => 'w',
+  'plan_dienst' => '/^[0-9\/]+$/',
+  'prev_id' => 'u',
+  'produkt_id' => 'u',
+  'ro' => 'u',
+  'spalten' => 'u',
+  'state' => 'u',
+  'transaktion_id' => 'u',
+  'verpackung_id' => 'u',
+  'window' => 'W',
+  'window_id' => 'w',
 );
 
 $http_input_sanitized = false;
@@ -4271,8 +4283,12 @@ $http_input_sanitized = false;
  *   (protection against submitting a form multiple times)
  */
 function sanitize_http_input() {
-  global $from_dokuwiki
-       , $foodsoft_get_vars, $http_input_sanitized, $session_id;
+
+  global
+    $foodsoft_get_vars,
+    $from_dokuwiki,
+    $http_input_sanitized,
+    $session_id;
 
   if( ! $from_dokuwiki ) {
     foreach( $_GET as $key => $val ) {
@@ -4282,18 +4298,15 @@ function sanitize_http_input() {
     if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
       need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
       sscanf( $_POST['itan'], "%u_%s", $t_id, $itan );
-      need( $t_id, 'fehlerhaftes Formular uebergeben' );
+      need( $t_id, 'fehlerhaftes Formular übergeben' );
       $row = sql_select_single_row( "SELECT * FROM transactions WHERE id=$t_id", true );
-      need( $row, 'fehlerhaftes Formular uebergeben' );
+      need( $row, 'fehlerhaftes Formular übergeben' );
       if( $row['used'] ) {
-        // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
         $_POST = array();
         echo "<div class='warn'>Warnung: mehrfach abgeschicktes Formular detektiert! (wurde nicht ausgewertet)</div>";
       } else {
-        need( $row['itan'] == $itan, 'ungueltige iTAN uebergeben' );
-        // echo "session_id: $session_id, from db: {$row['session_id']} <br>";
-        need( $row['session_id'] == $session_id, 'ungueltige session_id' );
-        // id ist noch unverbraucht: jetzt entwerten:
+        need( $row['itan'] == $itan, 'ungültige iTAN übergeben' );
+        need( $row['session_id'] == $session_id, 'ungültige session_id' );
         sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
     } else {
@@ -4367,7 +4380,11 @@ function checkvalue( $val, $typ){
   return $val;
 }
 
-// get_http_var:
+// get_http_var
+//
+// Create a global variable <name> and populate it with the GET or POST parameter
+// of the same name, using the <default> value if set.
+//
 // - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
 // - typ: definierte $typ argumente:
 //   d : ganze Zahl
@@ -4388,8 +4405,10 @@ function checkvalue( $val, $typ){
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
 function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
-  global $self_fields, $self_post_fields;
-  global $http_input_sanitized;
+  global
+    $http_input_sanitized,
+    $self_fields,
+    $self_post_fields;
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
@@ -4480,7 +4499,7 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
  *
  */
 function need_http_var( $name, $typ, $is_self_field = false ) {
-  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht uebergeben" );
+  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );
   return TRUE;
 }
 
@@ -4493,7 +4512,7 @@ function self_field( $name, $default = NULL ) {
 }
 
 /**
- * Database migration to tne neXt version
+ * Database migration to the neXt version
  * 
  * This function contains all changes in the DB schema across foodsoft versions.
  * 
@@ -4972,12 +4991,9 @@ function optionen( $values, $selected ) {
       $text = $v;
       $title = '';
     }
-    $output .= "<option value='$value'";
-    if( $value == $selected )
-      $output .= " selected";
-    if( $title )
-      $output .= " title='$title'";
-    $output .= ">$text</option>";
+    $selected_attr = ( $value == $selected ) ? "selected" : "";
+    $title_attr = $title ? "title='$title'" : "";
+    $output .= "<option value='$value' $title_attr $selected_attr>$text</option>";
   }
   return $output;
 }

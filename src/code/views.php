@@ -268,8 +268,6 @@ function dienst_view3($row){
   close_form();
 }
 
-
-
 /**
  *  Zeigt einen Dienst und die möglichen Aktionen
  */
@@ -567,7 +565,6 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
 }
 
 
-
 /**
  * Ausgabe der Links im Hauptmenue und im Foodsoft-Kopf
  */
@@ -814,8 +811,13 @@ define( 'PR_FAXOPTIONS'
  * after delivery delivered amounts.
  */
 function bestellschein_view(
-    $bestell_id, $editAmounts = FALSE, $editPrice = FALSE, $spalten = 0xfffff, $gruppen_id = false,
-    $select_columns = false, $select_nichtgeliefert = false
+    $bestell_id,
+    $editAmounts = FALSE,           // make order amounts editable
+    $editPrice = FALSE,             // make prices editable
+    $spalten = 0xfffff,             // table columns to be dsiplayed
+    $gruppen_id = false,            // if set to int: display group order for this group id, if false: display total order
+    $select_columns = false,        // display menu for choosing table columns
+    $select_nichtgeliefert = false  // display products that were not delivered
   ) {
   global $input_event_handlers;
 

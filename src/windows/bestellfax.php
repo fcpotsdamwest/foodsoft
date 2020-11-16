@@ -185,19 +185,20 @@ $faxform_id = open_form( '', 'action=faxansicht_save,export=' );
 
   close_table();
 
-
   bigskip();
+
   bestellschein_view(
-    $bestell_id 
-  , false    // Mengen...
-  , false    // ... und Preise hier _nicht_ edieren lassen
-  , $spalten | PR_FAXANSICHT
-  , 0        // Gruppenansicht: alle
-  , true     // angezeigte Spalten auswaehlen lassen
-  , false    // nichtgelieferte nicht anzeigen
+    $bestell_id,
+    false,                    // don't edit amounts
+    false,                    // don't edit prices
+    $spalten | PR_FAXANSICHT, // display all faX view columns
+    0,                        // display total for all groups
+    true,                     // no choosing display columns
+    false,                    // no displaying not-ordered products
   );
 
   bigskip();
+
   open_table();
     open_tr();
       open_th( 'medskip', '', 'Grußformel:' );
@@ -210,9 +211,19 @@ $faxform_id = open_form( '', 'action=faxansicht_save,export=' );
 close_form();
 
 open_div( 'right medskip' );
-  $confirm = ( (int)$lieferant['bestellfaxspalten'] !== (int)$spalten ) ? "if( confirm( 'Spaltenauswahl f&uuml;r diesen Lieferanten wurde ge&auml;ndert - sind sie sicher?' ) ) " : '';
-  open_span( 'qquad button', "onclick=\" $confirm { f=document.forms.form_$faxform_id;f.elements.export.value='bestellschein'; f.submit(); } \"", 'PDF erzeugen' );
-  open_span( 'qquad button', "onclick=\" $confirm document.forms.form_$faxform_id.submit(); \"", 'Speichern' );
+  $confirm = ( (int)$lieferant['bestellfaxspalten'] !== (int)$spalten )
+    ? "if( confirm( 'Spaltenauswahl f&uuml;r diesen Lieferanten wurde ge&auml;ndert - sind sie sicher?' ) ) "
+    : '';
+  open_span(
+    'qquad button',
+    "onclick=\" $confirm { f=document.forms.form_$faxform_id;f.elements.export.value='bestellschein'; f.submit(); } \"",
+    'PDF erzeugen'
+  );
+  open_span(
+    'qquad button',
+    "onclick=\" $confirm document.forms.form_$faxform_id.submit(); \"",
+    'Speichern'
+  );
 close_div()    ;
 
 open_option_menu_row();

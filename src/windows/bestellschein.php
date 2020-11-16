@@ -43,7 +43,7 @@ get_http_var( 'fc_kundennummer', 'H', $lieferant['kundennummer'] );
 get_http_var( 'besteller_name', 'H', $coopie_name );
 
 get_http_var( 'action', 'w', '' );
-$readonly and $action = '';
+$readonly && $action = '';
 
 switch( $action ) {
 
@@ -194,7 +194,7 @@ medskip();
 switch( $status ) {
   case STATUS_LIEFERANT:
   case STATUS_VERTEILT:
-    if( ! $readonly and ! $gruppen_id and hat_dienst(1,3,4) ) {
+    if( ! $readonly && ! $gruppen_id && hat_dienst(1,3,4) ) {
       open_fieldset( 'small_form', '', 'Zusätzliches Produkt eintragen', 'off' );
         open_form( '', 'action=insert' );
           open_div( 'kommentar' )
