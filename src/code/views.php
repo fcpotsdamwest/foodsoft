@@ -18,7 +18,7 @@ function number_selector($name, $min, $max, $selected, $format, $to_stdout = tru
 /**
  * Stellt eine komplette Editiermöglichkeit für
  * Datum und Uhrzeit zur Verfügung.
- * Muss in ein Formluar eingebaut werden
+ * Muss in ein Formular eingebaut werden
  * Die Elemente des Datums stehen dann zur Verfügung als
  *   <prefix>_minute
  *   <prefix>_stunde

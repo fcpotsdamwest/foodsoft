@@ -3736,7 +3736,7 @@ function sql_bestellung_pfandsumme( $bestell_id ) {
 
 function kontostand( $gruppen_id ) {
   global $specialgroups;
-  need( ! in_array( $gruppen_id, $specialgroups ), "kontostand fuer Basar und BadBank nicht definiert" );
+  need( ! in_array( $gruppen_id, $specialgroups ), "Kontostand für Basar und BadBank nicht definiert" );
   $row = sql_select_single_row( "
     SELECT (".select_soll_gruppen('bestellgruppen').") as soll
     FROM bestellgruppen
@@ -3906,7 +3906,7 @@ function sql_verluste_summe( $type ) {
 //     * VPE als verteileinheit ist mit beliebiger liefereinheit kombinierbar
 //  - lv_faktor:
 //     umrechnungsfaktor L-Einheit / V-Einheit
-//     wenn verteileinheit und liefereinheit verschiedene kanonische enheiten haben (nur bei GB, KI, PA, VPE als
+//     wenn verteileinheit und liefereinheit verschiedene kanonische einheiten haben (nur bei GB, KI, PA, VPE als
 //     L-Einheit oder VPE als V-Einheit erlaubt) muss dieser faktor manuell erfasst werden.
 // - gebindegroesse:
 //     gebindegroesse, vielfache der V-Einheit. Muss immer eine ganze Zahl sein!
