@@ -102,7 +102,7 @@ function price_view( $price, $fieldname = false, $transmit = true, $edit_if_fiel
     return "<span class='price number' $id>$price</span>";
 }
 
-// mult_view: erlaube bis zu 3 nachkommastellen; aber nur anzeigen, wenn noetig:
+// mult_view: erlaube bis zu 3 nachkommastellen; aber nur anzeigen, wenn nötig:
 //
 function mult_view( $mult, $fieldname = false, $transmit = true, $edit_if_fieldname = true ) {
   global $input_event_handlers;
@@ -316,7 +316,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
         open_td( "right $class" );
         // smallskip();
         if( $show_buttons ) {
-          echo fc_action( 'update,class=button smalll,text=&uuml;bernehmen,confirm=Diesen offenen Dienst &uuml;bernehmen?'
+          echo fc_action( 'update,class=button smalll,text=übernehmen,confirm=Diesen offenen Dienst übernehmen?'
                          , sprintf( 'action=uebernehmen_%u,message=1', $dienst_id ) );
         }
           smallskip();
@@ -331,7 +331,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
             open_tr();
               open_td( "left $class" );
               if( $dienst['soon'] )
-                echo fc_action( 'update,class=button,text=bestaetigen', sprintf( 'action=bestaetigen_%u', $dienst_id ) );
+                echo fc_action( 'update,class=button,text=bestätigen', sprintf( 'action=bestaetigen_%u', $dienst_id ) );
               else
                 echo fc_action( 'update,class=button,text=akzeptieren', sprintf( 'action=akzeptieren_%u', $dienst_id ) );
               open_td( "right $class" );
@@ -349,7 +349,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
           open_td( "right $class" );
           // smallskip();
           if( $show_buttons ) {
-            echo fc_action( 'update,class=button smalll,text=&uuml;bernehmen,confirm=Dieser Dienst ist fuer andere Gruppe vorgeschlagen --- &uuml;bernehmen?'
+            echo fc_action( 'update,class=button smalll,text=übernehmen,confirm=Dieser Dienst ist für andere Gruppe vorgeschlagen --- übernehmen?'
                           , sprintf( 'action=uebernehmen_%u,message=1', $dienst_id ) );
           }
         }
@@ -359,7 +359,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
           open_td( "$class smallskip", "colspan='2'", '&nbsp;' );
            open_tr();
           open_td( "left $class" );
-          echo fc_action( 'update,class=button,text=bestaetigen', sprintf( 'action=bestaetigen_%u', $dienst_id ) );
+          echo fc_action( 'update,class=button,text=bestätigen', sprintf( 'action=bestaetigen_%u', $dienst_id ) );
           smallskip();
         } else {
           open_td( "left $class", '', 'akzeptiert' );
@@ -367,7 +367,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
         open_td( "right $class" );
         // smallskip();
         if( $show_buttons and ( $login_gruppen_id != $dienst['gruppen_id'] ) ) {
-          echo fc_action( 'update,class=button smalll,text=&uuml;bernehmen,confirm=Bereits akzeptierten Dienst von andere Gruppe &uuml;bernehmen: ist das mit der anderen Gruppe abgesprochen?'
+          echo fc_action( 'update,class=button smalll,text=übernehmen,confirm=Bereits akzeptierten Dienst von andere Gruppe übernehmen: ist das mit der anderen Gruppe abgesprochen?'
                          , sprintf( 'action=uebernehmen_%u,message=1', $dienst_id ) );
         }
         // if( $show_buttons and ( $login_gruppen_id == $dienst['gruppen_id'] ) ) {
@@ -375,15 +375,15 @@ function dienstplan_eintrag_view( $dienst_id ) {
         // }
         break;
       case "Bestaetigt":
-        open_td( "left $class", '', 'bestaetigt' );
+        open_td( "left $class", '', 'bestätigt' );
         open_td( "right $class" );
         if( $show_buttons and ( $login_gruppen_id != $dienst['gruppen_id'] ) and ( ! $dienst['over'] ) ) {
-          echo fc_action( 'update,class=button smalll,text=&uuml;bernehmen,confirm=Diesen bereits BESTAETIGTEN Dienst von andere Gruppe &uuml;bernehmen: ist das mit der anderen Gruppe abgesprochen?'
+          echo fc_action( 'update,class=button smalll,text=übernehmen,confirm=Diesen bereits BESTÄTIGTEN Dienst von andere Gruppe übernehmen: ist das mit der anderen Gruppe abgesprochen?'
                          , sprintf( 'action=uebernehmen_%u,message=1', $dienst_id ) );
         }
         // smallskip();
         // if( $show_buttons and ( $login_gruppen_id == $dienst['gruppen_id'] ) ) {
-        //   echo fc_action( 'update,class=button smalll,text=geht doch nicht,confirm=Diesen bereits BESTAETIGTEN Dienst wieder ablehnen? (bitte unbedingt Ersatz suchen!)'
+        //   echo fc_action( 'update,class=button smalll,text=geht doch nicht,confirm=Diesen bereits BESTÄTIGTEN Dienst wieder ablehnen? (bitte unbedingt Ersatz suchen!)'
         //                 , sprintf( 'action=wirdOffen_%u', $dienst_id ) );
         // }
         break;
@@ -396,7 +396,7 @@ function dienstplan_eintrag_view( $dienst_id ) {
     if( hat_dienst(5) ) {
       smallskip();
       if( ( ( $dienst['status'] == 'Offen') or $dienst['editable'] ) && ! $readonly ) {
-        echo fc_action( "update,title=Dienst loeschen,class=drop,text=,confirm=Dienst wirklich loeschen?"
+        echo fc_action( "update,title=Dienst löschen,class=drop,text=,confirm=Dienst wirklich löschen?"
                                               , "action=dienstLoeschen,message=$dienst_id" );
       }
     }
@@ -454,7 +454,7 @@ function dienst_view( $dienst_id, $editable = false ) {
                  )
       );
       open_select( sprintf( 'personAendern_%u', $dienst_id ), 'autopost' );
-        $option_0 = "<option value='0' selected>(bitte Mitglied waehlen)</option>";
+        $option_0 = "<option value='0' selected>(bitte Mitglied wählen)</option>";
         $s = '';
         foreach( sql_gruppe_mitglieder( $gruppen_id ) as $mitglied ) {
           $selected = '';
@@ -480,7 +480,7 @@ function dienst_view( $dienst_id, $editable = false ) {
       if( ! $edit_gruppe ) {
         echo fc_link( 'gruppenmitglieder'
                      , array( 'gruppen_id' => $dienst['gruppen_id'], 'img' => false, 'class' => 'href'
-                            , 'text' => "Gruppe {$gruppe['gruppennummer']} / kein Mitglied gewaehlt" ) );
+                            , 'text' => "Gruppe {$gruppe['gruppennummer']} / kein Mitglied gewählt" ) );
       }
     }
   close_div();
@@ -528,7 +528,7 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
   if( $rueckbestaetigen_lassen ) {
     echo "<h1> Deine Gruppe hat bald " . fc_link( 'dienstplan', 'text=Dienst:,class=href' ) ."</h1>";
   } else {
-    echo "<h4> Eure naechsten ". fc_link( 'dienstplan', 'text=Dienste:,class=href' ) ."</h4>";
+    echo "<h4> Eure nächsten ". fc_link( 'dienstplan', 'text=Dienste:,class=href' ) ."</h4>";
   }
 
   open_table( 'smallskip list' );
@@ -542,7 +542,7 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
           if( $dienst['gruppenmitglieder_id'] ) {
             echo $dienst['vorname'];
           } else {
-            echo "(kein Mitglied ausgewaehlt)";
+            echo "(kein Mitglied ausgewählt)";
           }
           if( $rueckbestaetigen_lassen ) {
             echo fc_action( 'class=button,text=geht klar!', "action=dienstBestaetigen,dienst_id={$dienst['id']}" );
@@ -566,7 +566,7 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
 
 
 /**
- * Ausgabe der Links im Hauptmenue und im Foodsoft-Kopf
+ * Ausgabe der Links im Hauptmenü und im Foodsoft-Kopf
  */
 function areas_in_menu($area){
   open_tr();
@@ -730,7 +730,7 @@ function pick_group_text() {
     );
     $fieldcount++;
 
-    // sortierschluessel nur einmal ausgeben:
+    // Sortierschlüssel nur einmal ausgeben:
     //
     if( $last_key == $row[$keyfield] ) {
       $rowspan++;
@@ -998,7 +998,7 @@ function bestellschein_view(
             if( $n < PR_COL_NETTOSUMME )
               $cols_vor_summe += $c['cols'];
           } else {
-            $spalten = ($spalten & ~$n);  // nicht definiert: bit loeschen!
+            $spalten = ($spalten & ~$n);  // nicht definiert: bit löschen!
           }
         }
       }
@@ -1067,7 +1067,7 @@ function bestellschein_view(
       $basarbestellmenge = $produkte_row['basarbestellmenge'];
       $toleranzbestellmenge = $produkte_row['toleranzbestellmenge'];
 
-      // festbestellmenge enthaelt auch die "festen" basarbestellungen!
+      // festbestellmenge enthält auch die "festen" basarbestellungen!
       $festbestellmenge = $gesamtbestellmenge - $toleranzbestellmenge - $basarbestellmenge;
 
       $gebindegroesse = $produkte_row['gebindegroesse'];
@@ -1076,7 +1076,7 @@ function bestellschein_view(
       switch($status) {
         case STATUS_BESTELLEN:
           if( $gruppen_id ) {
-            $liefermenge = $gesamtbestellmenge;  // obere abschaetzung...
+            $liefermenge = $gesamtbestellmenge;  // obere abschätzung...
             $gebinde = "ERROR";  // nicht sinnvoll
           } else {
             // voraussichtliche liefermenge berechnen:
@@ -1203,7 +1203,7 @@ function bestellschein_view(
               if( $editAmounts ) {
                 printf( "
                   <input name='liefermenge$produkt_id' class='right' type='text' size='6' value='%s'
-                    title='tats&auml;chliche Liefermenge eingeben' $input_event_handlers >"
+                    title='tatsächliche Liefermenge eingeben' $input_event_handlers >"
                 , $m
                 );
               } else {
@@ -1555,7 +1555,7 @@ function distribution_view( $bestell_id, $produkt_id, $editable = false ) {
   }
 
   open_tr('summe');
-    open_td('', "colspan='3'", "M&uuml;ll:" );
+    open_td('', "colspan='3'", "Müll:" );
     open_td( 'mult', '', mult_view( $muellmenge, ( $editable ? "menge_{$bestell_id}_{$produkt_id}_{$muell_id}" : false ) ) );
     open_td( 'unit', '', $verteileinheit );
     open_td( 'number', '', price_view( $endpreis * $muellmenge / $verteilmult, ( $editable ? "preis_{$bestell_id}_{$produkt_id}_{$muell_id}" : false ), false, false ) );
@@ -1742,7 +1742,7 @@ function buchung_kurzinfo( $id ) {
       $typ = $row['transaktionstyp'];
       echo "interne Verrechnung: ";
       echo fc_link( 'verluste', array( 'class' => 'href', 'detail' => 0, 'text' => transaktion_typ_string( $typ )
-                                     , 'title' => 'zur &Uuml;bersicht der Verluste...' ) );
+                                     , 'title' => 'zur Übersicht der Verluste...' ) );
     } else {
        $gruppen_name = sql_gruppenname($gruppen_id);
        if( ($gruppen_id == $login_gruppen_id) or hat_dienst(4,5) )
@@ -1761,7 +1761,7 @@ function buchung_kurzinfo( $id ) {
 
 // preishistorie_view:
 //  - kann preishistorie anzeigen
-//  - kann preisauswahl fuer eine bestellung erlauben
+//  - kann preisauswahl für eine bestellung erlauben
 //
 function preishistorie_view( $produkt_id, $bestell_id = 0, $editable = false, $mod_id = false ) {
   global $mysqljetzt;
@@ -1804,7 +1804,7 @@ function preishistorie_view( $produkt_id, $bestell_id = 0, $editable = false, $m
         open_td( 'center', "style='padding:1ex 1em 1ex 1em;'" );
         if( $pr1['id'] == $preisid_in_bestellvorschlag ) {
           echo fc_link( '', array( 'class' => 'buttondown', 'text' => ' aktiv ', 'url' => ''
-                               , 'title' => "gilt momentan f&uuml;r Bestellung $bestellung_name" ) );
+                               , 'title' => "gilt momentan für Bestellung $bestellung_name" ) );
         } else {
           if( $editable and ( $rechnungsstatus < STATUS_ABGERECHNET ) ) {
             echo fc_action( array( 'class' => 'buttonup', 'text' => ' setzen '

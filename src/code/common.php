@@ -3,7 +3,7 @@
 // if( ! isset( $foodsoftpath ) ) {
 //   $foodsoftpath = realpath( dirname( __FILE__ ) . '/../' );
 // }
-global $foodsoftdir;   // noetig wenn aufruf aus wiki
+global $foodsoftdir;   // nötig wenn aufruf aus wiki
 if( ! isset( $foodsoftdir ) ) {
   $foodsoftdir = preg_replace( '#/[^/]+$#', '', $_SERVER['SCRIPT_NAME'] );
   // ausnahme: aufruf aus dem wiki heraus:
@@ -23,7 +23,7 @@ if( $allow_setup_from ) {
   exit(1);
 }
 
-// lese low-level Funktionen, die keine Datenbankverbindung benoetigen:
+// lese low-level Funktionen, die keine Datenbankverbindung benötigen:
 //
 require_once('code/err_functions.php');
 require_once('code/html.php');
@@ -38,9 +38,9 @@ if(
   exit();
 }
 
-// die restliche konfiguration koennen wir aus der leitvariablen-tabelle lesen
-// (skripte koennen dann persistente variable einfach speichern, aendern, und
-//  an slave (im keller) uebertragen)
+// die restliche konfiguration können wir aus der leitvariablen-tabelle lesen
+// (skripte können dann persistente variable einfach speichern, ändern, und
+//  an slave (im keller) übertragen)
 //
 global $leitvariable;
 
@@ -73,11 +73,11 @@ global
 
 $specialgroups = array();
 $basar_id or error( "Spezielle Basar-Gruppe nicht gesetzt (in tabelle leitvariablen!)" ); 
-$muell_id or error( "Spezielle Muell-Gruppe nicht gesetzt (in tabelle leitvariablen!)" );
+$muell_id or error( "Spezielle Müll-Gruppe nicht gesetzt (in tabelle leitvariablen!)" );
 $specialgroups[] = $basar_id;
 $specialgroups[] = $muell_id;
 
-// $self_fields: parameter, die in der url uebergeben werden, werden hier gesammelt
+// $self_fields: parameter, die in der url übergeben werden, werden hier gesammelt
 global
   $self_fields,
   $self_post_fields;

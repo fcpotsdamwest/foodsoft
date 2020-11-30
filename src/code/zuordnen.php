@@ -312,9 +312,9 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
  * @param array $using
  *   Tables
  * @param array $rules
- * need_joins: fuer skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
- *  erzeugt aus $rules JOIN-anweisungen fuer benoetigte tabellen; in $using koennen
- *  tabellen uebergeben werden, die bereits verfuegbar sind
+ * need_joins: for scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
+ *    erzeugt aus $rules JOIN-anweisungen für benötigte tabellen; in $using können
+ *    tabellen übergeben werden, die bereits verfügbar sind
  * 
  * Example:
  * TBA
@@ -365,8 +365,8 @@ function need_joins( $using, $rules ) {
 }
 
 /*
- * use_filters: fuer skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
- *  erzeugt optionale filterausdruecke, die bereits verfuegbare tabellen benutzen
+ * use_filters: für skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
+ *  erzeugt optionale filterausdrücke, die bereits verfügbare tabellen benutzen
  */
 function use_filters_array( $using, $rules ) {
   $filters = array();
@@ -457,7 +457,7 @@ function sql_dienste_tauschmoeglichkeiten( $dienst_id ) {
 
 
 /**
- *  Dienst Akzeptieren (oder auch bestaetigen)
+ *  Dienst Akzeptieren (oder auch bestätigen)
  */ 
 function sql_dienst_akzeptieren( $dienst_id, $abgesprochen = false, $status_neu = 'Akzeptiert' ) {
   global $login_gruppen_id;
@@ -466,10 +466,10 @@ function sql_dienst_akzeptieren( $dienst_id, $abgesprochen = false, $status_neu 
   need( ! $dienst['geleistet'], 'Dienst bereits geleistet!' );
   switch( $dienst['status'] ) {
     case 'Akzeptiert':
-    case 'Bestaetigt':
+    case 'Bestätigt':
       if( $dienst['gruppen_id'] )
         if( $login_gruppen_id != $dienst['gruppen_id'] )
-          need( $abgesprochen, "Dienst schon {$dienst['status']}: Uebernahme nur nach Absprache" );
+          need( $abgesprochen, "Dienst schon {$dienst['status']}: Übernahme nur nach Absprache" );
     case 'Vorgeschlagen':
     case 'Offen':
       break;
@@ -526,7 +526,7 @@ function sql_dienst_abtauschen( $dienst_id, $tausch_id ) {
       ) );
     }
   }
-  error( "Diensttausch fehlgeschlagen: kein gueltiger Ausweichdienst gewaehlt" );
+  error( "Diensttausch fehlgeschlagen: kein gültiger Ausweichdienst gewählt" );
 }
 
 /**
@@ -613,7 +613,7 @@ function sql_delete_dienst( $dienst_id ) {
   nur_fuer_dienst(5);
   return doSql(
     "DELETE FROM dienste WHERE id=$dienst_id"
-  , LEVEL_IMPORTANT, "Dienst loeschen fehlgeschlagen"
+  , LEVEL_IMPORTANT, "Dienst löschen fehlgeschlagen"
   );
 }
 
@@ -674,7 +674,7 @@ function sql_rotationsplan_next( $current, $dienst = false ) {
   );
   if( $next )
     return $next;
-  need( $current, "Kein Eintrag im Rotationsplan fuer Dienst $dienst" );
+  need( $current, "Kein Eintrag im Rotationsplan für Dienst $dienst" );
   return sql_rotationsplan_next( 0, $dienst );
 }
 
@@ -691,7 +691,7 @@ function sql_rotationsplan_prev( $current, $dienst = false ) {
   );
   if( $prev )
     return $prev;
-  need( $current, "Kein Eintrag im Rotationsplan fuer Dienst $dienst" );
+  need( $current, "Kein Eintrag im Rotationsplan für Dienst $dienst" );
   return sql_rotationsplan_prev( 0, $dienst );
 }
 
@@ -724,7 +724,7 @@ function sql_rotate_rotationsplan( $latest_position ) {
   $old = array_merge( $before, $after );
   $new = array_merge( $after, $before );
 
-  // rotationsplanposition ist UNIQUE KEY; daher erstmal alles aus dem Weg raeumen:
+  // rotationsplanposition ist UNIQUE KEY; daher erstmal alles aus dem Weg räumen:
   foreach( $new as $row ) {
     sql_update( 'gruppenmitglieder', $row['id'],
                  array( 'rotationsplanposition' => - $row['rotationsplanposition'] ) );
@@ -782,7 +782,7 @@ function create_dienste( $start, $spacing, $zahl, $personenzahlen ) {
 
 //////////////////////////////
 //
-// Funktionen fuer Hauptmenue
+// Funktionen für Hauptmenü
 // (todo: nach views verschieben?)
 //
 //////////////////////////////
@@ -871,7 +871,7 @@ $urandom_handle = false;
 function random_hex_string( $bytes ) {
   global $urandom_handle;
   if( ! $urandom_handle )
-    need( $urandom_handle = fopen( '/dev/urandom', 'r' ), 'konnte /dev/urandom nicht oeffnen' );
+    need( $urandom_handle = fopen( '/dev/urandom', 'r' ), 'konnte /dev/urandom nicht öffnen' );
   $s = '';
   while( $bytes > 0 ) {
     $c = fgetc( $urandom_handle );
@@ -1017,7 +1017,7 @@ function sql_basar_id() {
 }
 function sql_muell_id() {
   global $muell_id;
-  need( $muell_id, "Spezielle Muell-Gruppe nicht gesetzt (in tabelle leitvariablen!)" );
+  need( $muell_id, "Spezielle Müll-Gruppe nicht gesetzt (in tabelle leitvariablen!)" );
   return $muell_id;
 }
 
@@ -1241,7 +1241,7 @@ function optionen_gruppen(
     $output = $output . ">{$gruppe['name']} ({$gruppe['gruppennummer']})</option>";
   }
   if( $selected >=0 ) {
-    // $selected stand nicht zur Auswahl; vermeide zufaellige Anzeige:
+    // $selected stand nicht zur Auswahl; vermeide zufällige Anzeige:
     $output = "<option value='0' selected>(bitte Gruppe wählen)</option>" . $output;
   }
   return $output;
@@ -1262,11 +1262,11 @@ function check_new_group_nr( $newNummer, & $problems ){
   global $specialgroups;
 
   if( ( ! ( $newNummer > 0 ) ) || ( $newNummer > 98 ) ) {
-    $problems .= "<div class='warn'>Ung&uuml;ltige Gruppennummer!</div>";
+    $problems .= "<div class='warn'>Ungültige Gruppennummer!</div>";
     return false;
   }
   if( in_array( $newNummer, $specialgroups ) ) {
-    $problems .= "<div class='warn'>Ung&uuml;ltige Gruppennummer (reserviert fuer Basar oder Muell)</div>";
+    $problems .= "<div class='warn'>Ungültige Gruppennummer (reserviert für Basar oder Müll)</div>";
     return false;
   }
   $id = $newNummer;
@@ -1303,9 +1303,9 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
   , 'photo_url' => ''
   ) );
 
-  logger( "Gruppenmitglied $gruppenmitglieder_id ({$daten['vorname']}) aus Gruppe {$daten['gruppennummer']} geloescht" );
+  logger( "Gruppenmitglied $gruppenmitglieder_id ({$daten['vorname']}) aus Gruppe {$daten['gruppennummer']} gelöscht" );
 
-  // sockelbetrag fuer mitglied rueckerstatten:
+  // sockelbetrag für mitglied rückerstatten:
   $muell_id = sql_muell_id();
   if( $daten['sockeleinlage'] > 0 ) {
     if( sql_doppelte_transaktion(
@@ -1313,15 +1313,15 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
     , array( 'konto_id' => -1, 'gruppen_id' => $muell_id, 'transaktionsart' => TRANSAKTION_TYP_SOCKEL )
     , $daten['sockeleinlage']
     , $mysqlheute
-    , "Erstattung Sockeleinlage fuer ausgetretenes Mitglied " . $daten['vorname']
+    , "Erstattung Sockeleinlage für ausgetretenes Mitglied " . $daten['vorname']
     ) ) {
-      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage ausgetretenes Mitglied: {$daten['sockeleinlage']} Euro wurden erstattet.</div>";
+      $msg = $msg . "<div class='ok'>Änderung Sockeleinlage ausgetretenes Mitglied: {$daten['sockeleinlage']} Euro wurden erstattet.</div>";
     } else {
-      $problems = $problems . "<div class='warn'>Verbuchen Aenderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
+      $problems = $problems . "<div class='warn'>Verbuchen Änderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
     }
   }
 
-  // falls letztes mitglied der gruppe ausgetreten: sockelbetrag der Gruppe rueckerstatten:
+  // falls letztes mitglied der gruppe ausgetreten: sockelbetrag der Gruppe rückerstatten:
   $gruppendaten = sql_gruppe( $gruppen_id );
   if( ( $gruppendaten['mitgliederzahl'] == 0 ) and ( $gruppendaten['sockeleinlage_gruppe'] > 0 ) ) {
     if( sql_doppelte_transaktion(
@@ -1331,14 +1331,14 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
     , $mysqlheute
     , "Erstattung Sockeleinlage Gruppe " . $gruppendaten['name']
     ) ) {
-      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage_gruppe']} Euro wurden erstattet.</div>";
+      $msg = $msg . "<div class='ok'>Änderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage_gruppe']} Euro wurden erstattet.</div>";
       sql_update( 'bestellgruppen', $gruppen_id, array( 'sockeleinlage' => 0.0 ) );
     } else {
-      $problems = $problems . "<div class='warn'>Verbuchen Aenderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
+      $problems = $problems . "<div class='warn'>Verbuchen Änderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
     }
   }
 
-  // bevorstehende dienste abklaeren:
+  // bevorstehende dienste abklären:
   if( $gruppendaten['mitgliederzahl'] > 0 ) {
     $bevorstehende_dienste= sql_dienste( "( lieferdatum >= $mysqlheute ) and ( gruppenmitglieder_id = $gruppenmitglieder_id )" );
     if( $gruppendaten['mitgliederzahl'] == 1 ) {
@@ -1390,21 +1390,21 @@ function sql_insert_group_member($gruppen_id, $newVorname, $newName, $newMail, $
 
   $gruppendaten = sql_gruppe( $gruppen_id );
 
-  // sockelbetrag fuer mitglied verbuchen:
+  // sockelbetrag für mitglied verbuchen:
   if( $sockelbetrag_mitglied > 0 ) {
     if( sql_doppelte_transaktion(
       array( 'konto_id' => -1, 'gruppen_id' => $muell_id, 'transaktionsart' => TRANSAKTION_TYP_SOCKEL )
     , array( 'konto_id' => -1, 'gruppen_id' => $gruppen_id )
     , $sockelbetrag_mitglied
     , $mysqlheute
-    , "Sockeleinlage fuer neues Mitglied $newVorname"
+    , "Sockeleinlage für neues Mitglied $newVorname"
     ) ) {
-      $msg = $msg . "<div class='ok'>Aenderung Sockelbetrag neues Mitglied: $sockelbetrag_mitglied Euro wurden verbucht.</div>";
+      $msg = $msg . "<div class='ok'>Änderung Sockelbetrag neues Mitglied: $sockelbetrag_mitglied Euro wurden verbucht.</div>";
     } else {
       $problems .= "<div class='warn'>Verbuchen Sockelbetrag fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
     }
   }
-  // falls erstes mitglied der gruppe: sockelbetrag fuer ganze gruppe verbuchen:
+  // falls erstes mitglied der gruppe: sockelbetrag für ganze gruppe verbuchen:
   if( $sockelbetrag_gruppe > 0 ) {
     if( $gruppendaten['mitgliederzahl'] == 1 ) {
       if( sql_doppelte_transaktion(
@@ -1412,9 +1412,9 @@ function sql_insert_group_member($gruppen_id, $newVorname, $newName, $newMail, $
       , array( 'konto_id' => -1, 'gruppen_id' => $gruppen_id )
       , $sockelbetrag_gruppe
       , $mysqlheute
-      , "Sockeleinlage fuer Gruppe " . $gruppendaten['name']
+      , "Sockeleinlage für Gruppe " . $gruppendaten['name']
       ) ) {
-        $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: $sockelbetrag_gruppe Euro wurden verbucht.</div>";
+        $msg = $msg . "<div class='ok'>Änderung Sockeleinlage Gruppe: $sockelbetrag_gruppe Euro wurden verbucht.</div>";
         sql_update( 'bestellgruppen', $gruppen_id, array( 'sockeleinlage' => $sockelbetrag_gruppe ) );
       } else {
         $problems .= "<div class='warn'>Verbuchen Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
@@ -1471,8 +1471,8 @@ function sql_insert_group($newNumber, $newName, $pwd) {
   }
 }
 
-// optionsflags fuer anzeige in gruppen.php
-// (hier definiert, um bei aufruf aus anderem fenster optionen setzen zu koennen):
+// optionsflags für anzeige in gruppen.php
+// (hier definiert, um bei aufruf aus anderem fenster optionen setzen zu können):
 //
 define( 'GRUPPEN_OPT_INAKTIV', 1 );
 define( 'GRUPPEN_OPT_SCHULDEN', 2 );
@@ -1530,7 +1530,7 @@ function optionen_lieferanten( $selected = false, $option_0 = false ) {
     $output .= ">{$lieferant['name']}</option>";
   }
   if( $selected >=0 ) {
-    // $selected stand nicht zur Auswahl; vermeide zufaellige Anzeige:
+    // $selected stand nicht zur Auswahl; vermeide zufällige Anzeige:
     $output = "<option value='0' selected>(bitte Lieferant wählen)</option>" . $output;
   }
   return $output;
@@ -1547,9 +1547,9 @@ function sql_delete_lieferant( $lieferanten_id ) {
     , 'Lieferantenkonto nicht ausgeglichen: Lieferant $name kann nicht gelöpscht werden!' );
   doSql(
     "DELETE FROM lieferanten WHERE id=$lieferanten_id"
-  , LEVEL_IMPORTANT, "Loeschen des Lieferanten fehlgeschlagen"
+  , LEVEL_IMPORTANT, "Löschen des Lieferanten fehlgeschlagen"
   );
-  logger( "Lieferant $lieferanten_id geloescht" );
+  logger( "Lieferant $lieferanten_id gelöscht" );
 }
 
 function sql_lieferant_offene_bestellungen( $lieferanten_id ) {
@@ -1574,7 +1574,7 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
 
 ////////////////////////////////////
 //
-// funktionen fuer produkte und produktgruppen
+// funktionen für produkte und produktgruppen
 //
 ////////////////////////////////////
 
@@ -1784,7 +1784,7 @@ function sql_produktgruppen_name( $id ) {
 
 ////////////////////////////////////
 //
-// funktionen fuer gesamtbestellung, bestellvorschlaege und gruppenbestellungen:
+// funktionen für gesamtbestellung, bestellvorschläge und gruppenbestellungen:
 //
 ////////////////////////////////////
 
@@ -1840,8 +1840,8 @@ function sql_bestellung_lieferant_id($bestell_id){
 
 /**
  *  sql_change_bestellung_status:
- *   - fuehrt erlaubte Statusaenderungen einer Bestellung aus
- *   - ggf. werden Nebenwirkungen, wie verteilmengenZuweisen, ausgeloest
+ *   - führt erlaubte Statusänderungen einer Bestellung aus
+ *   - ggf. werden Nebenwirkungen, wie verteilmengenZuweisen, ausgelöst
  */
 function sql_change_bestellung_status( $bestell_id, $state ) {
   global $mysqljetzt, $dienstkontrollblatt_id;
@@ -1896,9 +1896,9 @@ function sql_change_bestellung_status( $bestell_id, $state ) {
   if( $result ) {
     if( $do_verteilmengen_zuweisen ) {
       verteilmengenZuweisen( $bestell_id );
-      // befriedigender waere, vormerkungen erst bei lieferung zu loeschen - das kann aber
-      // eventuell _nach_ erstellung der naechsten bestellvorlage sein; wir muessen also
-      // schon hier loeschen:
+      // befriedigender wäre, vormerkungen erst bei lieferung zu löschen - das kann aber
+      // eventuell _nach_ erstellung der nächsten bestellvorlage sein; wir müssen also
+      // schon hier löschen:
       vormerkungenLoeschen( $bestell_id );
     }
   }
@@ -1943,7 +1943,7 @@ function sql_bestellung( $bestell_id ) {
 
 
 /* function select_gesamtbestellungen_schuldverhaeltnis():
- *  liefert gesamtbestellungen, fuer die bereits ein verbindlicher vertrag besteht
+ *  liefert gesamtbestellungen, für die bereits ein verbindlicher vertrag besteht
  *  (ab STATUS_LIEFERANT)
  */
 function select_gesamtbestellungen_schuldverhaeltnis() {
@@ -1975,7 +1975,7 @@ function sql_insert_bestellung( $name, $startzeit, $endzeit, $lieferung, $liefer
 
 function sql_update_bestellung( $name, $startzeit, $endzeit, $lieferung, $bestell_id, $aufschlag_prozent ) {
   nur_fuer_dienst(4);
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Aenderung nicht moeglich: Bestellung ist bereits abgerechnet!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Änderung nicht moeglich: Bestellung ist bereits abgerechnet!" );
   return sql_update( 'gesamtbestellungen', $bestell_id, array(
     'name' => $name, 'bestellstart' => $startzeit, 'bestellende' => $endzeit, 'lieferung' => $lieferung
   , 'aufschlag_prozent' => $aufschlag_prozent
@@ -2033,21 +2033,21 @@ function sql_references_gesamtbestellung( $bestell_id ) {
 function sql_insert_gruppenbestellung( $gruppe, $bestell_id ){
   need( sql_gruppe_aktiv( $gruppe ) or ($gruppe == sql_muell_id()) or ($gruppe == sql_basar_id())
       , "sql_insert_gruppenbestellung: keine aktive Bestellgruppe angegeben!" );
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGESCHLOSSEN, "Aenderung nicht mehr moeglich: Bestellung ist abgeschlossen!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGESCHLOSSEN, "Änderung nicht mehr moeglich: Bestellung ist abgeschlossen!" );
   return sql_insert( 'gruppenbestellungen'
   , array( 'bestellgruppen_id' => $gruppe , 'gesamtbestellung_id' => $bestell_id )
-  , array(  /* falls schon existiert: -kein fehler -nix updaten -id zurueckgeben */  )
+  , array(  /* falls schon existiert: -kein fehler -nix updaten -id zurückgeben */  )
   );
 }
 
 
 ////////////////////////////////////
 //
-// funktionen fuer bestellmengen und verteil/liefermengen
+// funktionen für bestellmengen und verteil/liefermengen
 //
 ////////////////////////////////////
 
-// werte fuer feld `art' in bestellzuordnung:
+// werte für feld `art' in bestellzuordnung:
 //
 define( 'BESTELLZUORDNUNG_ART_VORMERKUNG_FEST', 10 );
 define( 'BESTELLZUORDNUNG_ART_VORMERKUNG_TOLERANZ', 11 );
@@ -2165,16 +2165,16 @@ function sql_bestellzuordnung_menge( $keys = array() ) {
 
 
 // select_bestellung_produkte():
-// liefert fuer ein oder alle produkte einer bestellung (group by produkt):
-// - produktdaten und preise (preisdatenSetzen() sollte zusaetzlich aufgerufen werden)
+// liefert für ein oder alle produkte einer bestellung (group by produkt):
+// - produktdaten und preise (preisdatenSetzen() sollte zusätzlich aufgerufen werden)
 // - gesamtbestellmenge
 // - festbestellmenge (gruppen _und_ basar)
 // - toleranzbestellmenge: alle toleranzebestellungen _ohne_ basar
 // - basarbestellmenge: _toleranzbestellungen_ des basars
-// - verteilmenge _ohne_ muellgruppe (nicht sinnvoll fuer basar: liefert nicht den basarbestand!)
-// - muellmenge: zuteilung an muell-gruppe
+// - verteilmenge _ohne_ müllgruppe (nicht sinnvoll für basar: liefert nicht den basarbestand!)
+// - muellmenge: zuteilung an müll-gruppe
 // $gruppen_id = 0: summe aller gruppen
-// $gruppen_id != 0: nur fuer diese gruppe (muell*, basar* sind dann nicht sinnvoll)
+// $gruppen_id != 0: nur für diese gruppe (muell*, basar* sind dann nicht sinnvoll)
 //
 function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
   $basar_id = sql_basar_id();
@@ -2195,12 +2195,12 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
     $bestell_id_filter = " gesamtbestellungen.id = $bestell_id";
   // }
 
-  // zur information, vor allem im "vorlaeufigen Bestellschein", auch Bestellmengen berechnen:
+  // zur information, vor allem im "vorläufigen Bestellschein", auch Bestellmengen berechnen:
   $gesamtbestellmenge_expr = "ifnull( sum( IF( (bestellzuordnung.art ".BESTELLZUORDNUNG_ART_BESTELLUNGEN."), bestellzuordnung.menge, 0 ) ), 0 )";
   $festbestellmenge_expr = "ifnull( sum( IF( (bestellzuordnung.art = ".BESTELLZUORDNUNG_ART_FESTBESTELLUNG."), bestellzuordnung.menge, 0 ) ), 0 )";
 
   // basarbestellmenge: _eigentliche_ basarbestellungen sind TOLERANZBESTELLUNG,
-  // basar mit FESTBESTELLUNG zaehlt wie gewoehnliche festmenge!
+  // basar mit FESTBESTELLUNG zählt wie gewöhnliche festmenge!
   $basarbestellmenge_expr = "
     ifnull( sum( IF( (bestellzuordnung.art = ".BESTELLZUORDNUNG_ART_TOLERANZBESTELLUNG.") and (gruppenbestellungen.bestellgruppen_id = $basar_id)
                       , bestellzuordnung.menge, 0 ) ), 0 )
@@ -2219,7 +2219,7 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
                       , bestellzuordnung.menge, 0 ) ), 0 )
     ";
   } else {
-    // funktioniert nicht fuer basar (als Warnungen: Werte nicht benutzen!
+    // funktioniert nicht für basar (als Warnungen: Werte nicht benutzen!
     $verteilmenge_expr = 999999;
     $muellmenge_expr = 999999;
   }
@@ -2227,8 +2227,8 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
   if( $orderby == '' )
     $orderby = "menge_ist_null, produktgruppen.name, produkte.name";
 
-  // tatsaechlich bestellte oder gelieferte produkte werden vor solchen mit
-  // menge 0 angezeigt; dafuer einen sortierbaren ausdruck definieren:
+  // tatsächlich bestellte oder gelieferte produkte werden vor solchen mit
+  // menge 0 angezeigt; dafür einen sortierbaren ausdruck definieren:
   switch($state) {
     case STATUS_BESTELLEN:
     case STATUS_LIEFERANT:
@@ -2316,28 +2316,28 @@ function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0,
 
 
 /*  preisdaten setzen:
- *  berechnet und setzt einige weitere nuetzliche eintraege einer 'produktpreise'-Zeile:
+ *  berechnet und setzt einige weitere nützliche einträge einer 'produktpreise'-Zeile:
  *   - kan_verteileinheit, kan_verteilmult, kan_liefereinheit, kan_liefermult:
- *     kanonische einheiten (masszahl abgespalten, einheit wie in global $masseinheiten)
+ *     kanonische einheiten (maßzahl abgespalten, einheit wie in global $masseinheiten)
  *   - liefereinheit_anzeige, verteileinheit_anzeige:
- *     alternative darstellung fuer bildschirmanzeige (kg und L statt g und ml bei grossen masszahlen)
+ *     alternative darstellung für bildschirmanzeige (kg und L statt g und ml bei großen maßzahlen)
  *   - kan_{liefer,verteil}einheit_anzeige, kan_{liefer,verteil}mult_anzeige:
- *     dito, zerlegt in masszahl und einheit
+ *     dito, zerlegt in maßzahl und einheit
  *   - nettolieferpreis, bruttolieferpreis: preise pro L-Einheit
  *   - nettopreis, bruttopreis: preise pro V-Einheit
  *   - endpreis:  bruttopreis plus pfand
- *   - lv_faktor (wird berechnet wenn moeglich, sonst aus datenbank entnommen)
+ *   - lv_faktor (wird berechnet wenn möglich, sonst aus datenbank entnommen)
  *   - preisaufschlag: aufschlag pro V-Einheit (berechnet als prozentsatz vom nettolieferpreis)
  */
 function preisdatenSetzen( $pr /* a row from produktpreise */ ) {
 
-  // kanonische masseinheiten setzen (gross/kleinschreibung, 1 space zwischenraum, kg -> g, ...)
+  // kanonische maßeinheiten setzen (gross/kleinschreibung, 1 space zwischenraum, kg -> g, ...)
   //
   list( $m, $e ) = kanonische_einheit( $pr['verteileinheit'] );
   $pr['kan_verteilmult'] = $m;
   $pr['kan_verteileinheit'] = $e;
   $pr['verteileinheit'] = "$m $e";
-  // fuer anzeige ggf groessere einheiten waehlen:
+  // für anzeige ggf größere einheiten wählen:
   switch( $e ) {
     case 'g':
       if( $m >= 1000 and ( $m % 100 == 0 ) ) {
@@ -2403,8 +2403,8 @@ function preisdatenSetzen( $pr /* a row from produktpreise */ ) {
 }
 
 // zuteilungen_berechnen():
-// wo benoetigt, ist sql_bestellung_produkte() schon aufgerufen; zwecks effizienz uebergeben wir der funktion
-// eine Ergebniszeile, um den komplexen query in sql_bestellung_produkte() nicht wiederholen zu muessen:
+// wo benötigt, ist sql_bestellung_produkte() schon aufgerufen; zwecks effizienz übergeben wir der funktion
+// eine Ergebniszeile, um den komplexen query in sql_bestellung_produkte() nicht wiederholen zu müssen:
 //
 function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte */ ) {
   $produkt_id = $mengen['produkt_id'];
@@ -2425,7 +2425,7 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
 
   $restmenge = $bestellmenge;
 
-  // erste zuteilungsrunde: festbestellungen in bestellreihenfolge erfuellen, dabei berechnete
+  // erste zuteilungsrunde: festbestellungen in bestellreihenfolge erfüllen, dabei berechnete
   // negativ-toleranz abziehen:
   //
   $festbestellungen = sql_bestellzuordnungen( array( 'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG, 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id ) );
@@ -2443,7 +2443,7 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
       $festzuteilungen[$gruppe] = 0;
     }
 
-    // negativ-toleranz ausrechnen und zurueckbehalten (maximal ein halbes gebinde):
+    // negativ-toleranz ausrechnen und zurückbehalten (maximal ein halbes gebinde):
     //
     $t_min = floor( ( $menge - $gebindegroesse / 2 ) / 2 );
     if( $t_min < 0 )
@@ -2460,7 +2460,7 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
     $offen[$gruppe] -= $menge;
   }
 
-  // zweite zuteilungsrunde: ebenfalls in bestellreihenfolge noch offene festbestellungen erfuellen:
+  // zweite zuteilungsrunde: ebenfalls in bestellreihenfolge noch offene festbestellungen erfüllen:
   //
   foreach( $festbestellungen as $row ) {
     if( $restmenge <= 0 )
@@ -2472,7 +2472,7 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
     $offen[$gruppe] -= $menge;
   }
 
-  // dritte zuteilungsrunde: mit positiv-toleranzen auffuellen:
+  // dritte zuteilungsrunde: mit positiv-toleranzen auffüllen:
   //
   $toleranzzuteilungen = array();
   if( $toleranzbestellmenge > 0 ) {
@@ -2613,8 +2613,8 @@ function basar_wert_brutto( $bestell_id = 0 ) {
 
 
 // // in der bilanz: wert der basarwaren entspricht dem, was wir den gruppen beim verkauf abziehen
-// // (inclusive pfand, aufschlag, und mwst (solange wir letztere nicht abfuehren muessen))
-///// keine gute idee: _pfand_ gehoert da nicht rein!
+// // (inclusive pfand, aufschlag, und mwst (solange wir letztere nicht abfuhren müssen))
+///// keine gute idee: _pfand_ gehört da nicht rein!
 // //
 // function basar_wert_bilanz( $bestell_id = 0 ) {
 //   $basar = sql_basar( $bestell_id );
@@ -2708,7 +2708,7 @@ function vormerkungenLoeschen( $bestell_id ) {
       $keys = array( 'produkt_id' => $produkt_id, 'gruppenbestellung_id' => $gruppenbestellung_id );
       $zuteilung = sql_bestellzuordnung_menge( $keys + array( 'art' => BESTELLZUORDNUNG_ART_ZUTEILUNGEN ) );
       if( $zuteilung < $vormerkung_fest ) {
-        // nicht vollstaendig erfuellt: neue vormerkung eintragen:
+        // nicht vollständig erfüllt: neue vormerkung eintragen:
         sql_insert( 'bestellzuordnung', $keys + array(
           'art' => BESTELLZUORDNUNG_ART_VORMERKUNG_FEST, 'menge' => ( $vormerkung_fest - $zuteilung )
         ) );
@@ -2726,16 +2726,16 @@ function vormerkungenLoeschen( $bestell_id ) {
     }
   }
   if( $vormerkungen_teilerfuellt + $vormerkungen_unerfuellt + $vormerkungen_erfuellt ) {
-    $js_on_exit[] = " alert( ' Durch diese Bestellung werden $vormerkungen_erfuellt Vormerkungen erfuellt und geloescht; '
-      + ' $vormerkungen_teilerfuellt wurden teilweise erfuellt und reduziert;'
-      + ' $vormerkungen_unerfuellt unerfuellte Vormerkungen fuer Produkte dieser Bestellvorlage bleiben unveraendert.'
+    $js_on_exit[] = " alert( ' Durch diese Bestellung werden $vormerkungen_erfuellt Vormerkungen erfüllt und gelöscht; '
+      + ' $vormerkungen_teilerfuellt wurden teilweise erfüllt und reduziert;'
+      + ' $vormerkungen_unerfuellt unerfüllte Vormerkungen für Produkte dieser Bestellvorlage bleiben unverändert.'
     ); ";
   }
 }
 
 function sql_change_liefermenge( $bestell_id, $produkt_id, $menge ) {
   nur_fuer_dienst(1,3,4);
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Aenderung nicht moeglich: Bestellung ist bereits abgerechnet!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Änderung nicht möglich: Bestellung ist bereits abgerechnet!" );
   return sql_update( 'bestellvorschlaege'
   , array( 'produkt_id' => $produkt_id, 'gesamtbestellung_id' => $bestell_id )
   , array( 'liefermenge' => $menge )
@@ -2743,13 +2743,13 @@ function sql_change_liefermenge( $bestell_id, $produkt_id, $menge ) {
 }
 
 function nichtGeliefert( $bestell_id, $produkt_id ) {
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Aenderung nicht moeglich: Bestellung ist bereits abgerechnet!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Änderung nicht möglich: Bestellung ist bereits abgerechnet!" );
   sql_delete_bestellzuordnungen( array( 'art' => BESTELLZUORDNUNG_ART_ZUTEILUNGEN, 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id ) );
   sql_change_liefermenge( $bestell_id, $produkt_id, 0 );
 }
 
 function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge = -1, $toleranzmenge = -1, $vormerken = false ) {
-  need( sql_bestellung_status( $bestell_id ) == STATUS_BESTELLEN, "Bestellen bei dieser Bestellung nicht mehr moeglich" );
+  need( sql_bestellung_status( $bestell_id ) == STATUS_BESTELLEN, "Bestellen bei dieser Bestellung nicht mehr möglich" );
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
 
   $keys = array( 'produkt_id' => $produkt_id, 'gruppenbestellung_id' => $gruppenbestellung_id );
@@ -2762,13 +2762,13 @@ function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge
     ) );
     $festmenge_alt = sql_bestellzuordnung_menge( $keys + array( 'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG ) );
     if( $festmenge > $festmenge_alt ) {
-      // Erhoehung der festmenge: zusaetzliche Bestellung am Ende der Schlange:
+      // Erhöhung der festmenge: zusätzliche Bestellung am Ende der Schlange:
       sql_insert( 'bestellzuordnung', $keys + array(
         'menge' => $festmenge - $festmenge_alt, 'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG
       ) );
     } elseif( $festmenge < $festmenge_alt ) {
-      // bei Ruecktritt von vorheriger Bestellung: neue Bestellung stellt sich _hinten_ in die Reihe
-      // (um Nachteile fuer andere Besteller zu minimieren):
+      // bei Rücktritt von vorheriger Bestellung: neue Bestellung stellt sich _hinten_ in die Reihe
+      // (um Nachteile für andere Besteller zu minimieren):
       sql_delete_bestellzuordnungen( $keys + array( 'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG ) );
       if( $festmenge > 0 ) {
         sql_insert( 'bestellzuordnung', $keys + array(
@@ -2809,7 +2809,7 @@ function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge
 }
 
 function sql_change_verteilmenge( $bestell_id, $produkt_id, $gruppen_id, $menge ) {
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Aenderung nicht mehr moeglich: Bestellung ist abgerechnet!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Änderung nicht mehr möglich: Bestellung ist abgerechnet!" );
 
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
   sql_delete_bestellzuordnungen( array( 'art' => BESTELLZUORDNUNG_ART_ZUTEILUNG
@@ -2823,7 +2823,7 @@ function sql_change_verteilmenge( $bestell_id, $produkt_id, $gruppen_id, $menge 
 }
 
 function sql_basar2group( $gruppen_id, $produkt_id, $bestell_id, $menge ) {
-  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGESCHLOSSEN, "Aenderung nicht mehr moeglich: Bestellung ist abgeschlossen!" );
+  need( sql_bestellung_status( $bestell_id ) < STATUS_ABGESCHLOSSEN, "Änderung nicht mehr möglich: Bestellung ist abgeschlossen!" );
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
   return doSql(
     " INSERT INTO bestellzuordnung (produkt_id, gruppenbestellung_id, menge, art)
@@ -2836,7 +2836,7 @@ function sql_basar2group( $gruppen_id, $produkt_id, $bestell_id, $menge ) {
 
 ////////////////////////////////////
 //
-// funktionen fuer gruppen-, lieferanten-, und bankkonto: transaktionen
+// funktionen für gruppen-, lieferanten-, und bankkonto: transaktionen
 //
 // "soll" und "haben" sind immer (wo nicht anders angegeben) aus sicht der FC
 //
@@ -2913,10 +2913,10 @@ function sql_link_transaction( $soll_id, $haben_id ) {
 }
 
 /*
- * sql_doppelte_transaktion: fuehrt eine doppelte buchung (also eine soll, eine haben buchung) aus.
+ * sql_doppelte_transaktion: führt eine doppelte buchung (also eine soll, eine haben buchung) aus.
  * $soll, $haben: arrays, geben konten an. zwingend ist element 'konto_id':
  *   konto_id == -1 bedeutet gruppen/lieferanten-transaktion, sonst bankkonto
- * flag $spende: einzige transaktion, die von nicht-diensten ausgefuehrt werden kann
+ * flag $spende: einzige transaktion, die von nicht-diensten ausgeführt werden kann
  */
 function sql_doppelte_transaktion( $soll, $haben, $betrag, $valuta, $notiz, $spende = false ) {
   global $dienstkontrollblatt_id, $login_gruppen_id;
@@ -3142,8 +3142,8 @@ define( 'PFAND_OPT_GRUPPEN_INAKTIV', 1 );
 define( 'PFAND_OPT_ALLE_BESTELLUNGEN', 2 );
 
 // pfandzuordnung_{lieferant,gruppe}:
-// schreibe _gesamtmenge_ fuer eine (bestellung,verpackung) oder (bestellung,gruppe),
-// _ersetzt_ fruehere zuordnungen (nicht additiv!)
+// schreibe _gesamtmenge_ für eine (bestellung,verpackung) oder (bestellung,gruppe),
+// _ersetzt_ frühere zuordnungen (nicht additiv!)
 //
 function sql_pfandzuordnung_lieferant( $bestell_id, $verpackung_id, $anzahl_voll, $anzahl_leer ) {
   need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Pfandzuordnung nicht mehr moeglich: Bestellung ist abgerechnet!" );
@@ -3164,7 +3164,7 @@ function sql_pfandzuordnung_lieferant( $bestell_id, $verpackung_id, $anzahl_voll
 function sql_pfandzuordnung_gruppe( $bestell_id, $gruppen_id, $anzahl_leer ) {
   need( sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET, "Pfandzuordnung nicht mehr moeglich: Bestellung ist abgerechnet!" );
   if( $anzahl_leer > 0 ) {
-    // pfandrueckgabe ist jetzt an eine gesamtbestellung gebunden, und wir brauchen eine gruppenbestellung:
+    // pfandrückgabe ist jetzt an eine gesamtbestellung gebunden, und wir brauchen eine gruppenbestellung:
     sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
     return sql_insert( 'gruppenpfand', array(
         'gruppen_id' => $gruppen_id
@@ -3181,20 +3181,20 @@ function sql_pfandzuordnung_gruppe( $bestell_id, $gruppen_id, $anzahl_leer ) {
 
 ////////////////////////////////////////////
 //
-// funktionen fuer gruppen-, lieferantenkonto: abfrage kontostaende/kontobewegungen
+// funktionen für gruppen-, lieferantenkonto: abfrage kontostände/kontobewegungen
 //
 ////////////////////////////////////////////
 
 // TRANSAKTION_TYP_xxx: dienen zur Klassifikation der BadBank-Buchungen,
-// die *SALDO*-typen auch fuer gruppen/lieferanten/bank:
+// die *SALDO*-typen auch für gruppen/lieferanten/bank:
 //
 define( 'TRANSAKTION_TYP_UNDEFINIERT', 0 );      // noch nicht zugeordnet
 define( 'TRANSAKTION_TYP_ANFANGSGUTHABEN', 1 );  // anfangsguthaben: gruppen, lieferanten und bank
 define( 'TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN', 2 ); // Ausgleich/Umlage Differenz Anfangsguthaben
 define( 'TRANSAKTION_TYP_SPENDE', 3 );           // freiwillige Spende
-define( 'TRANSAKTION_TYP_SONDERAUSGABEN', 4 );   // Mitgliedsbeitrag Haus der Natur, Kontofuehrung, ...
+define( 'TRANSAKTION_TYP_SONDERAUSGABEN', 4 );   // Mitgliedsbeitrag Haus der Natur, Kontoführung, ...
 define( 'TRANSAKTION_TYP_UMLAGE', 5 );           // Verlustumlage auf alle Mitglieder
-define( 'TRANSAKTION_TYP_SOCKEL', 6 );           // geparkte Sockelbetraege
+define( 'TRANSAKTION_TYP_SOCKEL', 6 );           // geparkte Sockelbeträge
 define( 'TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE', 7 ); // Umlage Bestellverluste (auch: ein paar ganz alte Basarabrechnungen)
 define( 'TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN', 8 ); // Umlage Sonderausgaben
 define( 'TRANSAKTION_TYP_UMBUCHUNG_SPENDE', 9 );   // umbuchung von spenden nach TRANSAKTION_TYP_AUSGLEICH_*
@@ -3256,10 +3256,10 @@ function transaktion_typ_string( $typ ) {
 }
 
 
-// optionen fuer kontoabfragen:
+// optionen für kontoabfragen:
 //
-// betraege werden immer als 'soll' der fc, also schuld der fc
-// (an gruppen, lieferanten oder bank) zurueckgegeben (ggf. also negativ)
+// Beträge werden immer als 'soll' der fc, also schuld der fc
+// (an gruppen, lieferanten oder bank) zurückgegeben (ggf. also negativ)
 //
 define( 'OPTION_WAREN_NETTO_SOLL', 1 );       /* waren ohne pfand */
 define( 'OPTION_WAREN_BRUTTO_SOLL', 2 );      /* mit mwst, ohne pfand */
@@ -3268,7 +3268,7 @@ define( 'OPTION_VPREIS_SOLL', 4 );          /* waren brutto inclusive pfand, abe
 define( 'OPTION_PFAND_VOLL_BRUTTO_SOLL', 14 );   /* schuld aus kauf voller pfandverpackungen */
 define( 'OPTION_PFAND_VOLL_NETTO_SOLL', 15 );
 define( 'OPTION_PFAND_VOLL_ANZAHL', 16 );
-define( 'OPTION_PFAND_LEER_BRUTTO_SOLL', 17 );   /* schuld aus rueckgabe leerer pfandverpackungen */
+define( 'OPTION_PFAND_LEER_BRUTTO_SOLL', 17 );   /* schuld aus Rückgabe leerer pfandverpackungen */
 define( 'OPTION_PFAND_LEER_NETTO_SOLL', 18 ); 
 define( 'OPTION_PFAND_LEER_ANZAHL', 19 );
 define( 'OPTION_EXTRA_BRUTTO_SOLL', 20 );   /* sonstiges: Rabatte, Versandkosten, ... (nur lieferantenseitig sinnvoll) */
@@ -3276,9 +3276,9 @@ define( 'OPTION_EXTRA_BRUTTO_SOLL', 20 );   /* sonstiges: Rabatte, Versandkosten
 
 
 /* select_bestellungen_soll_gruppen:
- *   liefert als skalarer subquery schuld der FC an gruppen aus bestellungen, und zugehoeriger
- *   pfandbewegungen (auch rueckgabe der betreffenden woche!)
- *   - $using ist array von tabellen, die aus dem uebergeordneten query benutzt werden sollen;
+ *   liefert als skalarer subquery schuld der FC an gruppen aus bestellungen, und zugehöriger
+ *   pfandbewegungen (auch Rückgabe der betreffenden woche!)
+ *   - $using ist array von tabellen, die aus dem übergeordneten query benutzt werden sollen;
  *     auswirkungen haben: 'gesamtbestellungen', 'bestellgruppen'
  *   - $art ist eine der optionen oben; SOLL immer aus sicht der FC
 */
@@ -3355,7 +3355,7 @@ function select_bestellungen_soll_gruppen( $art, $using = array() ) {
 
 /* select_bestellungen_soll_lieferanten:
  *   liefert als skalarer subquery forderung von lieferanten aus bestellungen
- *   $using ist array von tabellen, die aus dem uebergeordneten query benutzt werden sollen;
+ *   $using ist array von tabellen, die aus dem übergeordneten query benutzt werden sollen;
  *   auswirkung haben: 'gesamtbestellungen', 'lieferanten', 'pfandverpackungen'
 */
 function select_bestellungen_soll_lieferanten( $art, $using = array() ) {
@@ -3888,20 +3888,20 @@ function sql_verluste_summe( $type ) {
 
 // wichtige felder in tabelle produktpreise:
 //
-// einheiten: bestehen aus masszahl (optional, default ist 1, bis 3 nachkommastellen werden unterstuetzt) und
+// einheiten: bestehen aus Maßzahl (optional, default ist 1, bis 3 nachkommastellen werden unterstützt) und
 // der eigentlichen einheit. wir unterscheiden 2 einheiten:
 // - verteileinheit (V-Einheit) (unsere historisch erste und ehemals wichtigste einheit):
 //     - gruppen bestellen vielfache davon: jeweils eine pro klick im Bestellformular
 //     - produktmengen werden immer als vielfache davon gespeichert
 // - liefereinheit (L-Einheit)
 //     - preise werden pro liefereinheit gespeichert (spalte 'lieferpreis')
-//     - zweckmaessige einheit, die das bestellen beim lieferanten und den rechnungsabgleich erleichtern soll:
+//     - zweckmäßige einheit, die das bestellen beim lieferanten und den rechnungsabgleich erleichtern soll:
 //       * _immer_ die einheit, auf die sich der "einzelpreis" des lieferanten bezieht
 //       * oft (etwa beim bauern) auch die einheit, in der der wir bestellen, etwa "1 kg"
 //   zu beiden Einheiten berechnet kanonische_einheit() eine kanonische darstellung:
-//     * gleich wie einheit, ausser: kg in g und l in ml umgerechnet, gross/kleinschreibung vereinheitlicht, und
-//     * masszahl immer abgetrennt
-//   verteileinheit und liefereinheit muessen gleiche kanonische einheit haben, ausser:
+//     * gleich wie einheit, außer: kg in g und l in ml umgerechnet, gross/kleinschreibung vereinheitlicht, und
+//     * maßzahl immer abgetrennt
+//   verteileinheit und liefereinheit müssen gleiche kanonische einheit haben, außer:
 //     * GB, KI, VPE oder PA als liefereinheit: verteileinheit ist dann beliebig
 //     * VPE als verteileinheit ist mit beliebiger liefereinheit kombinierbar
 //  - lv_faktor:
@@ -3909,7 +3909,7 @@ function sql_verluste_summe( $type ) {
 //     wenn verteileinheit und liefereinheit verschiedene kanonische einheiten haben (nur bei GB, KI, PA, VPE als
 //     L-Einheit oder VPE als V-Einheit erlaubt) muss dieser faktor manuell erfasst werden.
 // - gebindegroesse:
-//     gebindegroesse, vielfache der V-Einheit. Muss immer eine ganze Zahl sein!
+//     gebindegröße, vielfache der V-Einheit. Muss immer eine ganze Zahl sein!
 // - lieferpreis:
 //   der nettopreis (ohne pfand, ohne mehrwertsteuer) je liefereinheit
 // - pfand:
@@ -3919,15 +3919,15 @@ function sql_verluste_summe( $type ) {
 //   mehrwertsteuersatz in prozent (meist 7.00 oder 19.00).
 //
 //  beispiele:
-//   lieferant/produkt   V-Einheit  L-Einheit  lv-faktor           gebindegroesse
+//   lieferant/produkt   V-Einheit  L-Einheit  lv-faktor           gebindegröße
 //  -----------------------------------------------------------------------------------------
-//   Terra/kaese           100 g      1 kg    (10 (automatisch))    20 (= 2kg)
+//   Terra/käse           100 g      1 kg    (10 (automatisch))    20 (= 2kg)
 //   Terra/Milch             1 FL     1 FL     (1 (automatisch))     6 (= 6FL)
 //   Terra/Roggen         2500 g      1 kg     (0.4 (automatisch))   3 (= 3*2.5kg)
-//   Terra/Olivenoel      3000 ml     1 L      (1 (automatisch))     1 (= 3L)
+//   Terra/Olivenöl      3000 ml     1 L      (1 (automatisch))     1 (= 3L)
 //   Terra/Knoblauchzopf   0.1 ST     1 ST    (10 (automatisch))    10 (= 1ST)
 //   Terra/Blumenkohl        1 ST     1 KI      8 (manuell)          8 (= 8ST = 1KI)
-//   B&L/Partybroetchen      1 ST    30 ST     30 (manuell)         30 (= 30ST ("Wagenrad"))
+//   B&L/Partybrötchen      1 ST    30 ST     30 (manuell)         30 (= 30ST ("Wagenrad"))
 //   B&L/Torte               1 ST    12 ST      6 (manuell)          6 (= 6ST ("halbe Torte"))
 //   Bauer/Kartoffeln      500 g      1 kg     (2 (automatisch)     25 (= 12.5kg ("1/4 Zentner"))
 //   Bode/Schokoriegel       1 VPE   45 g      (1 (manuell)         30 (= 30*45g = 30VPE)
@@ -3969,7 +3969,7 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
 
 /* sql_aktueller_produktpreis:
  *  liefert aktuellsten preis zu $produkt_id,
- *  oder false falls es keinen gueltigen preis gibt:
+ *  oder false falls es keinen gültigen preis gibt:
  */
 function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
   $preise = sql_produktpreise( $produkt_id, $zeitpunkt );
@@ -3978,7 +3978,7 @@ function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
 
 /* sql_aktueller_produktpreis_id:
  *  liefert id des aktuellsten preises zu $produkt_id,
- *  oder 0 falls es NOW() keinen gueltigen preis gibt:
+ *  oder 0 falls es NOW() keinen gültigen preis gibt:
  */
 function sql_aktueller_produktpreis_id( $produkt_id, $zeitpunkt = true ) {
   $row = sql_aktueller_produktpreis( $produkt_id, $zeitpunkt );
@@ -4002,9 +4002,9 @@ function select_current_productprice_id( $product_id, $timestamp = true ) {
 }
 
 // produktpreise_konsistenztest:
-//  - alle zeitintervalle bis auf das letzte muessen abgeschlossen sein
-//  - intervalle duerfen nicht ueberlappen
-//  - warnen, wenn kein aktuell gueltiger preis vorhanden
+//  - alle zeitintervalle bis auf das letzte müssen abgeschlossen sein
+//  - intervalle dürfen nicht ueberlappen
+//  - warnen, wenn kein aktuell gültiger preis vorhanden
 // rueckgabe: true, falls keine probleme, sonst false
 //
 function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id = false ) {
@@ -4036,12 +4036,12 @@ function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id =
     $pr0 = $pr1;
   }
   if( ! $pr0 ) {
-    div_msg( 'alert', 'HINWEIS: kein Preiseintrag fuer diesen Artikel vorhanden!' );
+    div_msg( 'alert', 'HINWEIS: kein Preiseintrag für diesen Artikel vorhanden!' );
   } else if ( $pr0['zeitende'] != '' ) {
     if ( $pr0['zeitende'] < $mysqljetzt ) {
-        div_msg( 'alert', 'HINWEIS: kein aktuell g&uuml;ltiger Preiseintrag fuer diesen Artikel vorhanden!' );
+        div_msg( 'alert', 'HINWEIS: kein aktuell gültiger Preiseintrag für diesen Artikel vorhanden!' );
     } else {
-        div_msg( 'alert', 'HINWEIS: aktueller Preis l&auml;uft aus!' );
+        div_msg( 'alert', 'HINWEIS: aktueller Preis läuft aus!' );
     }
   }
   return $rv;
@@ -4063,14 +4063,14 @@ function sql_insert_produktpreis (
   $verteileinheit,
   $lv_faktor
 ) {
-  need( $lieferpreis > 0, "kein gueltiger Lieferpreis" );
-  need( $gebindegroesse >= 1, "keine gueltige Gebindegroesse" );
-  need( $mwst >= 0, "kein gueltiger Mehrwertsteuersatz" );
-  need( $pfand >= 0, "kein gueltiges Pfand" );
-  need( list( $lm, $le ) = kanonische_einheit( $liefereinheit, false ), "keine gueltige L-Einheit" );
-  need( list( $vm, $ve ) = kanonische_einheit( $verteileinheit, false ), "keine gueltige V-Einheit" );
-  need( $lm >= 0.001, "keine gueltige Masszahl bei L-Einheit" );
-  need( $vm >= 0.001, "keine gueltige Masszahl bei V-Einheit" );
+  need( $lieferpreis > 0, "kein gültiger Lieferpreis" );
+  need( $gebindegroesse >= 1, "keine gültige Gebindegröße" );
+  need( $mwst >= 0, "kein gültiger Mehrwertsteuersatz" );
+  need( $pfand >= 0, "kein gültiges Pfand" );
+  need( list( $lm, $le ) = kanonische_einheit( $liefereinheit, false ), "keine gültige L-Einheit" );
+  need( list( $vm, $ve ) = kanonische_einheit( $verteileinheit, false ), "keine gültige V-Einheit" );
+  need( $lm >= 0.001, "keine gültige Maßzahl bei L-Einheit" );
+  need( $vm >= 0.001, "keine gültige Maßzahl bei V-Einheit" );
   if( $le == $ve ) {
     $lv_faktor = $lm / $vm;
   } else {
@@ -4088,7 +4088,7 @@ function sql_insert_produktpreis (
         error( "L-Einheit und V-Einheit nicht kompatibel" );
     }
   }
-  need( $lv_faktor >= 0.001, "kein gueltiger Umrechnungsfaktor L-Einheit / V-Einheit" );
+  need( $lv_faktor >= 0.001, "kein gültiger Umrechnungsfaktor L-Einheit / V-Einheit" );
 
   $aktueller_preis = sql_aktueller_produktpreis( $produkt_id, $start );
   if( $aktueller_preis ) {
@@ -4162,7 +4162,7 @@ function kanonische_einheit( $einheit, $die_on_error = true ) {
       break;
     default:
       //
-      // der rest sind zaehleinheiten (STueck und aequivalent)
+      // der rest sind zähleinheiten (STück und äquivalent)
       //
       foreach( $masseinheiten as $e ) {
         if( $einheit === strtolower($e) ) {
@@ -4232,7 +4232,7 @@ function sql_catalogue_acronym( $context, $acronym ) {
 //
 ////////////////////////////////////
 
-// variablen die in URL (method='GET' oder in href-url) auftreten duerfen,
+// variablen die in URL (method='GET' oder in href-url) auftreten dürfen,
 // mit typen:
 //
 $foodsoft_get_vars = array(
@@ -4278,7 +4278,7 @@ $http_input_sanitized = false;
 /**
  * Check HTTP request parameters
  * 
- * - are there uneXpected variables or variables with invalid values?
+ * - are there unexpected variables or variables with invalid values?
  * - for POST requests: was a valid and unused iTAN in the request
  *   (protection against submitting a form multiple times)
  */
@@ -4293,7 +4293,7 @@ function sanitize_http_input() {
   if( ! $from_dokuwiki ) {
     foreach( $_GET as $key => $val ) {
       need( isset( $foodsoft_get_vars[$key] ), "unerwartete Variable $key in URL uebergeben" );
-      need( checkvalue( $val, $foodsoft_get_vars[$key] ) !== false , "unerwarteter Wert fuer Variable $key in URL" );
+      need( checkvalue( $val, $foodsoft_get_vars[$key] ) !== false , "unerwarteter Wert für Variable $key in URL" );
     }
     if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
       need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
@@ -4337,7 +4337,7 @@ function checkvalue( $val, $typ){
         //FIXME: zahl sollte als zahl zurückgegeben 
         //werden, zur Zeit String
         $val = trim($val);
-        // eventuellen nachkommateil (und sonstigen Muell) abschneiden:
+        // eventuellen nachkommateil (und sonstigen Müll) abschneiden:
         $val = preg_replace( '/[^\d].*$/', '', $val );
         $pattern = '/^\d+$/';
         break;
@@ -4387,19 +4387,19 @@ function checkvalue( $val, $typ){
 // - typ: definierte $typ argumente:
 //   d : ganze Zahl
 //   u : nicht-negative ganze Zahl
-//   U : positive ganze Zahl (echt groesser als 0)
+//   U : positive ganze Zahl (echt größer als 0)
 //   H : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
-//   R : raw: keine Einschraenkung, keine Umwandlung
+//   R : raw: keine Einschränkung, keine Umwandlung
 //   f : Festkommazahl
 //   w : bezeichner: alphanumerisch und _; leerstring zugelassen
 //   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
-//   /.../: regex pattern. Wert wird ausserdem ge-trim()-t
+//   /.../: regex pattern. Wert wird außerdem ge-trim()-t
 // - default:
 //   - wenn array erwartet wird, kann der default ein array sein.
 //   - wird kein array erwartet, aber default is ein array, so wird $default[$name] versucht
 //
-// per POST uebergebene variable werden nur beruecksichtigt, wenn zugleich eine
-// unverbrauchte transaktionsnummer 'itan' uebergeben wird (als Sicherung
+// per POST übergebene variable werden nur berücksichtigt, wenn zugleich eine
+// unverbrauchte transaktionsnummer 'itan' übergeben wird (als Sicherung
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
 function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
@@ -4465,7 +4465,7 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
     foreach($arry as $key => $val){
       $new = checkvalue($val, $typ);
       if($new===FALSE){
-        // error( 'unerwarteter Wert fuer Variable $name' );
+        // error( 'unerwarteter Wert für Variable $name' );
         unset( $GLOBALS[$name] );
         return FALSE;
       } else {
@@ -4477,7 +4477,7 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
   } else {
       $new = checkvalue($arry, $typ);
       if($new===FALSE){
-        // error( 'unerwarteter Wert fuer Variable $name' );
+        // error( 'unerwarteter Wert für Variable $name' );
         unset( $GLOBALS[$name] );
         return FALSE;
       } else {
@@ -4934,7 +4934,7 @@ function setWikiHelpTopic( $topic ) {
 }
 
 // auf <title> (fensterrahmen) kann offenbar nicht mehr zugegriffen werden(?), wir
-// koennen daher nur noch den subtitle (im fenster) setzen:
+// können daher nur noch den subtitle (im fenster) setzen:
 //
 function setWindowSubtitle( $subtitle ) {
   open_javascript( replace_html( 'subtitle', "Foodsoft: $subtitle" ) );
@@ -5013,11 +5013,11 @@ function get_tmp_working_dir( $base = '/tmp' ) {
 }
 
 // insert_html:
-// erzeugt javascript-code, der $element als Child vom element $id ins HTML einfuegt.
+// erzeugt javascript-code, der $element als Child vom element $id ins HTML einfügt.
 // $element is entweder ein string (erzeugt textelement), oder ein
 // array( tag, attrs, childs ):
 //   - tag ist der tag-name (z.b. 'table')
-//   - attrs ist false, oder Liste von Paaren ( name, wert) gewuenschter Attribute
+//   - attrs ist false, oder Liste von Paaren ( name, wert) gewünschter Attribute
 //   - childs ist entweder false, ein Textstring, oder ein Array von $element-Objekten
 function insert_html( $id, $element ) {
   global $autoid;
@@ -5052,7 +5052,7 @@ function insert_html( $id, $element ) {
       attr_$autoid.nodeValue = '$newid';
       enode_$newid.setAttributeNode( attr_$autoid );
     ";
-    // sonstige gewuenschte attribute erzeugen:
+    // sonstige gewünschte attribute erzeugen:
     if( $attrs ) {
       foreach( $attrs as $a ) {
         $autoid++;
@@ -5064,7 +5064,7 @@ function insert_html( $id, $element ) {
         ";
       }
     }
-    // element einhaengen:
+    // element einhängen:
     $output = "$output
       document.getElementById( '$id' ).appendChild( enode_$newid );
     ";
@@ -5074,14 +5074,14 @@ function insert_html( $id, $element ) {
       foreach( $childs as $c )
         $output = $output . insert_html( $newid, $c );
     } else {
-      // abkuerzung fuer reinen textnode:
+      // abkürzung für reinen textnode:
       $output = $output . insert_html( $newid, $childs );
     }
   }
   return $output;
 }
 
-// replace_html: wie insert_html, loescht aber vorher alle Child-Elemente von $id
+// replace_html: wie insert_html, löscht aber vorher alle Child-Elemente von $id
 function replace_html( $id, $element ) {
   global $autoid;
   $autoid++;
@@ -5104,7 +5104,7 @@ function move_html( $id, $into_id ) {
     document.getElementById('$into_id').appendChild(child_$autoid);
   ";
   // appendChild erzeugt _keine_ Kopie!
-  // das urspruengliche element verschwindet, also ist das explizite loeschen unnoetig:
+  // das ursprüngliche element verschwindet, also ist das explizite löschen unnötig:
   //   document.getElementById('$id').removeChild(child_$autoid);
 }
 

@@ -1,16 +1,16 @@
 <?php
 
-// katalogsuche: sucht im lieferantenkatalog nach $produkt (soweit fuer den Lieferanten implementiert)
+// katalogsuche: sucht im lieferantenkatalog nach $produkt (soweit für den Lieferanten implementiert)
 // 
-// !!! dieses Skript ist nur fuer den _internen_ katalogabgleich aufgrund der Artikelnummer zustaendig!
-// !!! fuer die manuelle Suche ist windows/artikelsuche.php da!
+// !!! dieses Skript ist nur für den _internen_ katalogabgleich aufgrund der Artikelnummer zuständig!
+// !!! für die manuelle Suche ist windows/artikelsuche.php da!
 //
 // $produkt ist entweder eine produkt_id, oder das Ergebnis von sql_produkt().
-// moegliche rueckgabewerte:
+// mögliche rückgabewerte:
 //   1: kein Katalog vom Lieferanten vorhanden (ist kein Fehler)
-//   2: keine Artikelnummer - Suche nicht moeglich
+//   2: keine Artikelnummer - Suche nicht möglich
 //   0 / NULL: Suche ohne (eindeutigen) Treffer
-//   array(): enthaelt gefundenen Katalogeintrag
+//   array(): enthält gefundenen Katalogeintrag
 //
 function katalogsuche( $produkt ) {
   if( is_numeric( $produkt ) ) {
@@ -46,7 +46,7 @@ function katalogabgleich(
   $produkt_id
 , $display_level = 0  // 0: garnix, 1: abweichungen, 2: voller katalogeintrag
 , $editable = false
-, & $preiseintrag_neu = array() // aus Katalogeintrag Vorschlag fuer Preiseintrag generieren
+, & $preiseintrag_neu = array() // aus Katalogeintrag Vorschlag für Preiseintrag generieren
 ) {
   global $mwst_default;
 
@@ -63,7 +63,7 @@ function katalogabgleich(
     return 3;
   } else if( $katalogeintrag == 2 ) {
     if( $display_level >= 1 ) {
-      div_msg( 'warn', 'Katalogsuche: Artikelnummer des Produktes fehlt --- Suche nicht moeglich!' );
+      div_msg( 'warn', 'Katalogsuche: Artikelnummer des Produktes fehlt --- Suche nicht möglich!' );
     }
     return 2;
   } else if( ! $katalogeintrag ) {
@@ -106,7 +106,7 @@ function katalogabgleich(
       //   - $liefereinheit: auf diese bezieht sich der preis $katalog_netto,
       //     ebenso der wie der 'lieferpreis' in tabelle 'produktpreise'
       //   - $liefergebinde in vielfachen der $liefereinheit
-      //     (achtung: 'gebindegroesse' in tabelle 'produktpreise' ist in v-einheiten!)
+      //     (achtung: 'gebindegröße' in tabelle 'produktpreise' ist in v-einheiten!)
       switch( $kan_liefereinheit ) {
         case 'g':
           $liefereinheit = '1000 g';
@@ -125,7 +125,7 @@ function katalogabgleich(
           break;
       }
 
-      // default fuer v-einheit (nur relevant, falls gar keine oder inkompatible gesetzt)
+      // default für v-einheit (nur relevant, falls gar keine oder inkompatible gesetzt)
       switch( $kan_liefereinheit ) {
         case 'KI':
         case 'PA':
@@ -182,7 +182,7 @@ function katalogabgleich(
     default:
     case 'keins':
       if( $display_level >= 1 ) {
-        open_div( 'warn', '', "unbekanntes oder undefiniertes Katalogformat [{$katalogeintrag['katalogformat']}] --- Katalogabgleich nicht moeglich" );
+        open_div( 'warn', '', "unbekanntes oder undefiniertes Katalogformat [{$katalogeintrag['katalogformat']}] --- Katalogabgleich nicht möglich" );
       }
       return 2;
   }
@@ -225,7 +225,7 @@ function katalogabgleich(
           open_th( '', '', 'L-Preis' );
           open_th( '', '', 'MWSt' );
           open_th( '', '', 'Brutto' );
-          open_th( '', "title='hier koennt ihr fehlerhafte oder ungueltige Katalogeintraege markieren'", 'gilt noch' );
+          open_th( '', "title='hier könnt ihr fehlerhafte oder ungültige Katalogeinträge markieren'", 'gilt noch' );
         open_tr();
           open_td( '', '', $katalog_artikelnummer );
           open_td( '', '', $katalog_bestellnummer );
@@ -256,9 +256,9 @@ function katalogabgleich(
 
   ////////////////////////////////
   // aktuellsten preiseintrag mit Katalogeintrag vergleichen,
-  // Vorlage fuer neuen preiseintrag mit Katalogdaten vorbesetzen:
-  // - die L-felder werden immer aus dem katalog uebernommen, 
-  // - die V-felder wenn moeglich aus dem letzten Preiseintrag
+  // Vorlage für neuen preiseintrag mit Katalogdaten vorbesetzen:
+  // - die L-felder werden immer aus dem katalog übernommen,
+  // - die V-felder wenn möglich aus dem letzten Preiseintrag
   //
 
   $preiseintrag_neu['katalog_id'] = $katalog_id;
@@ -319,17 +319,17 @@ function katalogabgleich(
     list( $kan_verteilmult_neu, $kan_verteileinheit_neu ) = kanonische_einheit( $preiseintrag_neu['verteileinheit'] );
 
     if( $kan_liefereinheit !== $kan_verteileinheit_neu ) {
-      // keine automatische umrechnung moeglich; wir uebernehmen die alten werte, die
-      // manuell geprueft und bei bedarf korrigiert werden muessen:
+      // keine automatische umrechnung möglich; wir übernehmen die alten werte, die
+      // manuell geprüft und bei bedarf korrigiert werden müssen:
       if( $artikel['lv_faktor'] > 0.001 ) {
         $preiseintrag_neu['lv_faktor'] = $artikel['lv_faktor'];
-        if( $liefergebinde > 0 ) { // terra listet manchmal gebindegroesse 0
+        if( $liefergebinde > 0 ) { // terra listet manchmal gebindegröße 0
           $preiseintrag_neu['gebindegroesse'] = $liefergebinde * $preiseintrag_neu['lv_faktor'];
           if( abs( $preiseintrag_neu['gebindegroesse'] - $artikel['gebindegroesse'] ) > 0.001 ) {
-            $problems[] = "Problem: Gebindegroessen oder Umrechnung Liefer/Verteileinheit stimmen nicht:
+            $problems[] = "Problem: Gebindegrößen oder Umrechnung Liefer-/Verteileinheit stimmen nicht:
               <p class='li'>Katalog: <kbd>$liefergebinde * $liefereinheit</kbd></p>
               <p class='li'>Foodsoft: <kbd>{$artikel['gebindegroesse']} * {$artikel['verteileinheit']}</kbd></p>
-              <div class='small'>Bitte manuell pr&uuml;en und neuen Preiseintrag erfassen!</div>
+              <div class='small'>Bitte manuell prüfen und neuen Preiseintrag erfassen!</div>
             ";
           }
         }
@@ -340,7 +340,7 @@ function katalogabgleich(
           $preiseintrag_neu['lv_faktor'] = 1.0;
         }
         $problems[] = "Problem: Umrechnungsfaktor von Liefer und Verteileinheit noch nicht erfasst.
-            <div class='small'>Bitte manuell pr&uuml;en und neuen Preiseintrag erfassen!</div>
+            <div class='small'>Bitte manuell prüfen und neuen Preiseintrag erfassen!</div>
         ";
       }
 
@@ -350,10 +350,10 @@ function katalogabgleich(
       // anschliessend mit dem ist-zustand:
 
       $preiseintrag_neu['lv_faktor'] = $kan_liefermult / $kan_verteilmult_neu;
-      if( $liefergebinde > 0 ) { // terra listet manchmal gebindegroesse 0
+      if( $liefergebinde > 0 ) { // terra listet manchmal gebindegröße 0
         $preiseintrag_neu['gebindegroesse'] = $liefergebinde * $preiseintrag_neu['lv_faktor'];
         if( abs( $preiseintrag_neu['gebindegroesse'] - $artikel['gebindegroesse'] ) > 0.001 ) {
-          $problems[] = "Problem: Gebindegroessen stimmen nicht:
+          $problems[] = "Problem: Gebindegrößen stimmen nicht:
             <p class='li'>Katalog: <kbd>$liefergebinde * $liefereinheit</kbd></p>
             <p class='li'>Foodsoft: <kbd>{$artikel['gebindegroesse']} * {$artikel['verteileinheit']}</kbd></p>
           ";
@@ -385,7 +385,7 @@ function katalogabgleich(
     }
 
     if( ( ! $problems ) and ( ! $kgueltig ) ) {
-      $problems[] = "Katalogeintrag ist als ungueltig markiert, stimmt aber mit aktuellem Preiseintrag ueberein --- bitte manuell pruefen!";
+      $problems[] = "Katalogeintrag ist als ungültig markiert, stimmt aber mit aktuellem Preiseintrag überein --- bitte manuell prüfen!";
       $neednewprice = true;
     }
 
@@ -395,7 +395,7 @@ function katalogabgleich(
       } else {
         open_div( 'alert' );
         smallskip();
-        echo "Katalogeintrag ist als ungueltig markiert --- bitte pruefen:";
+        echo "Katalogeintrag ist als ungültig markiert --- bitte prüfen:";
         medskip();
       }
       foreach( $problems as $p ) {
@@ -432,10 +432,10 @@ function katalogabgleich(
 // update_preis:
 //   aktuellen preiseintrag aus katalog automatisch erzeugen
 //   (zur zeit: nur falsche bestellnummern werden automatisch korrigiert!)
-// rueckgabe:
+// rückgabe:
 //  -1 : preis ist aktuell, kein neueintrag notwendig
-//   0 : automatische aktualisierung nicht moeglich oder fehlgeschlagen
-//  >0 : preis wurde aktualisiert, rueckgabe ist produktpreise.id
+//   0 : automatische aktualisierung nicht möglich oder fehlgeschlagen
+//  >0 : preis wurde aktualisiert, rückgabe ist produktpreise.id
 //
 function update_preis( $produkt_id ) {
   global $mysqlheute;

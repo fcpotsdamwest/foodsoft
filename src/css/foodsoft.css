@@ -132,7 +132,7 @@ table.layout tr td, table table.layout tr td, table table table.layout tr td {
 }
 
 /*
- * table.list: standardtabelle fuer bestellscheine, kontoanzeigen, ...
+ * table.list: standardtabelle für bestellscheine, kontoanzeigen, ...
 */
 
 table.list tr td, table table.list tr td, table table table.list tr td, table.list tr th, table table.list tr th, table table table.list tr th {
@@ -234,7 +234,7 @@ li {
   width:100%;
 }
 
-/* fuer farbige zellen im bestellformular: */
+/* für farbige zellen im bestellformular: */
 
 .outdated {
   background-color:#ffffaa !important;
@@ -248,7 +248,7 @@ li {
   background-color:#fff0c0 !important;
 }
 
-/* fuer farbigen text: */
+/* für farbigen text: */
 .black {
   color:#000000;
 }
@@ -389,7 +389,7 @@ td.wide, th.wide {
 }
 
 
-/* fuer auswahllisten (grosse knoepfe) und aehnliches */
+/* für auswahllisten (große knöpfe) und ähnliches */
 
 table.menu, table.menu tr th {
   border:1px dotted gray;
@@ -482,7 +482,7 @@ table.list tr.groupofrows_top td, table.list tr.groupofrows_top th {
   border-bottom-style:none;
 }
 table.list tr.groupofrows_middle td, table.list tr.groupofrows_middle th {
-  /* folgezeilen koennen auf groesse 0 kollabieren: */
+  /* folgezeilen können auf größe 0 kollabieren: */
   padding-top:0pt;
   padding-bottom:0pt;
   margin-top:0pt;
@@ -636,7 +636,7 @@ div.alert, span.alert, div.warn, span.warn, div.ok, span.ok {
 
 /*
  *
- *  bedienelemente: knoepfe und links
+ *  bedienelemente: knöpfe und links
  *
  */
 
@@ -816,7 +816,7 @@ input.checkbox {
   margin-left:2em;
 }
 
-/* simulierte radioknoepfe (auswahl preiseintrag!) */
+/* simulierte radioknöpfe (auswahl preiseintrag!) */
 
 .buttonup {
   color:#000000;

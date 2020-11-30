@@ -1,6 +1,6 @@
 <?php
 //
-// verluste.php: detailansichten und uebersichtstabelle
+// verluste.php: detailansichten und übersichtstabelle
 //
 
 assert( $angemeldet ) or exit();
@@ -83,7 +83,7 @@ function verlust_bestellungen( $detail = false ) {
 
 function verlust_aufschlag( $detail = false ) {
   if( $detail ) {
-    ?> <h2>Aufschlaege auf Bestellungen:</h2> <?php
+    ?> <h2>Aufschläge auf Bestellungen:</h2> <?php
     open_table( 'list', "width='98%'" );
       open_th('','','Bestellung');
       open_th('','','Aufschlag Prozent');
@@ -183,7 +183,7 @@ if( $detail ) {
 $verluste_summe = 0.0;
 $ausgleich_summe = 0.0;
 
-?> <h1>Verlustaufstellung --- &Uuml;bersicht</h1> <?php
+?> <h1>Verlustaufstellung --- Übersicht</h1> <?php
 
 if( $editable ) {
 

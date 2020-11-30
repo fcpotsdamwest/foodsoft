@@ -86,7 +86,7 @@ switch( $action ) { // aktionen die keinen auszug brauchen
 
 
 //////////////////////
-// auszug auswaehlen:
+// auszug auswählen:
 //
 
 open_table('layout hfill' );

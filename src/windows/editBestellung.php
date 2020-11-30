@@ -75,7 +75,7 @@ if( $action == 'save' ) {
     } else {
       $bestell_id = sql_insert_bestellung( $bestellname, $startzeit, $endzeit, $lieferung, $lieferanten_id, $aufschlag );
 
-      // bestellvorschlaege eintragen und vormerkungen raussuchen:
+      // bestellvorschläge eintragen und vormerkungen raussuchen:
       $vormerkungen = array();
       foreach( $bestellliste as $produkt_id ) {
         sql_insert_bestellvorschlag( $produkt_id, $bestell_id );
@@ -83,7 +83,7 @@ if( $action == 'save' ) {
           'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN, 'produkt_id' => $produkt_id
         ) ) );
       }
-      // alle vormerkungen dieses lieferanten loeschen:
+      // alle vormerkungen dieses lieferanten löschen:
       sql_delete_bestellzuordnungen( array(
         'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN, 'lieferanten_id' => $lieferanten_id
       ) );
@@ -108,11 +108,11 @@ if( $action == 'save' ) {
       }
       if( $vorbestellungen_fest + $vorbestellungen_toleranz ) {
         $js_on_exit[] = " alert( '
-          Aufgrund bestehender Vormerkungen fuer Produkte in dieser Bestellvorlage wurden
+          Aufgrund bestehender Vormerkungen für Produkte in dieser Bestellvorlage wurden
           $vorbestellungen_fest Festbestellungen und $vorbestellungen_toleranz Toleranzbestellungen
           automatisch eingetragen.
-          Fuer Produkte dieses Lieferanten, die nicht in diese Bestellvorlage aufgenommen sind, wurden alle
-          Vormerkungen geloescht.
+          Für Produkte dieses Lieferanten, die nicht in diese Bestellvorlage aufgenommen sind, wurden alle
+          Vormerkungen gelöscht.
         ' ); ";
       }
       $done = true;

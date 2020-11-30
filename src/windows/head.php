@@ -1,7 +1,7 @@
 <?php
 // head.php
 //
-// kopf fuer kleine popup-Fenster
+// kopf für kleine popup-Fenster
 // - $title (<title>) und $subtitle (im Fenster) werden angezeigt
 // - ein "Close" Knopf wird automatisch erzeugt
 
@@ -56,7 +56,7 @@ open_div( $headclass, "id='header' style='padding:0.5ex 1em 0.5ex 1ex;margin:0pt
           }
         }
         if( $readonly )
-          open_span( 'qquad', '', 'schreibgesch&uuml;tzt!' );
+          open_span( 'qquad', '', 'schreibgeschützt!' );
       open_td();
   close_table();
 close_div();

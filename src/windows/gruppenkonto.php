@@ -14,14 +14,14 @@ if( $meinkonto ) {
   $gruppen_id = $login_gruppen_id;
   $self_fields['gruppen_id'] = $gruppen_id;
   $gruppen_name = sql_gruppenname( $gruppen_id );
-  ?> <h1>Mein Konto: Kontoausz&uuml;ge von Gruppe <?php echo $gruppen_name; ?></h1> <?php
+  ?> <h1>Mein Konto: Kontoauszüge von Gruppe <?php echo $gruppen_name; ?></h1> <?php
 
   if( ! $readonly ) {
 
     open_fieldset( 'small_form', '', 'Überweisung eintragen', 'off' );
       open_form( '', "action=einzahlung" );
         open_table('layout');
-          form_row_betrag( 'Ich habe heute ' ); echo ' Euro fuer unsere Gruppe '. gruppe_view( $login_gruppen_id ); submission_button( 'überwiesen' );
+          form_row_betrag( 'Ich habe heute ' ); echo ' Euro für unsere Gruppe '. gruppe_view( $login_gruppen_id ); submission_button( 'überwiesen' );
         close_table();
       close_form();
     close_fieldset();
@@ -67,7 +67,7 @@ if( $meinkonto ) {
     }
   }
 
-} else { // kontoblatt-anzeige fuer dienste
+} else { // kontoblatt-anzeige für dienste
   nur_fuer_dienst(4,5);
   setWikiHelpTopic( 'foodsoft:kontoblatt' );
   ?> <h1>Kontoblatt</h1> <?php
@@ -162,7 +162,7 @@ $pfandkontostand = pfandkontostand($gruppen_id);
 // wieviele Kontenbewegungen werden ab wo angezeigt...
 if (isset($_GET['start_pos'])) $start_pos = $_GET['start_pos']; else $start_pos = 0;
 //Funktioniert erstmal mit der Mischung aus Automatischer Berechung und manuellen Einträgen nicht
-//FIXME: vielleicht ggf. start/enddatum waehlbar machen? oder immer ganze jahre?
+//FIXME: vielleicht ggf. start/enddatum wählbar machen? oder immer ganze jahre?
 $size          = 2000;
 
 $aufschlag_anzeigen = ( sql_bestellungen( 'aufschlag_prozent > 0' ) ? true : false );

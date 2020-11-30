@@ -49,19 +49,19 @@ $leitvariable = array(
   , 'cols' => '1'
   )
 , 'readonly' => array(
-    'meaning' => 'Datenbank schreibgeschuetzt setzen (einige sehr eingeschränkte Schreibzugriffe sind dennoch moeglich)'
+    'meaning' => 'Datenbank schreibgeschützt setzen (einige sehr eingeschränkte Schreibzugriffe sind dennoch moeglich)'
   , 'default' => '0'
   , 'local' => true
-  , 'comment' => 'Flag (1 oder 0), um &Auml;nderungen an der Datenbank, etwa w&auml;hrend offline-Betrieb auf
+  , 'comment' => 'Flag (1 oder 0), um Änderungen an der Datenbank, etwa während offline-Betrieb auf
                   einem anderen Rechner, zu verhindern'
   , 'runtime_editable' => 1
   , 'cols' => '1'
   )
 , 'demoserver' => array(
-    'meaning' => 'oeffentlicher Demo-Server (mit eingeschraenkten Funktionen)'
+    'meaning' => 'öffentlicher Demo-Server (mit eingeschränkten Funktionen)'
   , 'default' => '0'
   , 'local' => false
-  , 'comment' => 'Flag (1 oder 0): unterbindet auf oeffentlichen Servern die Unterstuetzung fuer Lieferanten-Kataloge (aus rechtlichen Gruenden)'
+  , 'comment' => 'Flag (1 oder 0): unterbindet auf öffentlichen Servern die Unterstützung für Lieferanten-Kataloge (aus rechtlichen Gruenden)'
   , 'runtime_editable' => 1
   , 'cols' => '1'
   )
@@ -69,13 +69,13 @@ $leitvariable = array(
     'meaning' => 'Spitzname des Servers'
   , 'default' => '(noch namenlos)'
   , 'local' => true
-  , 'comment' => 'Dient nur zur Information und wird in der Fusszeile der Webseiten angezeigt'
+  , 'comment' => 'Dient nur zur Information und wird in der Fußzeile der Webseiten angezeigt'
   , 'runtime_editable' => 1
   , 'cols' => '40'
   )
 , 'sockelbetrag_gruppe' => array(
     'meaning' => 'Sockeleinlage in Euro pro Gruppe'
-  , 'comment' => '"Gesch&auml;ftsanteil", mit dem sich jede Gruppe am Eigenkapital der FoodCoop beteiligt'
+  , 'comment' => '"Geschäftsanteil", mit dem sich jede Gruppe am Eigenkapital der FoodCoop beteiligt'
   , 'default' => '0.0'
   , 'local' => false
   , 'runtime_editable' => 1
@@ -83,7 +83,7 @@ $leitvariable = array(
   )
 , 'sockelbetrag_mitglied' => array(
     'meaning' => 'Sockeleinlage in Euro pro Gruppenmitglied'
-  , 'comment' => '"Gesch&auml;ftsanteil", mit dem sich jedes Mitglied am Eigenkapital der FoodCoop beteiligt'
+  , 'comment' => '"Geschäftsanteil", mit dem sich jedes Mitglied am Eigenkapital der FoodCoop beteiligt'
   , 'default' => '6.00'
   , 'local' => false
   , 'runtime_editable' => 1
@@ -99,7 +99,7 @@ $leitvariable = array(
   )
 , 'mwst_default' => array(
     'meaning' => 'Default-MWSt-Satz'
-  , 'comment' => 'H&auml;ufigster Mehrwertsteuer-Satz in Prozent'
+  , 'comment' => 'Häufigster Mehrwertsteuer-Satz in Prozent'
   , 'default' => '7.00'
   , 'local' => false
   , 'runtime_editable' => 1
@@ -116,8 +116,8 @@ $leitvariable = array(
 , 'muell_id' => array(
     'meaning' => 'Nummer der speziellen Bad-Bank-Gruppe (traditionell: 13)'
   , 'default' => '13'
-  , 'comment' => 'Diese spezielle Gruppe &uuml;bernimmt Verluste der FoodCoop
-                   (steht also f&uuml;r die Gemeinschaft aller Mitglieder, die irgendwann per Umlage f&uuml;r die Verluste aufkommen m&uuml;ssen)'
+  , 'comment' => 'Diese spezielle Gruppe übernimmt Verluste der FoodCoop
+                   (steht also für die Gemeinschaft aller Mitglieder, die irgendwann per Umlage für die Verluste aufkommen müssen)'
   , 'local' => false
   , 'runtime_editable' => 0
   , 'cols' => '2'
@@ -125,7 +125,7 @@ $leitvariable = array(
 , 'basar_id' => array(
     'meaning' => 'Nummer der speziellen Basar-Gruppe (traditionell: 99)'
   , 'default' => '99'
-  , 'comment' => 'Diese spezielle Gruppe bestellt Waren f&uuml;r den Basar'
+  , 'comment' => 'Diese spezielle Gruppe bestellt Waren für den Basar'
   , 'local' => false
   , 'runtime_editable' => 0
   , 'cols' => '2'
@@ -133,7 +133,7 @@ $leitvariable = array(
 , 'database_version' => array(
     'meaning' => 'Version der Datenbank'
   , 'default' => '31'
-  , 'comment' => 'Bitte den vorgeschlagenen Wert &uuml;bernehmen und nicht manuell &auml;ndern: diese Variable wird bei Upgrades automatisch hochgesetzt!'
+  , 'comment' => 'Bitte den vorgeschlagenen Wert übernehmen und nicht manuell ändern: diese Variable wird bei Upgrades automatisch hochgesetzt!'
   , 'local' => false
   , 'runtime_editable' => 0
   , 'cols' => '3'
@@ -143,9 +143,9 @@ $leitvariable = array(
 // currently unused:
 //
 // , 'usb_device' => array(
-//     'meaning' => 'device in /dev des USB-sticks (fuer lokalen up/download ohne Netz)'
+//     'meaning' => 'device in /dev des USB-sticks (für lokalen up/download ohne Netz)'
 //   , 'default' => false
-//   , 'comment' => 'zur Zeit unbenutzt: vorgesehen fuer offline-Betrieb auf lokalem PC: das device des USB-Sticks; auf Server: false'
+//   , 'comment' => 'zur Zeit unbenutzt: vorgesehen für offline-Betrieb auf lokalem PC: das device des USB-Sticks; auf Server: false'
 //   , 'runtime_editable' => 1
 //   , 'local' => true
 //   , 'cols' => '20'

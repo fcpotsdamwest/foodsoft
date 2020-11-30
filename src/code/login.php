@@ -5,7 +5,7 @@
 // anmeldescript:
 //  - prueft, ob benutzer schon angemeldet (per cookie)
 //  - verarbeitet neuanmeldungen
-//  - per "login=logout" wird ein logout (loeschen des cookie) erzwungen
+//  - per "login=logout" wird ein logout (löschen des cookie) erzwungen
 //  - falls nicht angemeldet: anmeldeformular wird ausgegeben
 //  - falls $from_dokuwiki==true wird index.php?window=wiki aufgerufen
 //
@@ -15,7 +15,7 @@
 //  - $login_gruppen_name
 //  - $session_id
 //  - $login_dienst (0, 1, 3, 4 oder 5)
-// falls $login_dienst > 0 ausserdem:
+// falls $login_dienst > 0 außerdem:
 //  - $coopie_name
 //  - $dienstkontrollblatt_id
 
@@ -88,14 +88,14 @@ get_http_var( 'login', 'w', '' );
 switch( $login ) {
   case 'login': 
     get_http_var( 'login_gruppen_id', 'u' )
-      or $problems .= "<div class='warn'>FEHLER: keine Gruppe ausgewaehlt</div>";
+      or $problems .= "<div class='warn'>FEHLER: keine Gruppe ausgewählt</div>";
     get_http_var( 'passwort','R' )
       or $problems .= "<div class='warn'>FEHLER: kein Passwort angegeben</div>";
     get_http_var( 'dienst', 'u' )
-      or $problems .= "<div class='warn'>FEHLER: kein Dienst ausgewaehlt</div>";
+      or $problems .= "<div class='warn'>FEHLER: kein Dienst ausgewählt</div>";
 
     if( ! in_array( $dienst, array( 0, 1, 3, 4, 5 ) ) ) {
-      $problems .= "<div class='warn'>FEHLER: kein gueltiger Dienst angegeben</div>";
+      $problems .= "<div class='warn'>FEHLER: kein gültiger Dienst angegeben</div>";
     }
 
     if( $dienst != 0 ) {
@@ -241,15 +241,15 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
     close_table();
     open_div( 'kommentar', "id='nodienstform' style='display:" . ( $login_dienst ? 'none' : 'block' ) .";'" );
       if( $FC_acronym == 'LS' ) {
-        echo "Wenn du nur bestellen oder dein Konto einsehen m&ouml;chtest, brauchst Du hier keine Aktion auszuw&auml;hlen.";
+        echo "Wenn du nur bestellen oder dein Konto einsehen möchtest, brauchst Du hier keine Aktion auszuwählen.";
       } else {
-        echo "Wenn du nur bestellen oder dein Gruppenkonto einsehen m&ouml;chtest, brauchst Du hier keinen Dienst auszuw&auml;hlen.";
+        echo "Wenn du nur bestellen oder dein Gruppenkonto einsehen möchtest, brauchst Du hier keinen Dienst auszuwählen.";
       }
     close_div();
     open_div( '', "id='dienstform' style='display:" . ( $login_dienst ? 'block' : 'none' ) .";'" );
       open_div( 'kommentar', '', "
-        Wenn Du Dich f&uuml;r " . ( $FC_acronym == 'LS' ? 'eine Aktion' : 'einen Dienst' ) . " anmeldest,
-        kannst Du zus&auml;tzliche Funktionen der Foodsoft nutzen; au&szlig;rdem wirst Du 
+        Wenn Du Dich für " . ( $FC_acronym == 'LS' ? 'eine Aktion' : 'einen Dienst' ) . " anmeldest,
+        kannst Du zusätzliche Funktionen der Foodsoft nutzen; außerdem wirst Du 
         automatisch ins " . ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) . " eingetragen:
       " );
       open_fieldset( 'small_form', '', ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) );
@@ -260,7 +260,7 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
              <input type='text' size='20' name='telefon' value='<?php $telefon; ?>'> <?php
         close_div();
         open_div( 'newfield' );
-          ?> <label>Notiz fuers Dienstkontrollblatt:</label>
+          ?> <label>Notiz fürs Dienstkontrollblatt:</label>
              <br>
              <textarea cols='80' rows='3' name='notiz'><?php echo $notiz; ?></textarea> <?php
         close_div();

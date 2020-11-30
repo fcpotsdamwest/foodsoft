@@ -1,4 +1,4 @@
-<h1>Lieferanten&uuml;bersicht...</h1>
+<h1>Lieferantenübersicht...</h1>
 
 <?PHP
 
@@ -21,7 +21,7 @@ if( $action == 'delete' ) {
 open_table( 'menu', "style='margin-bottom:2em;'" );
   if( $editable ) {
       open_td( '', '', fc_link( 'edit_lieferant', "class=bigbutton,text=Neuer Lieferant" ) );
-      open_td( '', '', 'einen neuen Lieferanten hinzuf&uuml;gen...' );
+      open_td( '', '', 'einen neuen Lieferanten hinzufügen...' );
   }
   open_tr();
      open_td( '', '', fc_link( 'self', "class=bigbutton,text=Aktualisieren" ) );
@@ -59,8 +59,8 @@ foreach( sql_lieferanten() as $row ) {
       if( $editable ) {
         echo fc_link( 'edit_lieferant', "lieferanten_id=$lieferanten_id" );
         if( ( sql_references_lieferant($lieferanten_id) == 0 ) and ( abs($kontostand) < 0.005 ) ) {
-          echo fc_action( array( 'class' => 'drop', 'title' => 'Lieferanten l&ouml;schen'
-                               , 'confirm' => 'Soll der Lieferant wirklich GEL&Ouml;SCHT werden?' )
+          echo fc_action( array( 'class' => 'drop', 'title' => 'Lieferanten löschen'
+                               , 'confirm' => 'Soll der Lieferant wirklich GELÖSCHT werden?' )
                         , "action=delete,lieferanten_id=$lieferanten_id" );
         }
       } else {

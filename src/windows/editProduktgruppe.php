@@ -15,7 +15,7 @@ switch( $action ) {
     break;
   case 'delete':
     need_http_var( 'produktgruppen_id', 'U' );
-    need( references_produktgruppe( $produktgruppen_id ) == 0, "Loeschen nicht moeglich: Produktgruppe wird benutzt!" );
+    need( references_produktgruppe( $produktgruppen_id ) == 0, "Löschen nicht möglich: Produktgruppe wird benutzt!" );
     doSql( "DELETE FROM produktgruppen WHERE id=$produktgruppen_id" );
     break;
 }
@@ -40,7 +40,7 @@ open_fieldset( 'small_form', '', 'Produktgruppen' );
         open_td( '', '', $row['name'] );
         open_td();
           if( $editable && ( references_produktgruppe( $row['id'] ) == 0 ) )
-              echo fc_action( 'class=drop,text=,title=Produktgruppe l&ouml;schen?'
+              echo fc_action( 'class=drop,text=,title=Produktgruppe löschen?'
                             , "action=delete,produktgruppen_id={$row['id']}" );
     }
   close_table();

@@ -212,12 +212,12 @@ close_form();
 
 open_div( 'right medskip' );
   $confirm = ( (int)$lieferant['bestellfaxspalten'] !== (int)$spalten )
-    ? "if( confirm( 'Spaltenauswahl f&uuml;r diesen Lieferanten wurde ge&auml;ndert - sind sie sicher?' ) ) "
+    ? "if( confirm( 'Spaltenauswahl für diesen Lieferanten wurde geändert - sind sie sicher?' ) ) "
     : '';
   open_span(
     'qquad button',
     "onclick=\" $confirm { f=document.forms.form_$faxform_id;f.elements.export.value='bestellschein'; f.submit(); } \"",
-    'PDF erzeugen'
+    'Drucken'
   );
   open_span(
     'qquad button',

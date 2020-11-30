@@ -14,7 +14,7 @@ get_http_var( 'options', 'u', OPTION_PREISKONSISTENZTEST, true );
 $editable = ( hat_dienst(4) and ! $readonly );
 
 //
-// tabelle fuer hauptmenue und auswahl lieferanten:
+// tabelle für hauptmenü und auswahl lieferanten:
 //
 open_table('layout hfill' );
   open_td('left');
@@ -53,7 +53,7 @@ open_table('layout hfill' );
     auswahl_lieferant( $lieferanten_id );
 close_table();
 
-// ab hier muss ein Lieferant ausgewaehlt sein, sonst Ende:
+// ab hier muss ein Lieferant ausgewählt sein, sonst Ende:
 //
 if( ! $lieferanten_id )
   return;
@@ -104,7 +104,7 @@ open_table('list hfill');
     if( $editable )
       open_th( '', "title='in Bestellvorlage aufnehmen?'", 'aufnehmen?' );
     // open_th( '', "title='aktuelle Details zum Produkt'", 'Notiz' );
-    open_th( '', '', 'Gebindegroesse' );
+    open_th( '', '', 'Gebindegröße' );
     open_th( '', "colspan='2' title='Lieferanten-Preis (ohne Pfand, ohne MWSt)'", 'L-Nettopreis' );
     open_th( '', "colspan='2' title='Verbraucher-Preis mit Pfand und MWSt'", 'V-Preis' );
     open_th( '', '', 'Aktionen' );
@@ -133,7 +133,7 @@ open_table('list hfill');
         if( $preis_id ) {
           if( $vormerkungen_menge > 0 ) {
             $title = sprintf(
-              "Vormerkungen fuer %s %s vorhanden"
+              "Vormerkungen für %s %s vorhanden"
             , $vormerkungen_menge * $produkt['kan_verteilmult']
             , $produkt['kan_verteileinheit']
             );
@@ -167,7 +167,7 @@ open_table('list hfill');
           echo fc_link( 'edit_produkt', "produkt_id=$id" );
         echo fc_link( 'produktpreise', "produkt_id=$id,text=" );
         if( $editable and ( $references == 0 ) ) {
-          echo fc_action( array( 'class' => 'drop', 'title' => 'Produkt L&ouml;schen', 'confirm' => 'Soll das Produkt wirklich GEL&Ouml;SCHT werden?' )
+          echo fc_action( array( 'class' => 'drop', 'title' => 'Produkt Löschen', 'confirm' => 'Soll das Produkt wirklich GELÖSCHT werden?' )
                         , array( 'action' => 'delete', 'produkt_id' => $id ) );
         }
     open_tr( 'groupofrows_bottom' );
