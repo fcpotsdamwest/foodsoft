@@ -9,7 +9,7 @@ COMMIT=`git rev-parse --short HEAD`
 COMMIT_FULL=`git rev-parse HEAD`
 DIRTY=""
 git status | grep -qF 'working directory clean' || DIRTY='-dirty'
-echo "<a href='http://github.com/foodsoft/foodsoft/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >src/version.txt
+echo "<a href='http://github.com/fcpotsdamwest/foodsoft/commits/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >src/version.txt
 
 chmod 644 src/code/common.php
 chmod 644 src/code/config.php
