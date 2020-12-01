@@ -39,9 +39,6 @@ RUN set -ex \
         session \
         xml \
     && \
-    # Install TeXLive for PDF generation
-    apt -y install texlive-latex-base \
-    && \
     # Enable mod_rewrite
     a2enmod rewrite
 

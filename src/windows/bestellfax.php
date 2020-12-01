@@ -78,28 +78,29 @@ if( $export == 'bestellschein' ) {
 if( isset( $download ) && ( $download == 'bestellfax' ) ) {
   $fc_kundennummer = trim( $fc_kundennummer );
 
-  $tex = file_get_contents( 'templates/bestellschein.tex' );
-  foreach( array( 'lieferant_name', 'lieferant_strasse', 'lieferant_ort', 'lieferant_fax'
-                , 'lieferant_email' , 'lieferant_anrede', 'lieferant_grussformel'
-                , 'fc_kundennummer' , 'fc_name', 'fc_strasse', 'fc_ort'
-                , 'besteller_name', 'lieferdatum_trad'
+  $printable = file_get_contents( 'templates/bestellschein.html.tpl' );
+  foreach( array(
+    'lieferant_name',
+    'lieferant_strasse',
+    'lieferant_ort',
+    'lieferant_fax',
+    'lieferant_email',
+    'lieferant_anrede',
+    'lieferant_grussformel',
+    'fc_kundennummer',
+    'fc_name',
+    'fc_strasse',
+    'fc_ort',
+    'besteller_name',
+    'lieferdatum_trad'
   ) as $field ) {
-    $tex = preg_replace( "/@@$field@@/", tex_encode( $GLOBALS[ $field ] ) , $tex );
+    $printable = preg_replace( "/\{\{ $field \}\}/", $GLOBALS[ $field ] , $printable );
   }
-  $tex = preg_replace( '/@@tabelle@@/', bestellfax_tex( $bestell_id, $spalten ), $tex );
-  // file_put_contents( '/tmp/b.tex', $tex );
-  if( ( $pdf = tex2pdf( $tex ) ) ) {
-    $downloadname = 'Bestellschein.pdf';
-    // header("Content-Type: text/plain");
-    // echo $tex;
-    header( 'Content-Type: application/pdf' );
-    header( "Content-Disposition: filename=$downloadname" );
-    echo $pdf;
-    return;
-  } else {
-    header( 'Content-Type: text/html' );
-    open_div( 'warn', '', 'Konvertierung nach PDF fehlgeschlagen' );
-  }
+  $printable = preg_replace( '/\{\{ datum_heute \}\}/', date( "d.m.Y"), $printable );
+  $printable = preg_replace( '/\{\{ tabelle \}\}/', bestellfax_html( $bestell_id, $spalten ), $printable );
+
+  echo $printable;
+  exit(0);
 }
 
 
