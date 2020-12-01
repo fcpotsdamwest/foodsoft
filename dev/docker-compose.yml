@@ -1,14 +1,14 @@
 version: "3.2"
 
 services:
-  # idea: run php5 and php7 in parallel during the migration
+  # we run php8 and php7 in parallel until the migration to PHP8 iS finished
 
-  web_php5:
+  web_php8:
     build:
       context: ./..
-      dockerfile: dev/web/Containerfile.php5
+      dockerfile: dev/web/Containerfile.php8
       args:
-        PHP5_VERSION: ${PHP5_VERSION}
+        PHP8_VERSION: ${PHP8_VERSION}
     environment:
       EXT_UID: ${UID}
       EXT_GID: ${GID}
@@ -18,11 +18,11 @@ services:
     networks:
       - backend
     ports:
-      - "8005:80"
+      - "8008:80"
     volumes:
       - ../src:/src:ro
       - ./web/assets/foodsoft.conf:/etc/apache2/sites-available/foodsoft.conf
-    container_name: foodsoft-php5
+    container_name: foodsoft-php8
     command: /opt/bin/start-web.sh
 
   web_php7:
