@@ -24,9 +24,6 @@ Skripte und Dateien:
 
 - fcck.php: unfertig (ziel: check und reparatur der datenbankstruktur, garbage collection)
 
-- antixls.modif: perl-skript zur konversion xls -> csv (modifiziert: benutzt Klammeraffe @ statt Komma 
-  als Trennzeichen
-  
 - foodsoft.class.php: 
     authentication backend fuers doku-wiki: damit gelten im doku-wiki die Benutzeraccounts der foodsoft
     (diese datei muss nach Installation des doku-wiki nach /wiki/inc/auth kopiert werden und wird aktiviert

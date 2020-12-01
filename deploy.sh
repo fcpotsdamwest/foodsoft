@@ -62,7 +62,6 @@ chmod 644 src/leitvariable.php
 chmod 644 src/phpinfo.php
 chmod 644 src/setup.php
 chmod 644 src/structure.php
-chmod 644 src/templates/antixls.modif
 chmod 644 src/templates/bestellschein.tex
 chmod 644 src/templates/prettytables.tex
 chmod 644 src/windows/abrechnung.php

@@ -42,8 +42,6 @@ RUN set -ex \
     && \
     # Install specific foodsoft deps
     apt -y --force-yes install \
-        # Perl deps for antixls script
-        libspreadsheet-parseexcel-perl \
         # TeXLive for PDF generation
         texlive-latex-base \
     && \
