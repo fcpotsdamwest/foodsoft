@@ -4325,8 +4325,6 @@ function checkvalue( $val, $typ){
     $format = '';
     switch( substr( $typ, 0, 1 ) ) {
       case 'H':
-        if( get_magic_quotes_gpc() )
-          $val = stripslashes( $val );
         $val = htmlspecialchars( $val, ENT_QUOTES, 'UTF-8' );
         break;
       case 'R':
