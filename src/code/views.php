@@ -1282,41 +1282,31 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
   $status = $bestellung['rechnungsstatus'];
   need( $status >= STATUS_LIEFERANT );
 
-  $format = '\vrule width0.3pt height6mm depth3mm #';
-  $header = '';
+  $thead = '<tr>';
 
   if( $spalten & PR_COL_NAME ) {
-    $format .= '&\hskip2ex\truncHBox{65mm}{#}\box\truncHBoxOut\hskip1ex plus1fil\vrule width0.3pt';
-    $header .= '&Artikel';
+      $thead .= '<th>Artikel</th>';
   }
   if( $spalten & PR_COL_ANUMMER ) {
-    $format .= '&\hskip2ex plus1fil#\hskip1ex\vrule width0.3pt';
-    $header .= '&Artikel-Nr';
+      $thead .= '<th class="right">Art.-Nr.</th>';
   }
   if( $spalten & PR_COL_BNUMMER ) {
-    $format .= '&\hskip2ex plus1fil#\hskip1ex\vrule width0.3pt';
-    $header .= '&Bestell-Nr';
+      $thead .= '<th>Bestell-Nr</th>';
   }
   if( $spalten & PR_COL_LIEFERMENGE ) {
-    $format .= '&\hskip2ex plus1fil#\hskip3pt&#\hskip1ex plus1fil\vrule width0.3pt';
-    $header .= '&\span Menge';
+      $thead .= '<th>Menge</th>';
   }
   if( $spalten & PR_COL_LIEFERGEBINDE ) {
-    $format .= '&\hskip2ex plus1fil#\hskip3pt&{\scriptsize #}\hskip1ex plus1fil\vrule width0.3pt';
-    $header .= '&\span\normalsize Gebinde';
+      $thead .= '<th class="center">Gebinde</th><th>je Geb.</th>';
   }
   if( $spalten & PR_COL_LPREIS ) {
-    $format .= '&\hskip2ex plus1fil#\hskip3pt&{\scriptsize #}\hskip1ex plus1fil\vrule width0.3pt';
-    $header .= '&\span\normalsize\hskip-1ex Einzelpreis';
+      $thead .= '<th colspan="2">Einzelpreis</th>';
   };
   if( $spalten & PR_COL_NETTOSUMME ) {
-    $format .= '&\hskip1ex plus1fil#\hskip1ex\vrule width0.3pt';
-    $header .= '&Gesamtpreis';
+      $thead .= '<th class="right">Gesamt</th>';
   };
-  $tabstart = '\halign{'.$format.'\cr'.$header.'\cr';
 
-  $tex = $tabstart;
-
+  $tbody = "";
   $netto_summe = 0;
 
   foreach( $produkte as $produkte_row ) {
@@ -1345,41 +1335,69 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
 
     $netto_summe += $nettogesamtpreis;
 
-    $zeile = '';
+    $zeile = '<tr>';
     if( $spalten & PR_COL_NAME ) {
       $name = $produkte_row['produkt_name'];
-      $zeile .= '&' . tex_encode( $name );
+      $zeile .= '<td>' . $name . '</td>';
     }
     if( $spalten & PR_COL_ANUMMER ) {
-      $zeile .= '&' . $produkte_row['artikelnummer'];
+      $zeile .= '<td class="right">' . $produkte_row['artikelnummer'] . '</td>';
     }
     if( $spalten & PR_COL_BNUMMER ) {
-      $zeile .= '&' . $produkte_row['bestellnummer'];
+      $zeile .= '<td>' . $produkte_row['bestellnummer'] . '</td>';
     }
     if( $spalten & PR_COL_LIEFERMENGE ) {
-      $zeile .= '&' . mult2string( $liefermenge_scaled * $produkte_row['kan_liefermult_anzeige'] )
-                    . '&' . tex_encode( $produkte_row['kan_liefereinheit_anzeige'] );
+      $zeile .=
+        '<td>' .
+          mult2string( $liefermenge_scaled * $produkte_row['kan_liefermult_anzeige'] ) .
+        '</td' .
+        '<td>' .
+          $produkte_row['kan_liefereinheit_anzeige'] .
+        '</td>';
     }
     if( $spalten & PR_COL_LIEFERGEBINDE ) {
-      $zeile .= '&' . mult2string( $gebinde )
-                    . '& * (' . mult2string( $produkte_row['kan_verteilmult'] * $produkte_row['gebindegroesse'] ) 
-                              . '\,' . $produkte_row['kan_verteileinheit'] . ')' ;
+      $zeile .=
+        '<td class="center">' .
+          mult2string( $gebinde ) .
+        '</td>' .
+        '<td>' .
+            mult2string( $produkte_row['kan_verteilmult'] * $produkte_row['gebindegroesse'] ) .
+            '&thinsp;' .
+            $produkte_row['kan_verteileinheit'] .
+        '</td>';
     }
     if( $spalten & PR_COL_LPREIS ) {
-      $zeile .= '&' . sprintf( '%.2lf', $nettolieferpreis )
-                    . '& / ' . tex_encode( $produkte_row['liefereinheit_anzeige'] );
+      $zeile .=
+        '<td>' .
+          sprintf( '%.2lf', $nettolieferpreis ) .
+        '</td>' .
+        '<td>' .
+          '/&thinsp;' . $produkte_row['liefereinheit_anzeige'] .
+        '</td>';
     }
     if( $spalten & PR_COL_NETTOSUMME ) {
-      $zeile .= '&' . sprintf( '%.2lf', $nettogesamtpreis );
+      $zeile .=
+        '<td class="right">' . 
+          sprintf( '%.2lf', $nettogesamtpreis ) .
+        '</td>';
     }
-
-    $zeile .= '\cr';
-
-    $tex .= $zeile;
+    $zeile .= '</tr>';
+    $tbody .= $zeile;
   }
 
-  $tex .= '}';
-  return $tex;
+  return
+      '<table style="width: 100%; text-align: left;">' .
+        '<style>' .
+            'table { border-collapse: collapse; } ' .
+            'thead > tr:first-child { border-bottom: 1px solid black; } ' .
+            'tr:nth-child(even) { background-color: #f2f2f2; } ' .
+            'th, td { padding: 6px; } ' .
+            '.right { text-align: right } ' .
+            '.center { text-align: center } ' .
+        '</style>' .
+        "<thead>{$thead}</thead>" .
+        "<tbody>{$tbody}</tbody>" .
+      '<table>';
 }
 
 

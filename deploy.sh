@@ -62,9 +62,7 @@ chmod 644 src/leitvariable.php
 chmod 644 src/phpinfo.php
 chmod 644 src/setup.php
 chmod 644 src/structure.php
-chmod 644 src/templates/antixls.modif
-chmod 644 src/templates/bestellschein.tex
-chmod 644 src/templates/prettytables.tex
+chmod 644 src/templates/bestellschein.html.tpl
 chmod 644 src/windows/abrechnung.php
 chmod 644 src/windows/abschluss.php
 chmod 644 src/windows/artikelsuche.php
@@ -100,6 +98,5 @@ chmod 644 src/windows/pfandverpackungen.php
 chmod 644 src/windows/produkte.php
 chmod 644 src/windows/produktpreise.php
 chmod 644 src/windows/produktverteilung.php
-chmod 644 src/windows/updownload.php
 chmod 644 src/windows/verluste.php
 chmod 700 .git
