@@ -99,6 +99,5 @@ chmod 644 src/windows/pfandverpackungen.php
 chmod 644 src/windows/produkte.php
 chmod 644 src/windows/produktpreise.php
 chmod 644 src/windows/produktverteilung.php
-chmod 644 src/windows/updownload.php
 chmod 644 src/windows/verluste.php
 chmod 700 .git

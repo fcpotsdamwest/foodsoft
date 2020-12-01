@@ -793,12 +793,6 @@ function possible_areas(){
     "hint" => "Hier kann man das Dienstkontrollblatt einsehen...",
     "title" => "Dienstkontrollblatt");
 
-  if( ( hat_dienst(4) && $exportDB ) ) {
-    $areas[] = array("area" => "updownload",
-    "hint" => "Hier kann die Datenbank runtergeladen werden...",
-    "title" => "Download");
-  }
-
    $areas[] = array("area" => "dienstplan", 
      "hint"  => "Eigene Dienste anschauen, Dienste übernehmen, ...", 
      "title" => "Dienstplan" );
