@@ -68,7 +68,6 @@ chmod 644 src/windows/abschluss.php
 chmod 644 src/windows/artikelsuche.php
 chmod 644 src/windows/basar.php
 chmod 644 src/windows/bestellen.php
-chmod 644 src/windows/bestellen.php.neu
 chmod 644 src/windows/bestellfax.php
 chmod 644 src/windows/bestellschein.php
 chmod 644 src/windows/bestellungen.php
