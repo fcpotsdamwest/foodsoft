@@ -82,7 +82,6 @@ function verlust_bestellungen( $detail = false ) {
 }
 
 function verlust_aufschlag( $detail = false ) {
-  global $muell_id;
   if( $detail ) {
     ?> <h2>Aufschlaege auf Bestellungen:</h2> <?php
     open_table( 'list', "width='98%'" );

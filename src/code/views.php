@@ -18,7 +18,7 @@ function number_selector($name, $min, $max, $selected, $format, $to_stdout = tru
 /**
  * Stellt eine komplette Editiermöglichkeit für
  * Datum und Uhrzeit zur Verfügung.
- * Muss in ein Formluar eingebaut werden
+ * Muss in ein Formular eingebaut werden
  * Die Elemente des Datums stehen dann zur Verfügung als
  *   <prefix>_minute
  *   <prefix>_stunde
@@ -218,7 +218,7 @@ function konto_view( $konto_id = 0, $fieldname = '' ) {
 }
 
 function kontoauszug_view( $konto_id = 0, $auszug_jahr = '', $auszug_nr = '', $fieldname = '' ) {
-  global $input_event_handlers, $window;
+  global $window;
   if( $fieldname ) {
     return "Jahr: ".int_view( $auszug_jahr, $fieldname.'_jahr' )
          . " / Nr.: " .int_view( $auszug_nr, $fieldname.'_nr' );
@@ -267,8 +267,6 @@ function dienst_view3($row){
   submission_button( 'Dienst abschliessen' );
   close_form();
 }
-
-
 
 /**
  *  Zeigt einen Dienst und die möglichen Aktionen
@@ -567,7 +565,6 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
 }
 
 
-
 /**
  * Ausgabe der Links im Hauptmenue und im Foodsoft-Kopf
  */
@@ -779,53 +776,48 @@ function pick_group_text() {
 
 }
 
-// bestellschein_view:
-// uebersicht ueber bestellte und gelieferte mengen einer Bestellung anzeigen
-// moegliche Tabellenspalten:
-// die terminologie:
-//   nettopreis (wie im katalog)
-//   bruttopreis = netto + mwst
-//   vpreis = bruttopreis + pfand
-//   endpreis = vpreis + aufschlag
-define( 'PR_COL_NAME' , 0x1 );           // produktname
-define( 'PR_COL_ANUMMER', 0x2 );      // Artikelnummer
-define( 'PR_COL_BNUMMER', 0x4 );      // Bestellnummer
-define( 'PR_COL_LPREIS', 0x8 );          // Netto-L-Preis
+define( 'PR_COL_NAME' , 0x1 );            // produktname
+define( 'PR_COL_ANUMMER', 0x2 );          // Artikelnummer
+define( 'PR_COL_BNUMMER', 0x4 );          // Bestellnummer
+define( 'PR_COL_LPREIS', 0x8 );           // Netto-L-Preis (wie im Katalog)
 define( 'PR_COL_MWST', 0x10 );            // Mehrwertsteuersatz
 define( 'PR_COL_PFAND', 0x20 );           // Pfand
-define( 'PR_COL_VPREIS', 0x40 );      // Aufschlag (prozentual vom Nettopreis)
-define( 'PR_COL_AUFSCHLAG', 0x80 );      // Aufschlag (prozentual vom Nettopreis)
-define( 'PR_COL_ENDPREIS', 0x100 );         // V-Preis
+define( 'PR_COL_VPREIS', 0x40 );          // V-Preis (Nettopreis + MWSt + Pfand)
+define( 'PR_COL_AUFSCHLAG', 0x80 );       // Aufschlag (prozentual vom Nettopreis)
+define( 'PR_COL_ENDPREIS', 0x100 );       // End-Preis (V-Preis + Pfand)
 define( 'PR_COL_BESTELLMENGE', 0x200 );   // bestellte menge (1)
 define( 'PR_COL_BESTELLGEBINDE', 0x400 ); // bestellte Gebinde (1)
 define( 'PR_COL_LIEFERMENGE', 0x800 );    // gelieferte Menge (1,2)
 define( 'PR_COL_LIEFERGEBINDE', 0x1000 ); // gelieferte Gebinde(1,2)
 define( 'PR_COL_NETTOSUMME', 0x2000 );    // Gesamtpreis Netto (1,3)
 define( 'PR_COL_BRUTTOSUMME', 0x4000 );   // Gesamtpreis Brutto ohne Pfand (1,3)
-define( 'PR_COL_VSUMME', 0x8000 );      // V-Summe: brutto mit Pfand (1,3)
-define( 'PR_COL_ENDSUMME', 0x10000 );   // Endsumme: V-summe mit aufschlag (1,3)
-//
-// (1) mit $gruppen_id: Anzeige nur fuer diese gruppe
-// (2) nur moeglich ab STATUS_LIEFERANT
-// (3) bei STATUS_BESTELLEN: berechnet aus Bestellmenge, sonst aus Liefermenge
+define( 'PR_COL_VSUMME', 0x8000 );        // V-Summe: brutto mit Pfand (1,3)
+define( 'PR_COL_ENDSUMME', 0x10000 );     // Endsumme: V-summe mit aufschlag (1,3)
 //
 define( 'PR_ROWS_NICHTGELIEFERT', 0x20000 ); // nicht gelieferte Produkte auch anzeigen
 define( 'PR_ROWS_NICHTGEFUELLT', 0x40000 ); // nicht gefuellte gebinde auch anzeigen?
 
 define( 'PR_FAXANSICHT', 0x80000 ); // faxansicht: mehr eingabefelder / link .pdf download
 
-// FAXOPTIONS: optionen, die in der faxansicht verfuegbar sind:
-//
 define( 'PR_FAXOPTIONS'
   , PR_COL_NAME | PR_COL_ANUMMER | PR_COL_BNUMMER | PR_COL_LPREIS | PR_COL_NETTOSUMME
     | PR_COL_LIEFERMENGE | PR_COL_LIEFERGEBINDE | PR_FAXANSICHT );
 
-// $select_columns: menue zur auswahl der (moeglichen) Tabellenspalten generieren.
-// $select_nichtgeliefert: option anzeigen, ob auch nichtgelieferte angezeigt werden
-//
+/**
+ * Generate a list of ordered products
+ * 
+ * Can only be invoked beginning with 'STATUS_LIEFERANT'.
+ * If order status is STATUS_BESTELLEN, it will display ordered values,
+ * after delivery delivered amounts.
+ */
 function bestellschein_view(
-    $bestell_id, $editAmounts = FALSE, $editPrice = FALSE, $spalten = 0xfffff, $gruppen_id = false,
-    $select_columns = false, $select_nichtgeliefert = false
+    $bestell_id,
+    $editAmounts = FALSE,           // make order amounts editable
+    $editPrice = FALSE,             // make prices editable
+    $spalten = 0xfffff,             // table columns to be dsiplayed
+    $gruppen_id = false,            // if set to int: display group order for this group id, if false: display total order
+    $select_columns = false,        // display menu for choosing table columns
+    $select_nichtgeliefert = false  // display products that were not delivered
   ) {
   global $input_event_handlers;
 
@@ -1275,6 +1267,17 @@ function bestellschein_view(
 }
 
 
+/**
+ * Generate the table of orders for the order document sent to the supplier
+ * using TeX markup for subsequent rendering to PDF.
+ * 
+ * @param int|string $bestell_id
+ *   Order ID
+ * @param int $spalten
+ *   Value representing the columns selected for rendering
+ * @return string
+ *   TeX table
+ */
 function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
   $produkte = sql_bestellung_produkte( $bestell_id );
   $bestellung = sql_bestellung( $bestell_id );
@@ -1310,15 +1313,11 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
   $netto_summe = 0;
 
   foreach( $produkte as $produkte_row ) {
-    $produkt_id = $produkte_row['produkt_id'];
-
     // preise je V-einheit:
     $nettopreis = $produkte_row['nettopreis'];
 
     $nettolieferpreis = $produkte_row['nettolieferpreis'];
     $lv_faktor = $produkte_row['lv_faktor'];
-
-    $gesamtbestellmenge = $produkte_row['gesamtbestellmenge'];
 
     $gebindegroesse = $produkte_row['gebindegroesse'];
     $kan_verteilmult = $produkte_row['kan_verteilmult'];
@@ -1361,9 +1360,9 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
           mult2string( $gebinde ) .
         '</td>' .
         '<td>' .
-            mult2string( $produkte_row['kan_verteilmult'] * $produkte_row['gebindegroesse'] ) .
+            mult2string( $kan_verteilmult * $gebindegroesse ) .
             '&thinsp;' .
-            $produkte_row['kan_verteileinheit'] .
+            $kan_verteilmult .
         '</td>';
     }
     if( $spalten & PR_COL_LPREIS ) {
@@ -1401,8 +1400,14 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
 }
 
 
-
-
+/**
+ * Generate a list of products that are in the db
+ * but not in the order with the given ID
+ * 
+ * This is used in the context of correcting the order list,
+ * e.g. to add a product which was delivered instead of an
+ * ordered (but not available) other product (accounting)
+ */
 function select_products_not_in_list( $bestell_id ) {
   $bestellung = sql_bestellung( $bestell_id );
   $lieferanten_id = $bestellung['lieferanten_id'];
@@ -1620,6 +1625,10 @@ function abrechnung_overview( $abrechnung_id, $bestell_id_current = 0 ) {
   close_table();
 }
 
+/**
+ * Create an HTML table with the basic metadata for an order
+ * (label, supplier, order period, fc surcharge, status)
+ */
 function bestellung_overview( $bestell_id, $gruppen_id = 0 ) {
   global $login_gruppen_id, $window_id;
 
@@ -2216,6 +2225,7 @@ function catalogue_acronym_view( $editable ) {
           . "ORDER BY context, acronym") );
   
   // $decoder = function($string) { return html_entity_decode($string, ENT_QUOTES, 'UTF-8' ); };
+  $acronyms_decoded = null;
   foreach( $acronyms as $n => $row )
     foreach( $row as $name => $val )
       $acronyms_decoded[ $n ][ $name ] = html_entity_decode( $val, ENT_QUOTES, 'UTF-8' );

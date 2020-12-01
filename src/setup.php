@@ -171,7 +171,6 @@ function check_3() {
             <?php } else { $problems = true; ?>
               <td class='warn'>$db_server nicht gesetzt</td>
             <?php } ?>
-          </td>
         </tr>
         <tr>
           <th>Datenbank:</th>
@@ -180,7 +179,6 @@ function check_3() {
             <?php } else { $problems = true; ?>
               <td class='warn'>$db_ name nicht gesetzt</td>
             <?php } ?>
-          </td>
         </tr>
         <tr>
           <th>Benutzer:</th>
@@ -189,7 +187,6 @@ function check_3() {
             <?php } else { $problems = true; ?>
               <td class='warn'>$db_user nicht gesetzt</td>
             <?php } ?>
-          </td>
         </tr>
         <tr>
           <th>Password:</th>
@@ -208,13 +205,13 @@ function check_3() {
     <?php
     $db_handle = mysqli_connect($db_server,$db_user,$db_pwd);
     if( $db_handle ) {
-      ?> <td class='ok'>Verbindung zum MySQL Server OK </td></tr> <?php
+      ?> <td class='ok'>Verbindung zum MySQL Server OK </td> <?php
     } else {
       ?>
         <td class='warn'>
           Verbindung zum MySQL Server fehlgeschlagen:
           <div class='warn'><?php echo mysqli_error( $db_handle ); ?></div>
-        </dt>
+        </td>
       <?php
       $problems = true;
     }
@@ -228,13 +225,13 @@ function check_3() {
     <?php
     $db_selected = mysqli_select_db( $db_handle, $db_name );
     if( $db_selected ) {
-      ?> <td class='ok'>Verbindung zur Datenbank OK </td></tr> <?php
+      ?> <td class='ok'>Verbindung zur Datenbank OK </td> <?php
     } else {
       ?>
         <td class='warn'>
           Verbindung zur Datenbank fehlgeschlagen:
           <div class='warn'><?php echo mysqli_error( $db_handle ); ?></div>
-        </dt>
+        </td>
       <?php
       $problems = true;
     }
@@ -803,7 +800,7 @@ function check_6() {
     $group_id = $_POST['group_id'];
     $group_name = $_POST['group_name'];
     $password = $_POST['group_password'];
-    $urandom_handle = fopen( '/dev/urandom', 'r' );
+    $urandom_handle = fopen( '/dev/urandom', 'rb' );
     $bytes = 4;
     $salt = '';
     while( $bytes > 0 ) {
@@ -973,7 +970,7 @@ foreach( $checks as $f => $title ) {
 
 if( count( $changes ) > 0 ) {
   ?>
-    <h3 clas='alert' style='padding-top:2em;'>Korrekturen an der Datenbank:</h3>
+    <h3 class='alert' style='padding-top:2em;'>Korrekturen an der Datenbank:</h3>
     <table class='list'>
       <tr>
         <th>SQL Befehl:</th>
@@ -985,7 +982,6 @@ if( count( $changes ) > 0 ) {
       <tr>
         <td><pre> <?php echo htmlspecialchars("$s\n"); ?></pre></td>
     <?php
-    $result = false;
     $result = mysqli_query( $db_handle, $s );
     if( $result ) {
       ?>

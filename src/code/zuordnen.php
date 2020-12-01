@@ -78,6 +78,18 @@ function cond2filter( $key, $cond ) {
   }
 }
 
+/**
+ * Generate a generic SQL query from the provided parameters.
+ * 
+ * @param string $op
+ *   Operation to execute, e.g. INSERT, DELETE etc:
+ * @param string|array $selects
+ *   Columns to select
+ * @param string|array $joins
+ *   
+ * @return string
+ *   Generated SQL query
+ */
 function get_sql_query( $op, $table, $selects = '*', $joins = '', $filters = false, $orderby = false, $groupby = false ) {
   if( is_string( $selects ) ) {
     $select_string = $selects;
@@ -253,6 +265,28 @@ function adefault( $array, $index, $default ) {
     return $default;
 }
 
+/**
+ * Convert a SQL query result into a simple PHP array.
+ * 
+ * Supports tables that are designed as a key-value-sructure
+ * 
+ * @param mysqli_result|array
+ *   A query result to be converted.
+ * @param bool|int $key
+ *   Key-Value-Mode: The column index to use as key.
+ *   Falsy to disable Key-Value-Mode.
+ *   (This means 0 as key column won't work with this implementation)
+ * @param bool $val
+ *   Key-Value-Mode: The column index to use as value.
+ *   Only evaluated if $key is truthy.
+ * @param $result_type
+ *   MYSQLI_ASSOC: return assoc array (column names as keys)
+ *   MYSQLI_NUM: return array (column indices as keys)
+ *   MYSQLI_BOTH: return array with both attribute sets
+ * @return array
+ *   Table-Mode: Array of arrays, each containing one data row (default: as assoc array).
+ *   Key-Value-Mode: One flat assoc array containing all key-value-pairs.
+ */
 function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI_ASSOC ) {
   if( is_array( $result ) )  // temporary kludge: make me idempotent
     return $result;
@@ -272,10 +306,21 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
 }
 
 
-/*
+/**
+ * TBA
+ * 
+ * @param array $using
+ *   Tables
+ * @param array $rules
  * need_joins: fuer skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
  *  erzeugt aus $rules JOIN-anweisungen fuer benoetigte tabellen; in $using koennen
  *  tabellen uebergeben werden, die bereits verfuegbar sind
+ * 
+ * Example:
+ * TBA
+ * 
+ * @return array
+ *   TBA
  */
 function need_joins_array( $using, $rules ) {
   $joins = array();
@@ -291,6 +336,17 @@ function need_joins_array( $using, $rules ) {
   }
   return $joins;
 }
+
+/**
+ * Generate a JOIN clause for embedding into a SQL statement.
+ * 
+ * @param array $using
+ *   
+ * @param array $rules
+ *   Assoc array with conditions for ON clauses
+ * @return string
+ *   JOIN clause
+ */
 function need_joins( $using, $rules ) {
   $joins = '';
   $joins_array = need_joins_array( $using, $rules );
@@ -322,6 +378,10 @@ function use_filters_array( $using, $rules ) {
   }
   return $filters;
 }
+
+/**
+ * TBA
+ */
 function use_filters( $using, $rules ) {
   $filters = '';
   $filters_array = use_filters_array( $using, $rules );
@@ -695,7 +755,7 @@ function sql_change_rotationsplan( $mitglied_id, $dienst, $move_down ) {
 }
 
 /**
- *  Erzeugt Dienste für einen Zeitraum
+ *  Legt Dienste-Einträge für einen Zeitraum (Dienstperiode) in der DB an.
  */
 function create_dienste( $start, $spacing, $zahl, $personenzahlen ) {
   foreach( $personenzahlen as $dienstname => $personen ) {
@@ -1139,10 +1199,23 @@ function sql_gruppe_offene_bestellungen( $gruppen_id ) {
   " ) );
 }
 
+/**
+ * Create group options list.
+ * 
+ * @param int $selected
+ *   the selected indeX
+ * @param array $keys
+ *   parameters to be passed on to `sql_gruppen`
+ * @param bool|string $option_0
+ *   a special option label representing the indeX value 0.
+ *   Set to False to disable it.
+ * @return string
+ *   a HTML snippet contain a sequence of `option` elements
+ */
 function optionen_gruppen(
-  $selected = 0
-, $keys = array( 'aktiv' => 'true' )
-, $option_0 = false
+  $selected = 0,
+  $keys = array( 'aktiv' => 'true' ),
+  $option_0 = false
 ) {
   $output='';
   if( $option_0 ) {
@@ -1258,7 +1331,7 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
     , $mysqlheute
     , "Erstattung Sockeleinlage Gruppe " . $gruppendaten['name']
     ) ) {
-      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage']} Euro wurden erstattet.</div>";
+      $msg = $msg . "<div class='ok'>Aenderung Sockeleinlage Gruppe: {$gruppendaten['sockeleinlage_gruppe']} Euro wurden erstattet.</div>";
       sql_update( 'bestellgruppen', $gruppen_id, array( 'sockeleinlage' => 0.0 ) );
     } else {
       $problems = $problems . "<div class='warn'>Verbuchen Aenderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
@@ -1832,6 +1905,16 @@ function sql_change_bestellung_status( $bestell_id, $state ) {
   return $result;
 }
 
+/**
+ * Query `gesamtbestellungen`.
+ * 
+ * @param string $filter
+ *   valid SQL where clause (optional)
+ * @param string $orderby
+ *   valid SQL 'order by' clause (optional)
+ * @return array
+ *   Array of assoc arrays, each representing one result row
+ */
 function sql_bestellungen( $filter = 'true', $orderby = 'rechnungsstatus, abrechnung_id, bestellende DESC, name' ) {
   return mysql2array( doSql( "
     SELECT gesamtbestellungen.*
@@ -1843,6 +1926,15 @@ function sql_bestellungen( $filter = 'true', $orderby = 'rechnungsstatus, abrech
   " ) );
 }
 
+/**
+ * Get total order record for given order ID.
+ * 
+ * @param int|string $bestell_id
+ *   order ID to query
+ * @return array
+ *   Order data for that order ID.
+ *
+ */
 function sql_bestellung( $bestell_id ) {
   $r = sql_bestellungen( "gesamtbestellungen.id = $bestell_id" );
   need( count($r) == 1 );
@@ -2778,10 +2870,14 @@ function sql_gruppen_transaktion(
 
 
 function sql_bank_transaktion(
-  $konto_id, $auszug_jahr, $auszug_nr
-, $haben, $valuta
-, $dienstkontrollblatt_id, $notiz
-, $konterbuchung_id
+  $konto_id,
+  $auszug_jahr,
+  $auszug_nr,
+  $haben,
+  $valuta,
+  $dienstkontrollblatt_id,
+  $notiz,
+  $konterbuchung_id
 ) {
   global $mysqlheute;
 
@@ -3113,14 +3209,14 @@ define( 'TRANSAKTION_TYP_STORNO', 98 );          // Buchungen, die sich gegensei
 
 
 $selectable_types = array(
-  TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE
-, TRANSAKTION_TYP_ANFANGSGUTHABEN
-, TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN
-, TRANSAKTION_TYP_SPENDE
-, TRANSAKTION_TYP_SONDERAUSGABEN
-, TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN
+  TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE,
+  TRANSAKTION_TYP_ANFANGSGUTHABEN,
+  TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN,
+  TRANSAKTION_TYP_SPENDE,
+  TRANSAKTION_TYP_SONDERAUSGABEN,
+  TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN,
 /// , TRANSAKTION_TYP_VERLUST   // bestellverluste gehen extra!
-, TRANSAKTION_TYP_UMLAGE
+  TRANSAKTION_TYP_UMLAGE,
 );
 
 function transaktion_typ_string( $typ ) {
@@ -3640,7 +3736,7 @@ function sql_bestellung_pfandsumme( $bestell_id ) {
 
 function kontostand( $gruppen_id ) {
   global $specialgroups;
-  need( ! in_array( $gruppen_id, $specialgroups ), "kontostand fuer Basar und BadBank nicht definiert" );
+  need( ! in_array( $gruppen_id, $specialgroups ), "Kontostand für Basar und BadBank nicht definiert" );
   $row = sql_select_single_row( "
     SELECT (".select_soll_gruppen('bestellgruppen').") as soll
     FROM bestellgruppen
@@ -3810,7 +3906,7 @@ function sql_verluste_summe( $type ) {
 //     * VPE als verteileinheit ist mit beliebiger liefereinheit kombinierbar
 //  - lv_faktor:
 //     umrechnungsfaktor L-Einheit / V-Einheit
-//     wenn verteileinheit und liefereinheit verschiedene kanonische enheiten haben (nur bei GB, KI, PA, VPE als
+//     wenn verteileinheit und liefereinheit verschiedene kanonische einheiten haben (nur bei GB, KI, PA, VPE als
 //     L-Einheit oder VPE als V-Einheit erlaubt) muss dieser faktor manuell erfasst werden.
 // - gebindegroesse:
 //     gebindegroesse, vielfache der V-Einheit. Muss immer eine ganze Zahl sein!
@@ -3876,7 +3972,8 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
  *  oder false falls es keinen gueltigen preis gibt:
  */
 function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
-  return end( sql_produktpreise( $produkt_id, $zeitpunkt ) );
+  $preise = sql_produktpreise( $produkt_id, $zeitpunkt );
+  return end( $preise );
 }
 
 /* sql_aktueller_produktpreis_id:
@@ -3955,8 +4052,16 @@ function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id =
  *  Erzeugt einen Produktpreiseintrag
  */
 function sql_insert_produktpreis (
-  $produkt_id, $lieferpreis, $start, $bestellnummer, $gebindegroesse
-, $mwst, $pfand, $liefereinheit, $verteileinheit, $lv_faktor
+  $produkt_id,
+  $lieferpreis,
+  $start,
+  $bestellnummer,
+  $gebindegroesse,
+  $mwst,
+  $pfand,
+  $liefereinheit,
+  $verteileinheit,
+  $lv_faktor
 ) {
   need( $lieferpreis > 0, "kein gueltiger Lieferpreis" );
   need( $gebindegroesse >= 1, "keine gueltige Gebindegroesse" );
@@ -4131,47 +4236,59 @@ function sql_catalogue_acronym( $context, $acronym ) {
 // mit typen:
 //
 $foodsoft_get_vars = array(
-  'abrechnung_id' => 'u'
-, 'action' => 'w'
-, 'area' => 'w'
-, 'auszug' => '/\d+-\d+/'
-, 'auszug_jahr' => 'u'
-, 'auszug_nr' => 'u'
-, 'auszus_jahr' => 'u'
-, 'bestell_id' => 'u'
-, 'buchung_id' => 'd' /* kann auch negativ sein */
-, 'confirmed' => 'w'
-, 'detail' => 'w'
-, 'download' => 'w'
-, 'faxspalten' => 'u'
-, 'gruppen_id' => 'u'
-, 'id' => 'u'
-, 'id_to' => 'u'
-, 'login' => 'w'
-, 'katalogdatum' => 'w'
-, 'katalogtyp' => 'w'
-, 'konto_id' => 'u'
-, 'lieferanten_id' => 'u'
-, 'meinkonto' => 'u'
-, 'optionen' => 'u'
-, 'options' => 'u'
-, 'orderby' => 'w'
-, 'plan_dienst' => '/^[0-9\/]+$/'
-, 'prev_id' => 'u'
-, 'produkt_id' => 'u'
-, 'ro' => 'u'
-, 'spalten' => 'u'
-, 'state' => 'u'
-, 'transaktion_id' => 'u'
-, 'verpackung_id' => 'u'
-, 'window' => 'W'
-, 'window_id' => 'w'
+  'abrechnung_id' => 'u',
+  'action' => 'w',
+  'area' => 'w',
+  'auszug' => '/\d+-\d+/',
+  'auszug_jahr' => 'u',
+  'auszug_nr' => 'u',
+  'auszus_jahr' => 'u',
+  'bestell_id' => 'u',
+  'buchung_id' => 'd' /* kann auch negativ sein */,
+  'confirmed' => 'w',
+  'detail' => 'w',
+  'download' => 'w',
+  'faxspalten' => 'u',
+  'gruppen_id' => 'u',
+  'id' => 'u',
+  'id_to' => 'u',
+  'login' => 'w',
+  'katalogdatum' => 'w',
+  'katalogtyp' => 'w',
+  'konto_id' => 'u',
+  'lieferanten_id' => 'u',
+  'meinkonto' => 'u',
+  'optionen' => 'u',
+  'options' => 'u',
+  'orderby' => 'w',
+  'plan_dienst' => '/^[0-9\/]+$/',
+  'prev_id' => 'u',
+  'produkt_id' => 'u',
+  'ro' => 'u',
+  'spalten' => 'u',
+  'state' => 'u',
+  'transaktion_id' => 'u',
+  'verpackung_id' => 'u',
+  'window' => 'W',
+  'window_id' => 'w',
 );
 
 $http_input_sanitized = false;
+
+/**
+ * Check HTTP request parameters
+ * 
+ * - are there uneXpected variables or variables with invalid values?
+ * - for POST requests: was a valid and unused iTAN in the request
+ *   (protection against submitting a form multiple times)
+ */
 function sanitize_http_input() {
-  global $from_dokuwiki
-       , $foodsoft_get_vars, $http_input_sanitized, $session_id;
+
+  global
+    $foodsoft_get_vars,
+    $from_dokuwiki,
+    $http_input_sanitized,
+    $session_id;
 
   if( ! $from_dokuwiki ) {
     foreach( $_GET as $key => $val ) {
@@ -4181,18 +4298,15 @@ function sanitize_http_input() {
     if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
       need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
       sscanf( $_POST['itan'], "%u_%s", $t_id, $itan );
-      need( $t_id, 'fehlerhaftes Formular uebergeben' );
+      need( $t_id, 'fehlerhaftes Formular übergeben' );
       $row = sql_select_single_row( "SELECT * FROM transactions WHERE id=$t_id", true );
-      need( $row, 'fehlerhaftes Formular uebergeben' );
+      need( $row, 'fehlerhaftes Formular übergeben' );
       if( $row['used'] ) {
-        // formular wurde mehr als einmal abgeschickt: POST-daten verwerfen:
         $_POST = array();
         echo "<div class='warn'>Warnung: mehrfach abgeschicktes Formular detektiert! (wurde nicht ausgewertet)</div>";
       } else {
-        need( $row['itan'] == $itan, 'ungueltige iTAN uebergeben' );
-        // echo "session_id: $session_id, from db: {$row['session_id']} <br>";
-        need( $row['session_id'] == $session_id, 'ungueltige session_id' );
-        // id ist noch unverbraucht: jetzt entwerten:
+        need( $row['itan'] == $itan, 'ungültige iTAN übergeben' );
+        need( $row['session_id'] == $session_id, 'ungültige session_id' );
         sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
     } else {
@@ -4203,6 +4317,9 @@ function sanitize_http_input() {
 }
 
 
+/**
+ * Check if $val is valid for the given type.
+ */
 function checkvalue( $val, $typ){
     $pattern = '';
     $format = '';
@@ -4263,7 +4380,11 @@ function checkvalue( $val, $typ){
   return $val;
 }
 
-// get_http_var:
+// get_http_var
+//
+// Create a global variable <name> and populate it with the GET or POST parameter
+// of the same name, using the <default> value if set.
+//
 // - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
 // - typ: definierte $typ argumente:
 //   d : ganze Zahl
@@ -4284,8 +4405,10 @@ function checkvalue( $val, $typ){
 // gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
 //
 function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
-  global $self_fields, $self_post_fields;
-  global $http_input_sanitized;
+  global
+    $http_input_sanitized,
+    $self_fields,
+    $self_post_fields;
 
   if( ! $http_input_sanitized )
     sanitize_http_input();
@@ -4376,7 +4499,7 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
  *
  */
 function need_http_var( $name, $typ, $is_self_field = false ) {
-  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht uebergeben" );
+  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );
   return TRUE;
 }
 
@@ -4389,7 +4512,13 @@ function self_field( $name, $default = NULL ) {
 }
 
 /**
- *
+ * Database migration to the neXt version
+ * 
+ * This function contains all changes in the DB schema across foodsoft versions.
+ * 
+ * @param int $version
+ *   Current version that should be updated
+ * @return
  */
 function update_database( $version ) {
   switch( $version ) {
@@ -4455,7 +4584,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 10 ) );
       logger( 'update_database: update to version 10 successful' );
 
-  case 10:
+    case 10:
       logger( 'starting update_database: from version 10' );
 
       // preise ab jetzt pro L-einheit speichern:
@@ -4483,7 +4612,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 11 ) );
       logger( 'update_database: update to version 11 successful' );
 
-  case 11:
+    case 11:
       logger( 'starting update_database: from version 11' );
 
       doSql( "ALTER TABLE `gruppenbestellungen` CHANGE column `bestellguppen_id` `bestellgruppen_id` int(11)" );
@@ -4514,7 +4643,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 12 ) );
       logger( 'update_database: update to version 12 successful' );
 
-  case 12:
+    case 12:
       logger( 'starting update_database: from version 12' );
 
       doSql( "ALTER TABLE `bestellvorschlaege` MODIFY COLUMN `liefermenge` decimal(10,3) not null default 0
@@ -4589,7 +4718,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 13 ) );
 
       logger( 'update_database: update to version 13 successful' );
-  case 13:
+    case 13:
       logger( 'starting update_database: from version 13' );
 
       doSql( "update `bestellzuordnung` set art=20 where art=0" );
@@ -4598,7 +4727,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 14 ) );
 
       logger( 'update_database: update to version 14 successful' );
-  case 14:
+    case 14:
       logger( 'starting update_database: from version 14' );
 
       doSql( "ALTER TABLE `lieferantenkatalog` ADD COLUMN `katalogformat` varchar(20) not null default '' " );
@@ -4607,7 +4736,7 @@ function update_database( $version ) {
 
       logger( 'update_database: update to version 15 successful' );
 
-  case 15:
+    case 15:
       logger( 'starting update_database: from version 15' );
 
       doSql( "ALTER TABLE `lieferantenkatalog` ADD COLUMN `gueltig` tinyint(1) not null default 1 " );
@@ -4615,7 +4744,7 @@ function update_database( $version ) {
 
       logger( 'update_database: update to version 16 successful' );
 
-  case 16:
+    case 16:
       logger( 'starting update_database: from version 16' );
 
       doSql( "ALTER TABLE `gesamtbestellungen` ADD COLUMN `abrechnung_id` int(11) not null default 0 " );
@@ -4624,7 +4753,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 17 ) );
       logger( 'update_database: update to version 17 successful' );
 
-  case 17:
+    case 17:
       logger( 'starting update_database: from version 17' );
 
       doSql( "ALTER TABLE `produkte` ADD COLUMN `dauerbrenner` tinyint(1) not null default 0 " );
@@ -4634,7 +4763,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 18 ) );
       logger( 'update_database: update to version 18 successful' );
 
-  case 18:
+    case 18:
       logger( 'starting update_database: from version 18' );
 
       doSql( "ALTER TABLE `lieferantenkatalog` MODIFY COLUMN `gebinde` decimal(8,3) not null default 1.0 " );
@@ -4642,7 +4771,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 19 ) );
       logger( 'update_database: update to version 19 successful' );
 
-  case 19:
+    case 19:
       logger( 'starting update_database: from version 19' );
 
       sql_update( 'lieferanten', array( 'katalogformat' => 'terra' ), array( 'katalogformat' => 'terra_xls' ) );
@@ -4657,7 +4786,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 20 ) );
       logger( 'update_database: update to version 20 successful' );
 
-  case 20:
+    case 20:
       logger( 'starting update_database: from version 20' );
 
       sql_update( 'lieferantenkatalog', array( 'katalogformat' => 'terra' ), array( 'katalogformat' => 'terra_xls' ) );
@@ -4665,7 +4794,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 21 ) );
       logger( 'update_database: update to version 21 successful' );
       
-  case 21:
+    case 21:
       logger( 'starting update_database: from version 21' );
 
       doSql( "ALTER TABLE `lieferantenkatalog` ADD COLUMN `hersteller` text not null default '' " );
@@ -4675,7 +4804,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 22 ) );
       logger( 'update_database: update to version 22 successful' );
   
-  case 22:
+    case 22:
       logger( 'starting update_database: from version 22' );
 
       doSql( "ALTER TABLE `sessions` ADD COLUMN `muteReconfirmation_timestamp` timestamp null default null" );
@@ -4683,7 +4812,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 23 ) );
       logger( 'update_database: update to version 23 successful' );
       
- case 23:
+    case 23:
       logger( 'starting update_database: from version 23' );
       
       doSql( "CREATE TABLE `catalogue_acronyms` ("
@@ -4699,7 +4828,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 24 ) );
       logger( 'update_database: update to version 24 successful' );
    
- case 24:
+    case 24:
       logger( 'starting update_database: from version 24' );
 
       doSql( "ALTER TABLE `lieferanten`
@@ -4717,7 +4846,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 25 ) );
       logger( 'update_database: update to version 25 successful' );
 
- case 25:
+    case 25:
       logger( 'starting update_database: from version 25' );
 
       doSql( "ALTER TABLE `gruppenmitglieder`
@@ -4729,7 +4858,7 @@ function update_database( $version ) {
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 26 ) );
       logger( 'update_database: update to version 26 successful' );
 
-case 26:
+    case 26:
       logger( 'starting update_database: from version 26' );
 
       sql_insert( 'leitvariable', array(
@@ -4746,7 +4875,7 @@ case 26:
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 27 ) );
       logger( 'update_database: update to version 27 successful' );
 
-  case 27:
+    case 27:
       logger( 'starting update_database: from version 27' );
 
       doSql( "ALTER TABLE `lieferanten` ADD COLUMN `bestellfaxspalten` int(11) not null default 534541" );
@@ -4754,7 +4883,7 @@ case 26:
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 28 ) );
       logger( 'update_database: update to version 28 successful' );
       
-  case 28:
+    case 28:
       logger( 'starting update_database: from version 28' );
       sql_insert( 'leitvariable', array(
         'name' => 'exportDB'
@@ -4764,7 +4893,7 @@ case 26:
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 29 ) );
       logger( 'update_database: update to version 29 successful' );
       
-  case 29:
+    case 29:
       logger( 'starting update_database: from version 29' );
 
       doSql( "ALTER TABLE `gruppenmitglieder` ADD COLUMN `notiz` text not null " );
@@ -4772,7 +4901,7 @@ case 26:
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 30 ) );
       logger( 'update_database: update to version 30 successful' );
 
-  case 30:
+    case 30:
       logger( 'starting update_database: from version 30' );
 
       doSql( "ALTER TABLE `bestellgruppen` ADD COLUMN `notiz_gruppe` text not null " );
@@ -4834,6 +4963,22 @@ function get_itan( $force_new = false ) {
   return $itan;
 }
 
+/**
+ * Generate HTML options elements for values with one option selected.
+ * 
+ * Each value may be a scalar or a tuple with 2 or 3 elements.
+ * In the tuple case, the items are mapped to options attributes:
+ * - [0] => value
+ * - [1] => text label
+ * - [2] => title (optional)
+ * 
+ * @param array $values
+ * @param mixed $selected
+ * 
+ * @return string
+ *   generated HTML
+ * 
+ */
 function optionen( $values, $selected ) {
   $output = '';
   foreach( $values as $v ) {
@@ -4846,12 +4991,9 @@ function optionen( $values, $selected ) {
       $text = $v;
       $title = '';
     }
-    $output .= "<option value='$value'";
-    if( $value == $selected )
-      $output .= " selected";
-    if( $title )
-      $output .= " title='$title'";
-    $output .= ">$text</option>";
+    $selected_attr = ( $value == $selected ) ? "selected" : "";
+    $title_attr = $title ? "title='$title'" : "";
+    $output .= "<option value='$value' $title_attr $selected_attr>$text</option>";
   }
   return $output;
 }
