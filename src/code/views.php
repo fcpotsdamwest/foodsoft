@@ -1268,17 +1268,17 @@ function bestellschein_view(
 
 
 /**
- * Generate the table of orders for the order document sent to the supplier
- * using TeX markup for subsequent rendering to PDF.
+ * Generate the table of orders for printing and sending to the supplier
+ * (priner-friendly HTML)
  * 
  * @param int|string $bestell_id
  *   Order ID
  * @param int $spalten
  *   Value representing the columns selected for rendering
  * @return string
- *   TeX table
+ *   HTML table
  */
-function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
+function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
   $produkte = sql_bestellung_produkte( $bestell_id );
   $bestellung = sql_bestellung( $bestell_id );
 
@@ -1362,12 +1362,12 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
         '<td>' .
             mult2string( $kan_verteilmult * $gebindegroesse ) .
             '&thinsp;' .
-            $kan_verteilmult .
+            $produkte_row['kan_verteileinheit'] .
         '</td>';
     }
     if( $spalten & PR_COL_LPREIS ) {
       $zeile .=
-        '<td>' .
+        '<td class="right">' .
           sprintf( '%.2lf', $nettolieferpreis ) .
         '</td>' .
         '<td>' .
@@ -1389,8 +1389,9 @@ function bestellfax_tex( $bestell_id, $spalten = 0xfffff ) {
         '<style>' .
             'table { border-collapse: collapse; } ' .
             'thead > tr:first-child { border-bottom: 1px solid black; } ' .
-            'tr:nth-child(even) { background-color: #f2f2f2; } ' .
+            'th { background-color:#ccc; } ' .
             'th, td { padding: 6px; } ' .
+            'tr:nth-child(even) { background-color: #f2f2f2; } ' .
             '.right { text-align: right } ' .
             '.center { text-align: center } ' .
         '</style>' .
