@@ -57,7 +57,7 @@ switch( $action ) {
     $set2 = sql_abrechnung_set( $sets[1] );
     $lieferanten_id = sql_bestellung_lieferant_id( $abrechnung_id );
     foreach( $set2 as $bestell_id ) {
-      need( $lieferanten_id == sql_bestellung_lieferant_id( $bestell_id ), "Nur Bestellungen bei demselben Lieferanten koennen zusammengefasst werden!" );
+      need( $lieferanten_id == sql_bestellung_lieferant_id( $bestell_id ), "Nur Bestellungen bei demselben Lieferanten können zusammengefasst werden!" );
       sql_update( 'gesamtbestellungen', $bestell_id, array( 'abrechnung_id' => $abrechnung_id ) );
     }
     $set = sql_abrechnung_set( $abrechnung_id );
@@ -157,7 +157,7 @@ foreach( $bestellungen as $bestellung ) {
     switch( $rechnungsstatus ) {
 
       case STATUS_BESTELLEN:
-        $views[] = fc_link( 'bestellschein', "class=href,bestell_id=$bestell_id,text=Bestellschein (vorl&auml;ufig)" );
+        $views[] = fc_link( 'bestellschein', "class=href,bestell_id=$bestell_id,text=Bestellschein (vorläufig)" );
         if( hat_dienst(4) ) {
           if ( $row['bestellende'] < $mysqljetzt ) {
             $actions[] = fc_action( array( 'text' => '>>> Bestellschein fertigmachen >>>'
@@ -165,7 +165,7 @@ foreach( $bestellungen as $bestellung ) {
                                          , 'confirm' => 'Jetzt Bestellschein für Lieferanten fertigmachen?' )
                                   , array( 'action' => 'changeState'
                                          , 'change_id' => $bestell_id, 'change_to' => STATUS_LIEFERANT ) );
-            $actions[] = fc_action( "title=Bestellung löschen,class=drop,text=löschen,confirm=Bestellung wirklich loeschen?"
+            $actions[] = fc_action( "title=Bestellung löschen,class=drop,text=löschen,confirm=Bestellung wirklich löschen?"
                                   , "action=delete,delete_id=$bestell_id" );
           } else {
             $actions[] = "
@@ -174,7 +174,7 @@ foreach( $bestellungen as $bestellung ) {
           }
           $actions[] = fc_link( 'bestellen', array( 'bestell_id' => $bestell_id
                                         , 'class' => 'browse', 'text' => 'zum Bestellen...' ) );
-          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten &auml;ndern..." );
+          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten ändern..." );
         }
         break;
   
@@ -183,7 +183,7 @@ foreach( $bestellungen as $bestellung ) {
         if( $login_dienst > 0 )
           $views[] = fc_link( 'verteilliste', "class=href,bestell_id=$bestell_id" );
         if( hat_dienst(4) ) {
-          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten &auml;ndern..." );
+          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten ändern..." );
           $actions[] = fc_action( array( 'text' => '<<< Nachbestellen lassen <<<'
                                        , 'title' => 'Bestellung nochmal zum Bestellen freigeben?' )
                                 , array( 'action' => 'changeState'
@@ -196,7 +196,7 @@ foreach( $bestellungen as $bestellung ) {
                                 , array( 'action' => 'changeState'
                                        , 'change_id' => $bestell_id, 'change_to' => STATUS_VERTEILT ) );
         if( hat_dienst(4) )
-          $actions[] = fc_action( "title=Bestellung löschen,class=drop,text=löschen,confirm=Bestellung wirklich loeschen?"
+          $actions[] = fc_action( "title=Bestellung löschen,class=drop,text=löschen,confirm=Bestellung wirklich löschen?"
                                 , "action=delete,delete_id=$bestell_id" );
         break;
   
@@ -207,7 +207,7 @@ foreach( $bestellungen as $bestellung ) {
           $views[] = fc_link( 'verteilliste', "class=href,bestell_id=$bestell_id,ro=1,text=Produktverteilung (Druck)" );
         }
         if( hat_dienst(4) ) {
-          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten &auml;ndern..." );
+          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten ändern..." );
           if( $abrechnung_set_count > 1 ) {
             $combs[] = fc_action( 'update,text=Trennen,confirm=Bestellung von Gesamtabrechnung abtrennen?', "action=split,message=$bestell_id" );
           }

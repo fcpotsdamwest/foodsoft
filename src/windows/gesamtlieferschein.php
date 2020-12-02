@@ -1,6 +1,6 @@
 <?php
 //
-// bestellschein.php: detailanzeige gesamtlieferschein, abhaengig vom status der bestellung
+// bestellschein.php: detailanzeige gesamtlieferschein, abhängig vom status der bestellung
 //
 
 error_reporting(E_ALL);

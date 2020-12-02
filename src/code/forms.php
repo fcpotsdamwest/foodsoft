@@ -116,7 +116,7 @@ function form_finish_transaction( $transaction_id ) {
       form_row_date( 'Valuta:', 'valuta' );
       open_tr();
         open_td( 'right', "colspan='2'" );
-        echo "Best&auml;tigen: <input type='checkbox' name='confirm' value='yes' $input_event_handlers>";
+        echo "Bestätigen: <input type='checkbox' name='confirm' value='yes' $input_event_handlers>";
         qquad();
         submission_button( 'OK' );
     close_table();
@@ -604,7 +604,7 @@ function formular_umbuchung_verlust( $typ = 0 ) {
               hidden_input( 'von_typ', $typ );
             } else {
               open_select( 'von_typ' );
-                ?> <option value=''>(bitte Quelle w&auml;hlen)</option> <?php
+                ?> <option value=''>(bitte Quelle wählen)</option> <?php
                 foreach( array( TRANSAKTION_TYP_SPENDE , TRANSAKTION_TYP_UMLAGE ) as $t ) {
                    ?> <option value='<?php echo $t; ?>'><?php echo transaktion_typ_string($t); ?></option> <?php
                  }
@@ -614,7 +614,7 @@ function formular_umbuchung_verlust( $typ = 0 ) {
           open_td( 'label', '', 'nach:' );
           open_td( 'kbd' );
             open_select( 'nach_typ' );
-              ?> <option value=''>(bitte Ziel w&auml;hlen)</option> <?php
+              ?> <option value=''>(bitte Ziel wählen)</option> <?php
               foreach( array( TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN
                             , TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN
                             , TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE ) as $t ) {
@@ -719,7 +719,7 @@ function formular_artikelnummer( $produkt_id, $toggle = false, $bestell_id = 0 )
   $anummer = $produkt['artikelnummer'];
   $lieferanten_id = $produkt['lieferanten_id'];
 
-  open_fieldset( 'small_form', '', "Artikelnummer ($anummer) &auml;ndern", $toggle );
+  open_fieldset( 'small_form', '', "Artikelnummer ($anummer) ändern", $toggle );
     open_table( 'layout' );
         open_td( '', '' );
           open_form( '', 'action=artikelnummer_setzen' );
@@ -748,10 +748,10 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
   $preis_id = sql_aktueller_produktpreis_id( $produkt_id );
   $produkt = sql_produkt( array( 'produkt_id' => $produkt_id, 'preis_id' => $preis_id ) );
 
-  // besetze $vorschlag mit Werten fuer Formularfelder; benutze nacheinander
+  // besetze $vorschlag mit Werten für Formularfelder; benutze nacheinander
   //  - existierende Werte in $vorschlag (typischerweise: automatisch aus lieferantenkatalog entnommen)
   //  - existierende Werte aus $produkt
-  //  - vernuenftigen Default
+  //  - vernünftigen Default
 
   if( ! isset( $vorschlag['gebindegroesse'] ) )
     $vorschlag['gebindegroesse'] = $preis_id ? $produkt['gebindegroesse'] : 1;
@@ -828,7 +828,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
                  onmouseout="help(' ');" >
            <input type='text' size='4' class='number' name='liefermult' id='newliefermult'
              value='<?php echo $vorschlag['kan_liefermult']; ?>'
-             title='Vielfache der Einheit: meist 1, ausser bei g, z.B. 1000 fuer 1kg'
+             title='Vielfache der Einheit: meist 1, außer bei g, z.B. 1000 für 1kg'
              onchange='preisberechnung_vorwaerts();'>
            <select size='1' name='liefereinheit' id='newliefereinheit'
              onchange='preisberechnung_vorwaerts();'>
@@ -854,7 +854,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
                  onmouseout="help(' ');" >
            <input type='text' size='4' class='number' name='verteilmult' id='newverteilmult'
              value='<?php echo $vorschlag['kan_verteilmult']; ?>'
-             title='Vielfache der Einheit: meist 1, ausser bei g, z.B. 1000 fuer 1kg'
+             title='Vielfache der Einheit: meist 1, außer bei g, z.B. 1000 für 1kg'
              onchange='preisberechnung_vorwaerts();'>
            <select size='1' name='verteileinheit' id='newverteileinheit'
              onchange='preisberechnung_vorwaerts();'>
@@ -864,10 +864,10 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
         <?php
 
       open_tr(); // gebinde
-           open_td( 'label', '', 'Gebindegr&ouml;&szlig;e:' );
+           open_td( 'label', '', 'Gebindegröße:' );
            open_td();
            ?>
-           <span onmouseover="help('Gebindegroesse: wieviel von diesem Produkt muessen wir auf einmal bestellen --- muss ein Vielfaches fer V-Einheit sein!');"
+           <span onmouseover="help('Gebindegröße: wieviel von diesem Produkt müssen wir auf einmal bestellen --- muss ein Vielfaches fer V-Einheit sein!');"
                  onmouseout="help(' ');" >
            <input type='text' size='4' class='number' name='gebindegroesse' id='newgebindegroesse'
              value='<?php echo mult2string( $vorschlag['gebindegroesse'] / $vorschlag['lv_faktor'] ) ; ?>'
@@ -1016,9 +1016,9 @@ function action_form_produktpreis() {
 
   need_http_var('produkt_id','u');
 
-  // get_http_var('name','H','');  // notwendig, sollte aber moeglichst nicht geaendert werden!
+  // get_http_var('name','H','');  // notwendig, sollte aber möglichst nicht geändert werden!
   need_http_var('verteilmult','f');
-  $verteilmult = mult2string( $verteilmult ); // ...maximal 3 nachkommastellen, und nur wenn noetig!
+  $verteilmult = mult2string( $verteilmult ); // ...maximal 3 nachkommastellen, und nur wenn nötig!
   need_http_var('verteileinheit',$unit_pattern);
   need_http_var('liefermult','f');
   $liefermult = mult2string( $liefermult );
@@ -1037,7 +1037,7 @@ function action_form_produktpreis() {
 
   $gebindegroesse *= $lv_faktor;
   // kludge alert: rundungsfehler korrigieren (gebindegroesse muss ganzzahlig und >= 1 sein!)
-  // (eigentlich brauchen wir Q-arithnetik fuer den lv_faktor)
+  // (eigentlich brauchen wir Q-arithmetik für den lv_faktor)
   $gebindegroesse = floor( $gebindegroesse + 0.02 );
 
   $produkt = sql_produkt( $produkt_id );
@@ -1057,8 +1057,8 @@ function action_form_produktpreis() {
 
 // fieldset_edit_transaction: ediert eine transaktion der beiden transaktionen einer buchung.
 // $tag: 1 oder 2:
-//  - felder die in beiden transactions identisch sein muessen, werden nur bei $tag == 1 angezeigt
-//  - $tag wird an feldnamen angehaengt, um beide transaktionen unterscheiden zu koennen.
+//  - felder die in beiden transactions identisch sein müssen, werden nur bei $tag == 1 angezeigt
+//  - $tag wird an feldnamen angehängt, um beide transaktionen unterscheiden zu können.
 //
 function fieldset_edit_transaction( $id, $tag, $editable ) {
   global $selectable_types;
@@ -1144,7 +1144,7 @@ function fieldset_edit_transaction( $id, $tag, $editable ) {
             form_row_betrag( 'Haben FC:', ( $editable and $tag == 1 ) ? 'haben' : false, $haben );
           }
 
-    } else {  // regulaere (nicht-13) gruppen-transaktion
+    } else {  // reguläre (nicht-13) gruppen-transaktion
       open_tr();
         open_th( 'smallskip', "colspan='2'", "Gruppen-Transaktion <span class='small'>$id</span>" );
       form_row_gruppe( 'Gruppe:', false, $t['gruppen_id'] );  // TODO: make this editable?

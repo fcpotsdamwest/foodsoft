@@ -11,7 +11,7 @@ assert( $angemeldet ) or exit();
 $editable = ( hat_dienst(4) and ! $readonly );
 
 need_http_var('produkt_id','u',true);
-get_http_var('bestell_id','u',0,true);  // optional: waehle preiseintrag fuer diese bestellung!
+get_http_var('bestell_id','u',0,true);  // optional: wähle preiseintrag für diese bestellung!
 
 $produkt = sql_produkt( $produkt_id );
 $lieferanten_id = $produkt['lieferanten_id'];
@@ -76,9 +76,9 @@ switch( $action ) {
 
 $neednewprice = FALSE;         // flag: neuen preiseintrag vorschlagen (falls gar keiner oder fehlerhaft):
 $neednewarticlenumber = FALSE; // flag: suche nach artikelnummer vorschlagen (falls kein Treffer bei Katalogsuche):
-$preiseintrag_neu = array();   // array fuer vorschlag neuer preiseintrag
+$preiseintrag_neu = array();   // array für vorschlag neuer preiseintrag
 
-// neu laden (falls durch $action geaendert), mit aktuellen preisdaten (soweit vorhanden):
+// neu laden (falls durch $action geändert), mit aktuellen preisdaten (soweit vorhanden):
 //
 $preis_id = sql_aktueller_produktpreis_id( $produkt_id );
 $produkt = sql_produkt( array( 'produkt_id' => $produkt_id, 'preis_id' => $preis_id ) );
@@ -107,12 +107,12 @@ open_fieldset( 'big_form', '', "Foodsoft-Datenbank:" );
       open_th( '', '', 'Name' );
       open_th( '', "title='Bestellnummer'", 'B-Nr.' );
       open_th( 'mult', "title='L-Preis: Netto-Einzelpreis beim Lieferanten'", 'L-Preis' );
-      open_th( 'unit', "title='Liefer-Einheit: fuer Abgleich mit Rechnungen und Katalog'", '/ L-Einheit' );
+      open_th( 'unit', "title='Liefer-Einheit: für Abgleich mit Rechnungen und Katalog'", '/ L-Einheit' );
       open_th( '', "title='MWSt in Prozent'", 'MWSt' );
       open_th( '', "title='Pfand je V-Einheit'", 'Pfand' );
-      open_th( '', "title='Wieviel wir beim Lieferanten auf einmal bestellen muessen'", 'Gebindegroesse' );
+      open_th( '', "title='Wieviel wir beim Lieferanten auf einmal bestellen müssen'", 'Gebindegröße' );
       open_th( 'mult', "title='V-Preis: mit Pfand und Mehrwertsteuer'", 'V-Preis' );
-      open_th( 'unit', "title='Verteil-Einheit: fuers Bestellen und Verteilen bei uns'", '/ V-Einheit' );
+      open_th( 'unit', "title='Verteil-Einheit: fürs Bestellen und Verteilen bei uns'", '/ V-Einheit' );
     open_tr();
       open_td();
         open_table( 'layout hfill' );
@@ -140,7 +140,7 @@ open_fieldset( 'big_form', '', "Foodsoft-Datenbank:" );
       div_msg( 'warn', 'FEHLER: keine gültige Liefereinheit' );
       $neednewprice = TRUE;
     }
-    // FIXME: hier mehr tests machen! aber: waere nur fuer lieferanten ohne erfassten katalog nuetzlich!
+    // FIXME: hier mehr tests machen! aber: wäre nur für lieferanten ohne erfassten katalog nützlich!
   }
 
 close_fieldset();

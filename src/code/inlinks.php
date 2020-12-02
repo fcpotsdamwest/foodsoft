@@ -60,14 +60,14 @@ function fc_window_defaults( $name ) {
       $parameters['window_id'] = $GLOBALS['window_id'];
       break;
     //
-    // Anzeige im Hauptfenster (aus dem Hauptmenue) oder in "grossem" Fenster moeglich:
+    // Anzeige im Hauptfenster (aus dem Hauptmenü) oder in "großem" Fenster möglich:
     //
     case 'menu':
     case 'index':
       $parameters['window'] = 'menu';
       $parameters['window_id'] = 'main';
       $parameters['text'] = 'Beenden';
-      $parameters['title'] = 'zur&uuml;ck zum Hauptmen&uuml;';
+      $parameters['title'] = 'zurück zum Hauptmenü';
       $options = $large_window_options;
       break;
     case 'wiki':
@@ -106,7 +106,7 @@ function fc_window_defaults( $name ) {
       $parameters['window_id'] = 'bilanz';
       $parameters['text'] = 'Bilanz';
       $parameters['class'] = 'chart';
-      $parameters['title'] = 'zur &Uuml;bersicht &uuml;ber die Finanzen der Foodcoop...';
+      $parameters['title'] = 'zur Übersicht über die Finanzen der Foodcoop...';
       $options = $large_window_options;
       break;
     case 'produkte':
@@ -137,7 +137,7 @@ function fc_window_defaults( $name ) {
       $parameters['window'] = 'basar';
       $parameters['window_id'] = 'basar';
       $parameters['text'] = "Basar";
-      $parameters['title'] = "zur Basar&uuml;bersicht...";
+      $parameters['title'] = "zur Basarübersicht...";
       $parameters['class'] = 'browse';
       $options = array_merge( $large_window_options, array( 'width' => 1200 ) );
       break;
@@ -171,7 +171,7 @@ function fc_window_defaults( $name ) {
       $parameters['window'] = 'abrechnung';
       $parameters['window_id'] = 'abrechnung';
       $parameters['text'] = 'Abrechnung';
-      $parameters['title'] = 'zur &Uuml;bersichtsseite Abrechnung...';
+      $parameters['title'] = 'zur Übersichtsseite Abrechnung...';
       $parameters['class'] = 'record';
       $options = array_merge( $large_window_options, array( 'width' => 860, 'height' => 720 ) );
       break;
@@ -289,7 +289,7 @@ function fc_window_defaults( $name ) {
       $parameters['window_id'] = 'verluste';
       $parameters['text'] = 'Verlustaufstellung';
       $parameters['class'] = 'browse';
-      $parameters['title'] = 'zur &Uuml;bersicht &uuml;ber die Verluste der Foodcoop...';
+      $parameters['title'] = 'zur Übersicht über die Verluste der Foodcoop...';
         $options = array_merge(
           $large_window_options, array( 'toolbar' => 'no', 'location' => 'no', 'width' => '800', 'menubar' => 'no','height' => '1000' ) );
       break;

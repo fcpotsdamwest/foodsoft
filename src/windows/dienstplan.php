@@ -3,7 +3,7 @@
 //error_reporting(E_ALL);
 // $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
 
-get_http_var( 'plan_dienst', '/^[0-9\/]+$/', '1/2', true ); // fuer anzeige rotationsplan
+get_http_var( 'plan_dienst', '/^[0-9\/]+$/', '1/2', true ); // für anzeige rotationsplan
 get_http_var( 'options', 'u', 0, true );
 
 define( 'OPTION_SHOW_HISTORY', 1 );
@@ -110,7 +110,7 @@ switch( $action ) {
             open_div( 'warn' );
               echo 'Bitte Ausweichdatum auswählen: ';
               open_select( 'tausch_id' );
-                echo "<option value=''>(bitte auswaehlen)</option>";
+                echo "<option value=''>(bitte auswählen)</option>";
                 foreach( $tauschmoeglichkeiten as $t ) {
                   echo "<option value={$t['id']}>{$t['lieferdatum']}</option>";
                 }
@@ -156,7 +156,7 @@ if( hat_dienst(5) ) {
     open_form( '', 'action=diensteErstellen' );
       open_table( 'smallskip' );
         open_tr();
-          open_td( '', '', "Verteile Dienste fuer " . int_view( $dienstanzahl, 'dienstanzahl', 2 ) . " Liefertage," );
+          open_td( '', '', "Verteile Dienste für " . int_view( $dienstanzahl, 'dienstanzahl', 2 ) . " Liefertage," );
         open_tr();
           open_td( 'qquad', '', "im Abstand von je " . int_view( $dienstinterval, 'dienstinterval', 2 ) . " Tagen," );
         open_tr();
@@ -249,7 +249,7 @@ open_table( 'list' );
         open_div( '', '', $currentDate );
         if( hat_dienst(5) && ! $readonly ) {
           open_div( 'bigskip center', ''
-            , fc_action( "update,title=Dienste fuer ganzen Liefertag loeschen,class=drop,text=,confirm=Alle Dienste dieses Tages wirklich loeschen?"
+            , fc_action( "update,title=Dienste für ganzen Liefertag löschen,class=drop,text=,confirm=Alle Dienste dieses Tages wirklich löschen?"
                        , "action=diensteTagLoeschen,message={$dienst['id']}" )
           );
         }

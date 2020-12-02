@@ -29,7 +29,7 @@ $avatar_msg = '';
 get_http_var('action','w','');
 switch( $action ) {
   case 'new_pwd':
-    need( $edit_pwd, "keine Berechtigung zur Passwortaenderung!" );
+    need( $edit_pwd, "keine Berechtigung zur Passwortänderung!" );
     need_http_var('newPass', 'R');
     need_http_var('newPass2', 'R');
     if($newPass!=$newPass2){
@@ -167,7 +167,7 @@ medskip();
 
 echo $pwmsg;
 if( $edit_pwd ) {
-  open_fieldset( 'small_form medskip', '', 'Passwort aendern', 'off' );
+  open_fieldset( 'small_form medskip', '', 'Passwort ändern', 'off' );
     open_form( '', 'action=new_pwd' );
       open_table('layout');
         open_tr(); open_td( 'label', '', 'Passwort:');

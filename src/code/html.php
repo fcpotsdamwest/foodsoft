@@ -402,7 +402,7 @@ function floating_submission_button() {
       open_td('alert left');
         ?> <a class='close' title='Schließen' href='javascript:true;'
           onclick='document.getElementById("floating_submit_button_<?php echo $form_id; ?>").style.display = "none"; return false;'></a> <?php
-      open_td('alert center quad', '', "&Auml;nderungen sind noch nicht gespeichert!" );
+      open_td('alert center quad', '', "Änderungen sind noch nicht gespeichert!" );
     open_tr();
       open_td( 'alert center oneline smallskip', "colspan='2'" );
         reset_button();
@@ -425,18 +425,18 @@ function submission_button( $text = '', $active = true, $confirm = '' ) {
   open_span( 'qquad', '', "<a href=\"javascript:$confirm submit_form( $form_id );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>" );
 }
 
-function reset_button( $text = 'Zur&uuml;cksetzen' ) {
+function reset_button( $text = 'Zurücksetzen' ) {
   global $form_id;
   open_span( 'qquad', '', "<a class='button inactive' href='javascript:true;' id='reset_button_$form_id' title='Änderungen zurücknehmen'
                               onClick=\"var form = $('form_$form_id'); form.reset(); form.fire('form:afterReset'); on_reset($form_id); return false;\">$text</a>" );
 }
 
-function check_all_button( $text = 'Alle ausw&auml;hlen', $title = '' ) {
+function check_all_button( $text = 'Alle auswählen', $title = '' ) {
   global $form_id;
   $title or $title = $text;
   echo "<a class='button' title='$text' onClick='checkAll($form_id);'>$text</a>";
 }
-function uncheck_all_button( $text = 'Alle abw&auml;hlen', $title = '' ) {
+function uncheck_all_button( $text = 'Alle abwählen', $title = '' ) {
   global $form_id;
   $title or $title = $text;
   echo "<a class='button' title='$text' onClick='uncheckAll($form_id);'>$text</a>";
@@ -556,7 +556,7 @@ function close_all_tags() {
 register_shutdown_function( 'close_all_tags' );
 
 function div_msg( $class, $msg, $backlink = false ) {
-  echo "<div class='$class'>$msg " . ( $backlink ? fc_link( $backlink, 'text=zur&uuml;ck...' ) : '' ) ."</div>";
+  echo "<div class='$class'>$msg " . ( $backlink ? fc_link( $backlink, 'text=zurück...' ) : '' ) ."</div>";
 }
 
 function open_hints() {

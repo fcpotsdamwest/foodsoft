@@ -45,7 +45,7 @@ function need( $exp, $comment = "Problem" ) {
 function fail_if_readonly() {
   global $readonly;
   if( isset( $readonly ) and $readonly ) {
-    open_div( 'warn', '', 'Datenbank ist schreibgesch&uuml;tzt - Operation nicht m&ouml;glich!' );
+    open_div( 'warn', '', 'Datenbank ist schreibgeschützt - Operation nicht möglich!' );
     die();
   }
   return true;

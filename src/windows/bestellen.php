@@ -9,12 +9,12 @@ if( hat_dienst(4) ) {
   $gruppen_id = $basar_id;
   $kontostand = 250.0;
   $festgelegt = 0.0;
-  echo "<h1>Bestellen f&uuml;r den Basar</h1>";
+  echo "<h1>Bestellen für den Basar</h1>";
 } else {
-  $gruppen_id = $login_gruppen_id;  // ...alle anderen fuer sich selbst!
+  $gruppen_id = $login_gruppen_id;  // ...alle anderen für sich selbst!
   $kontostand = kontostand( $gruppen_id );
   // $festgelegt = gruppenkontostand_festgelegt( $gruppen_id );
-  echo "<h1>Bestellen f&uuml;r Gruppe $login_gruppen_name</h1>";
+  echo "<h1>Bestellen für Gruppe $login_gruppen_name</h1>";
 }
 
 get_http_var('bestell_id','u',false,true );
@@ -29,7 +29,7 @@ if( count( $laufende_bestellungen ) < 1) {
   return;
 }
 
-// tabelle fuer infos und auswahl bestellungen:
+// tabelle für infos und auswahl bestellungen:
 //
 open_table( 'layout hfill' );
 
@@ -79,7 +79,7 @@ switch( $action ) {
       $gesamtpreis += $produkt['endpreis'] * ( $fest + $toleranz );
     }
     if( $gesamtpreis > 0.005 ) {
-      need( $gesamtpreis <= $kontostand, "Konto &uuml;berzogen!" );
+      need( $gesamtpreis <= $kontostand, "Konto überzogen!" );
     }
     foreach( $bestellungen as $produkt_id => $m ) {
       change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $m['fest'], $m['toleranz'], $m['vormerken'] );
@@ -92,7 +92,7 @@ switch( $action ) {
     sql_delete_bestellvorschlag( $produkt_id, $bestell_id );
     break;
   case 'update_prices':
-    // preiseintrage automatisch aktualisieren: bisher nur fuer bestellnummern:
+    // preiseinträge automatisch aktualisieren: bisher nur für bestellnummern:
     $n = 0;
     foreach( sql_bestellung_produkte( $bestell_id ) as $p ) {
       $id = update_preis( $p['produkt_id'] );
@@ -105,9 +105,9 @@ switch( $action ) {
       }
     }
     if( $n ) {
-      $js_on_exit[] = "alert( 'Die Preiseintraege von $n Produkten wurden aktualisiert.' );";
+      $js_on_exit[] = "alert( 'Die Preiseinträge von $n Produkten wurden aktualisiert.' );";
     } else {
-      $js_on_exit[] = "alert( 'Fuer kein Produkt konnte der Preis automatisch aktualisiert werden --- bitte manuell pruefen!' );";
+      $js_on_exit[] = "alert( 'Für kein Produkt konnte der Preis automatisch aktualisiert werden --- bitte manuell prüfen!' );";
     }
     break;
 }
@@ -188,7 +188,7 @@ if( ! $readonly ) {
       //
       gebinde = Math.floor( festmenge / gebindegroesse[produkt] );
 
-      // falls angebrochenes gebinde: wenn moeglich, mit toleranz auffuellen:
+      // falls angebrochenes gebinde: wenn möglich, mit toleranz auffüllen:
       //
       if( gebinde * gebindegroesse[produkt] < festmenge )
         if( (gebinde+1) * gebindegroesse[produkt] <= festmenge + toleranzmenge )
@@ -199,19 +199,19 @@ if( ! $readonly ) {
       zuteilung_fest = 0;
       if( fest[produkt] >= fest_alt[produkt] ) {
 
-        // falls festmenge hoeher oder gleichgeblieben:
-        // gruppe kriegt mindestens das, was schon vorher zugeteilt worden waere:
+        // falls festmenge höher oder gleichgeblieben:
+        // gruppe kriegt mindestens das, was schon vorher zugeteilt worden wäre:
         //
         menge = Math.min( zuteilung_fest_alt[produkt], restmenge );
         zuteilung_fest += menge;
         restmenge -= menge;
 
-        // ...dann werden, soweit moeglich, die anderen festbestellungen erfuellt:
+        // ...dann werden, soweit möglich, die anderen festbestellungen erfüllt:
         //
         menge = Math.min( fest_andere[produkt], restmenge );
         restmenge -= menge;
 
-        // ...dann wird die zuteilung der gruppe, soweit moeglich, aufgestockt:
+        // ...dann wird die zuteilung der gruppe, soweit möglich, aufgestockt:
         //
         menge = Math.min( fest[produkt] - zuteilung_fest, restmenge );
         zuteilung_fest += menge; restmenge -= menge;
@@ -219,7 +219,7 @@ if( ! $readonly ) {
       } else {
 
         // festmenge wurde reduziert:
-        // erstmal werden die anderen gruppen beruecksichtigt...
+        // erstmal werden die anderen gruppen berücksichtigt...
         //
         menge = Math.min( fest_andere[produkt], restmenge );
         restmenge -= menge;
@@ -231,7 +231,7 @@ if( ! $readonly ) {
 
       }
 
-      // falls noch toleranz beruecksichtigt wird: moeglichst gleichmaessig nach quote verteilen:
+      // falls noch toleranz berücksichtigt wird: möglichst gleichmäßig nach quote verteilen:
       //
       if( restmenge > 0 ) {
         quote = restmenge / ( toleranz_andere[produkt] + toleranz[produkt] );
@@ -375,7 +375,7 @@ if( ! $readonly ) {
       while( id.firstChild ) {
         id.removeChild( id.firstChild );
       }
-      id.appendChild( document.createTextNode( 'Produkt hinzufuegen: bitte vorher erst Änderungen speichern!' ) );
+      id.appendChild( document.createTextNode( 'Produkt hinzufügen: bitte vorher erst Änderungen speichern!' ) );
       id.style.backgroundColor = '#ffffa0';
       id.className = 'inactive';
 
@@ -449,7 +449,7 @@ if( ! $readonly ) {
     open_div( 'table', 'style="width:100%;"' );
       open_div( 'tr' );
         open_div( 'alert left td', '', fc_link( 'self', array( 'class' => 'close', 'url' => "javascript:set_footbar(0);") ) );
-        open_div( 'alert left td', '', "&Auml;nderungen sind noch nicht gespeichert!" );
+        open_div( 'alert left td', '', "Änderungen sind noch nicht gespeichert!" );
         open_div( 'alert center td');
           echo "Gesamtpreis: ";
           open_div( '', 'id="gesamtpreis1" style="display:inline"', '-' );
@@ -488,7 +488,7 @@ open_table( 'list hfill' );  // bestelltabelle
       open_span( 'floatleft', "title='Bestellmenge deiner Gruppe'", 'deine Bestellung' );
       open_span( 'quad floatright', "title='Falls Produkt nicht kommt: automatisch vormerken für nächste Bestellung?'", "vormerken" );
       close_div();
-    open_th( '', "title='maximale (bei voller Zuteilung) Kosten f&uuml;r deine Gruppe'", 'Kosten' );
+    open_th( '', "title='maximale (bei voller Zuteilung) Kosten für deine Gruppe'", 'Kosten' );
     open_th( '', "colspan='1' title='Bestellungen aller Gruppen'", 'Gesamtbestellung' );
     if( hat_dienst(4) )
       open_th( '', '', 'Aktionen' );
@@ -597,7 +597,7 @@ foreach( $produkte as $produkt ) {
           $title = 'Preis aktuell und konsistent mit Lieferantenkatalog '. $katalogdaten['katalogname'];
           break;
         case 3:
-          // kein Katalog erfasst: Abgleich nicht moeglich!
+          // kein Katalog erfasst: Abgleich nicht möglich!
           break;
         case 4:
           $bestellnummern_falsch[] = $n;
@@ -752,7 +752,7 @@ if( ! $readonly ) {
   }
   smallskip();
   open_div( 'middle', "id='hinzufuegen' style='display:block;'" );  
-    open_fieldset( 'small_form', '', 'Zus&auml;tzlich Produkt in Bestellvorlage aufnehmen', 'off' );
+    open_fieldset( 'small_form', '', 'Zusätzlich Produkt in Bestellvorlage aufnehmen', 'off' );
       open_form( '', 'action=produkt_hinzufuegen');
         open_table('small_form');
           open_tr();
@@ -771,9 +771,9 @@ if( ! $readonly ) {
             open_td('', '', '');
             open_td('', 'id="productLink"', '');
             open_td('right');
-              submission_button( 'Produkt hinzuf&uuml;gen', true
-                , "Produkt zur Bestellvorlage hinzufuegen: bist du ueberzeugt, dass das Gebinde noch voll werden wird, "
-                  ."und dass du dich nicht lieber an der Bestellung eines schon teilweise gefuellten Gebindes beteiligen moechtest?"
+              submission_button( 'Produkt hinzufügen', true
+                , "Produkt zur Bestellvorlage hinzufügen: bist du überzeugt, dass das Gebinde noch voll werden wird, "
+                  ."und dass du dich nicht lieber an der Bestellung eines schon teilweise gefüllten Gebindes beteiligen möchtest?"
               );
         close_table();
       close_form();

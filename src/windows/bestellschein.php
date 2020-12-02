@@ -1,6 +1,6 @@
 <?php
 //
-// bestellschein.php: detailanzeige bestellschein / lieferschein, abhaengig vom status der bestellung
+// bestellschein.php: detailanzeige bestellschein / lieferschein, abhängig vom status der bestellung
 //
 
  
@@ -101,7 +101,7 @@ if( $gruppen_id and ! in_array( $gruppen_id, $specialgroups ) ) {
 
 
 $default_spalten = PR_COL_NAME | PR_COL_LPREIS | PR_COL_ENDPREIS | PR_COL_MWST | PR_COL_PFAND | PR_COL_AUFSCHLAG;
-switch( $status ){    // anzeigedetails abhaengig vom Status auswaehlen
+switch( $status ){    // anzeigedetails abhängig vom Status auswählen
   case STATUS_BESTELLEN:
     $editable = FALSE;
     if( $gruppen_id ) {
@@ -129,7 +129,7 @@ switch( $status ){    // anzeigedetails abhaengig vom Status auswaehlen
       $editable = FALSE;
       $default_spalten |= ( PR_COL_BESTELLMENGE | PR_COL_LIEFERMENGE | PR_COL_ENDSUMME );
     } else {
-      // ggf. liefermengen aendern lassen:
+      // ggf. liefermengen ändern lassen:
       $editable = (!$readonly) && ( hat_dienst(1,3,4) && ( $status == STATUS_VERTEILT ) );
       $default_spalten
         |= ( PR_COL_BESTELLMENGE | PR_COL_LIEFERMENGE | PR_COL_LIEFERGEBINDE | PR_COL_NETTOSUMME | PR_ROWS_NICHTGEFUELLT );
@@ -186,7 +186,7 @@ bestellschein_view(
   $editable,   // Preise edieren zulassen?
   $spalten,    // welche Tabellenspalten anzeigen
   $gruppen_id, // Gruppenansicht (0: alle)
-  true,        // angezeigte Spalten auswaehlen lassen
+  true,        // angezeigte Spalten auswählen lassen
   true         // Option: Anzeige nichtgelieferte zulassen
 );
 
@@ -198,15 +198,15 @@ switch( $status ) {
       open_fieldset( 'small_form', '', 'Zusätzliches Produkt eintragen', 'off' );
         open_form( '', 'action=insert' );
           open_div( 'kommentar' )
-            ?> Hier koennt ihr ein weiteres geliefertes Produkt in den Lieferschein eintragen: <?php
+            ?> Hier könnt ihr ein weiteres geliefertes Produkt in den Lieferschein eintragen: <?php
             open_ul();
               open_li( '', '', 'das Produkt muss vorher in der Produkt-Datenbank erfasst sein' );
               open_li( '', '', 'die <em>Liefermenge</em> ist danach noch 0 und muss hinterher gesetzt werden!' );
             close_ul();
           close_div();
           select_products_not_in_list($bestell_id);
-          // mengeneingabe ist hier sinnlos, da wir keine Masseinheit anbieten koennen
-          // (die haengt von der auswahl in obiger Produktliste ab!)
+          // mengeneingabe ist hier sinnlos, da wir keine Maßeinheit anbieten können
+          // (die hängt von der auswahl in obiger Produktliste ab!)
           // ?> <label>Menge:</label> <?php
           // echo int_view( 1, 'menge' );
           submission_button();

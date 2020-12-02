@@ -15,7 +15,6 @@ RUN set -ex \
         git \
         libcurl4-nss-dev \
         libicu-dev \
-        libmcrypt-dev \
         libpng-dev \
         libssl-dev \
         libxml2-dev \
@@ -31,7 +30,6 @@ RUN set -ex \
         curl \
         dom \
         gd \
-        hash \
         intl \
         mysqli \
         opcache \

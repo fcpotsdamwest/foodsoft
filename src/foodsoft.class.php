@@ -5,7 +5,7 @@
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Timo
  *
- * (diese datei gehoert nach /wiki/inc/auth und wird aktiviert durch
+ * (diese datei gehört nach /wiki/inc/auth und wird aktiviert durch
  *   $conf['authtype'] = 'foodsoft';
  *  in /wiki/conf/dokuwiki.php)
  *

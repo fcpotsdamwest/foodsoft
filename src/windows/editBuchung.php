@@ -21,7 +21,7 @@ $buchung = sql_get_transaction( $buchung_id );
 $k_id = $buchung['konterbuchung_id'];
 if( ! $k_id ) {
   div_msg( 'kommentar', "
-    Buchung ist nicht vollstaendig oder fehlerhaft.
+    Buchung ist nicht vollständig oder fehlerhaft.
     Falls es sich um eine noch unbestätigte Einzahlung handelt: bitte erst bestätigen!
   " );
   return;
@@ -29,7 +29,7 @@ if( ! $k_id ) {
 
 $k_buchung = sql_get_transaction( $k_id ); 
 
-// waehle eine (hoffentlich) leicht verstaendliche / kanonische reihenfolge der beiden Buchungen:
+// wähle eine (hoffentlich) leicht verständliche / kanonische reihenfolge der beiden Buchungen:
 //
 if( $buchung_id < 0 ) {
   if( $k_id > 0 ) { //  wenn eine bank-transaktion dabei: diese zuerst anzeigen!
@@ -37,7 +37,7 @@ if( $buchung_id < 0 ) {
     $buchung_id = $k_id;
     $k_id = $h;
   } else {  // beides sind gruppen-transaktionen
-    // gruppe-13 buchungen moeglichst als zweites anzeigen:
+    // gruppe-13 buchungen möglichst als zweites anzeigen:
     if( ( $buchung['gruppen_id'] == $muell_id ) and ($k_buchung['gruppen_id'] != $muell_id ) ) {
       $h = $buchung_id;
       $buchung_id = $k_id;
@@ -45,7 +45,7 @@ if( $buchung_id < 0 ) {
     }
   }
 }
-$self_fields['buchung_id'] = $buchung_id;   // moeglicherweise getauscht
+$self_fields['buchung_id'] = $buchung_id;   // möglicherweise getauscht
 
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';

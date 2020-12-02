@@ -16,7 +16,7 @@ if( hat_dienst(4,5) ) {
       open_th('', '', 'Optionen' );
     open_tr();
       open_td();
-        option_checkbox( 'optionen', GRUPPEN_OPT_DETAIL, 'Details f&uuml;r Gruppenmitglieder anzeigen' );
+        option_checkbox( 'optionen', GRUPPEN_OPT_DETAIL, 'Details für Gruppenmitglieder anzeigen' );
     open_tr();
       open_td();
         option_checkbox( 'optionen', GRUPPEN_OPT_INAKTIV, 'inaktive Gruppen zeigen'
@@ -59,12 +59,12 @@ switch( $action ) {
     $kontostand = kontostand( $gruppen_id );
     $offene_bestellungen = sql_gruppe_offene_bestellungen( $gruppen_id );
     if( abs($kontostand) > 0.005 ) {
-      div_msg( 'warn', "Kontostand ($kontostand EUR) ist nicht null: L&ouml;schen nicht m&ouml;glich!" );
+      div_msg( 'warn', "Kontostand ($kontostand EUR) ist nicht null: Löschen nicht möglich!" );
     } elseif( $offene_bestellungen ) {
-      div_msg( 'warn', "nicht alle Bestellungen der Gruppe abgeschlossen: Loeschen nicht moeglich!" );
+      div_msg( 'warn', "nicht alle Bestellungen der Gruppe abgeschlossen: Löschen nicht möglich!" );
     } elseif( $gruppe['mitgliederzahl'] != 0 ) {
-      div_msg( 'warn', "Mitgliederzahl ist nicht null: L&ouml;schen nicht m&ouml;glich!" );
-      div_msg( 'warn', "(bitte erst Mitglieder l&ouml;schen, um Sockelbetrag zu verbuchen)" );
+      div_msg( 'warn', "Mitgliederzahl ist nicht null: Löschen nicht möglich!" );
+      div_msg( 'warn', "(bitte erst Mitglieder löschen, um Sockelbetrag zu verbuchen)" );
     } else {
       logger( "Gruppe $gruppen_id wird inaktiv" );
       sql_update( 'bestellgruppen', $gruppen_id, array( 'aktiv' => 0 ) );
@@ -80,7 +80,7 @@ switch( $action ) {
     $gruppen_id = sql_insert_group( $newNumber, $newName, $pwd );
     if( $gruppen_id ) {
       echo fc_openwindow( 'gruppenmitglieder', "gruppen_id=$gruppen_id" );
-      $js_on_exit[] = "alert( ' Gruppe erfolgreich angelegt! Vorl&auml;ufiges Passwort: $pwd (bitte notieren!) ' ); ";
+      $js_on_exit[] = "alert( ' Gruppe erfolgreich angelegt! Vorläufiges Passwort: $pwd (bitte notieren!) ' ); ";
     } else {
       $msg .= "<div class='warn'>Eintrag fehlgeschlagen!</div>";
     }
@@ -91,7 +91,7 @@ switch( $action ) {
     $trans = sql_get_transaction( -$transaction_id );
     if( $trans['gruppen_id'] != $login_gruppen_id )
       nur_fuer_dienst(4,5);
-    need( $trans['konterbuchung_id'] == 0, 'bereits verbucht, kann nicht mehr gel&ouml;scht werden!' );
+    need( $trans['konterbuchung_id'] == 0, 'bereits verbucht, kann nicht mehr gelöscht werden!' );
     doSql( "DELETE FROM gruppen_transaktion WHERE id=$transaction_id" );
     break;
 }
@@ -175,13 +175,13 @@ open_table('list');
                 open_tr();
                   open_td( 'left', '', $trans['eingabedatum_trad'] );
                   open_td( 'number', '', price_view( $trans['summe'] ) );
-                  open_td( '', '', fc_action( array( 'class' => 'drop', 'title' => 'L&ouml;schen?', 'confirm' => 'Gutschrift wirklich löschen?' )
+                  open_td( '', '', fc_action( array( 'class' => 'drop', 'title' => 'Löschen?', 'confirm' => 'Gutschrift wirklich löschen?' )
                                             , array( 'action' => 'cancel_payment', 'transaction_id' => $trans['id'] ) ) );
               }
             close_table();
           }
         }
-        // loeschen nur wenn
+        // löschen nur wenn
         // - kontostand 0
         // - mitgliederzahl 0 (wegen rueckbuchung sockelbetrag!)
         // - bestellungen, an denen sich die gruppe beteiligt hat, sind abgeschlossen
@@ -191,8 +191,8 @@ open_table('list');
             && ( $gruppe['mitgliederzahl'] == 0 )
             && ( ! in_array( $id, $specialgroups ) )
         ) {
-          echo fc_action( array( 'class' => 'drop', 'title' => 'Gruppe l&ouml;schen?', 'text' => ''
-                               , 'confirm' => 'Soll die Gruppe wirklich GEL&Ouml;SCHT werden?' )
+          echo fc_action( array( 'class' => 'drop', 'title' => 'Gruppe löschen?', 'text' => ''
+                               , 'confirm' => 'Soll die Gruppe wirklich GELÖSCHT werden?' )
                         , array( 'action' => 'delete', 'gruppen_id' => $gruppe['id'] ) );
         }
       } else {

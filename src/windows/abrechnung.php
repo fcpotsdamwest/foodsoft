@@ -218,7 +218,7 @@ if( $bestellung['aufschlag_prozent'] > 0 ) {
       open_td( '', "colspan='3'", "Aufschlag gesamt:" );
     } else {
       open_td( '', "colspan='3'"
-        , "Aufschlag " . price_view( $bestellung['aufschlag_prozent'] ) . "% fuer Bestellgruppen:"
+        , "Aufschlag " . price_view( $bestellung['aufschlag_prozent'] ) . "% für Bestellgruppen:"
       );
     }
     open_td( 'bold number', '', price_view( -$aufschlag_soll ) );

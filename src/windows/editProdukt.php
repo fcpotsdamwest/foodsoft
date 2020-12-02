@@ -51,7 +51,7 @@ if( $action == 'save' ) {
   if( ! $problems ) {
     if( $produkt_id ) {
       if( sql_update( 'produkte', $produkt_id, $values ) ) {
-        $msg .= "<div class='ok'>&Auml;nderungen gespeichert</div>";
+        $msg .= "<div class='ok'>Änderungen gespeichert</div>";
         $done = true;
       } else {
         $problems .= "<div class='warn'>Änderung fehlgeschlagen: " . mysqli_error($db_handle) . '</div>';

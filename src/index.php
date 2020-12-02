@@ -31,13 +31,13 @@ switch( $window_id ) {
       case 'menu':
       case "bestellen":
         // if( hat_dienst(0) )
-          if( dienst_liste( $login_gruppen_id, 'bestaetigen lassen' ) )
+          if( dienst_liste( $login_gruppen_id, 'bestätigen lassen' ) )
             break;
       default:
         if( is_readable( "windows/$window.php" ) ) {
           include( "windows/$window.php" );
         } else {
-          div_msg( 'warn', "Ung&uuml;ltiger Bereich: $window" );
+          div_msg( 'warn', "Ungültiger Bereich: $window" );
           include('windows/menu.php');
         }
     }
@@ -51,7 +51,7 @@ switch( $window_id ) {
       open_td( 'right' );
         echo $mysqljetzt;
         if( $readonly ) {
-          echo "<span style='font-weight:bold;color:440000;'> --- !!! Datenbank ist schreibgeschuetzt !!!</span>";
+          echo "<span style='font-weight:bold;color:440000;'> --- !!! Datenbank ist schreibgeschützt !!!</span>";
         }
     close_table();
     close_div(); // payload
@@ -68,7 +68,7 @@ switch( $window_id ) {
     if( is_readable( "windows/$window.php" ) ) {
       include( "windows/$window.php" );
     } else {
-      div_msg( 'warn', "Ung&uuml;ltiger Bereich: $window" );
+      div_msg( 'warn', "Ungültiger Bereich: $window" );
     }
     break;
 }
