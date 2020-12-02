@@ -51,7 +51,7 @@ if( $action == 'save' ) {
   } else {
     if( $lieferanten_id ) {
       if( sql_update( 'lieferanten', $lieferanten_id, $values ) ) {
-        $msg = $msg . "<div class='ok'>&Auml;nderungen gespeichert</div>";
+        $msg = $msg . "<div class='ok'>Änderungen gespeichert</div>";
       } else {
         $problems = $problems . "<div class='warn'>Änderung fehlgeschlagen: " . mysqli_error($db_handle) . '</div>';
       }
@@ -78,7 +78,7 @@ open_form( '', 'action=save' );
       form_row_text( 'Faxnummer:', ( $editable ? 'fax' : false ), 50, $fax );
       form_row_text( 'Email:', ( $editable ? 'mail' : false ), 50, $mail );
       form_row_text( 'Liefertage:', ( $editable ? 'liefertage' : false ), 50, $liefertage );
-      form_row_text( 'Bestellmodalit&auml;ten:', ( $editable ? 'bestellmodalitaeten' : false ), 50, $bestellmodalitaeten );
+      form_row_text( 'Bestellmodalitäten:', ( $editable ? 'bestellmodalitaeten' : false ), 50, $bestellmodalitaeten );
       form_row_text( 'Kundennummer:', ( $editable ? 'kundennummer' : false ), 50, $kundennummer );
       form_row_text( 'Webadresse:', ( $editable ? 'url' : false ), 50, $url );
       open_tr();
@@ -99,7 +99,7 @@ open_form( '', 'action=save' );
           if( $selected ) {
             echo "<option value='keins'>(unbekannt oder nicht implementiert)</option>";
           } else {
-            echo "<option value='keins' checked>(bitte Katalogformat waehlen)</option>";
+            echo "<option value='keins' checked>(bitte Katalogformat wählen)</option>";
           }
           echo "$options";
         close_select();

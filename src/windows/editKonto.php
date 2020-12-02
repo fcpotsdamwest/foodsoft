@@ -35,7 +35,7 @@ if( $action == 'save' ) {
   } else {
     if( $konto_id ) {
       if( sql_update( 'bankkonten', $konto_id, $values ) ) {
-        $msg .= "<div class='ok'>&Auml;nderungen gespeichert</div>";
+        $msg .= "<div class='ok'>Änderungen gespeichert</div>";
       } else {
         $problems .= "<div class='warn'>Änderung fehlgeschlagen: " . mysqli_error($db_handle) . '</div>';
       }

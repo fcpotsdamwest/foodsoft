@@ -3,7 +3,7 @@
 // verteilung.php
 //
 // zeigt verteilung eines oder aller produkte einer bestellung auf die gruppen an
-// und erlaubt aenderung der verteilmengen.
+// und erlaubt Änderung der verteilmengen.
 
 //error_reporting(E_ALL); // alle Fehler anzeigen
 
@@ -31,7 +31,7 @@ if( $produkt_id ) {
 bestellung_overview( $bestell_id );
 
 
-// aktionen verarbeiten; hier: liefer/verteilmengen aendern:
+// aktionen verarbeiten; hier: liefer/verteilmengen ändern:
 //
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';

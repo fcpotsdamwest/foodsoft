@@ -145,7 +145,7 @@ if( $basar_row ) {
 }
 if( $muell_row ) {
   open_tr('summe');
-    open_td( '', "colspan='3'", 'M&uuml;ll:' );
+    open_td( '', "colspan='3'", 'Müll:' );
     open_td( 'number', '', price_view( $muell_row['pfand_voll_brutto_soll'] ) );
     open_td( 'number', '', int_view( $muell_row['pfand_leer_anzahl'] ) );
     open_td( 'number', '', price_view( $muell_row['pfand_leer_brutto_soll'] ) );

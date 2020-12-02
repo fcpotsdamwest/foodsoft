@@ -16,7 +16,7 @@ need_http_var( 'katalogkw', 'w' );
 // echo '<br>tmpfile: ' . $_FILES['katalog']['tmp_name'];
 // echo '<br>katalogkw: ' . $katalogkw . '<br>';
 
-open_div( '', '', "Katalog einlesen: Lieferant: {$lieferant['name']} / g&uuml;ltig: $katalogkw" );
+open_div( '', '', "Katalog einlesen: Lieferant: {$lieferant['name']} / gültig: $katalogkw" );
 
 
 function katalog_update(
@@ -140,8 +140,8 @@ function katalog_update(
 //                                                                                                                                                               36 ?
 //                                                                                                                                                                 37 nettopreis
 
-// upload_bnn: fuer midgard, grell, und vielleicht noch andere
-// $katalogformat: koennte immer 'bnn' sein, aber wir lassen das parametrisierbar, falls es sich mal aendert,
+// upload_bnn: für midgard, grell, und vielleicht noch andere
+// $katalogformat: könnte immer 'bnn' sein, aber wir lassen das parametrisierbar, falls es sich mal ändert,
 // und um mit der existierenden datenbank kompatibel zu bleiben:
 //
 function upload_bnn( $katalogformat ) {

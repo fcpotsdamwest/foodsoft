@@ -21,7 +21,7 @@ $katalogformat = $lieferant['katalogformat'];
 ?> <h1>Lieferantenkatalog </h1> <?php
 
 open_div( 'oneline' );
-  echo "Lieferant auswaehlen: ";
+  echo "Lieferant auswählen: ";
   open_select( 'lieferanten_id', 'autoreload' );
     echo optionen_lieferanten( $lieferanten_id );
   close_select();
@@ -44,7 +44,7 @@ switch( $katalogformat ) {
     medskip();
     open_div( 'warn' );
       medskip();
-      echo "Artikelsuche: fuer Lieferant ";
+      echo "Artikelsuche: für Lieferant ";
       echo fc_link( 'edit_lieferant', array( 'text' => $lieferant_name, 'class' => 'href', 'lieferanten_id' => $lieferanten_id ) );
       echo " ist das Katalogformat [$katalogformat] eingestellt; dieses wird leider (noch) nicht unterstuetzt!";
       medskip();
@@ -52,8 +52,8 @@ switch( $katalogformat ) {
     return;
 }
 
-// $bestell_id: falls aufgerufen aus 'preiseintrag fuer bestellung waehlen', muessen wir die
-// wieder zurueckgeben:
+// $bestell_id: falls aufgerufen aus 'preiseintrag für bestellung wählen', müssen wir die
+// wieder zurückgeben:
 //
 get_http_var( 'bestell_id', 'u', 0, true );
 
@@ -121,8 +121,8 @@ if( $editable and ( ! $produkt_id ) ) {
           open_tr();
             open_td( '', '', $row['katalogdatum'] );
             open_td( '', '', $row['katalogtyp'] );
-            open_td( '', '', fc_action( array( 'class' => 'drop', 'title' => 'Katalog l&ouml;schen'
-                                             , 'confirm' => 'Soll der Katalog wirklich GEL&Ouml;SCHT werden?' )
+            open_td( '', '', fc_action( array( 'class' => 'drop', 'title' => 'Katalog löschen'
+                                             , 'confirm' => 'Soll der Katalog wirklich GELÖSCHT werden?' )
                                       , array( 'action' => 'delete', 'katalogdatum' => $row['katalogdatum']
                                                                    , 'katalogtyp' => $row['katalogtyp'] ) ) );
         }
@@ -132,19 +132,19 @@ if( $editable and ( ! $produkt_id ) ) {
       ?> <h3> Neuen Katalog einlesen: </h3> <?php
       open_table('layout');
         open_td( '', '', "Datei (Format: $katalogformat): <input type='file' name='katalog'>" );
-        open_td( '', '', " &nbsp; gueltig ab (Format: JJJJkwWW): <input type='text' name='katalogkw' size='8'>" );
+        open_td( '', '', " &nbsp; gültig ab (Format: JJJJkwWW): <input type='text' name='katalogkw' size='8'>" );
         open_td(); submission_button( 'Einlesen' );
       close_table();
     close_fieldset();
   close_form();
 }
 
-open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer fuer <i>$produktname</i>" : "Artikelsuche im Katalog" );
+open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer für <i>$produktname</i>" : "Artikelsuche im Katalog" );
 
   if( $demoserver ) {
     open_div( 'warn', '', "
-      Die Katalogsuche in den Lieferantenkatalogen ist auf diesem &ouml;ffentlichen Demo-Server leider
-      nicht zul&auml;ssig!
+      Die Katalogsuche in den Lieferantenkatalogen ist auf diesem öffentlichen Demo-Server leider
+      nicht zulässig!
     " );
     close_fieldset();
     return;
@@ -221,7 +221,7 @@ open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer
           open_td( 'mult' );
             $anummer = $row['artikelnummer'];
             if ( $produkt_id > 0 ) {
-              echo fc_action( "window=produktpreise,class=button,text=$anummer,produkt_id=$produkt_id,bestell_id=$bestell_id,title=Artikelnummer auswaehlen"
+              echo fc_action( "window=produktpreise,class=button,text=$anummer,produkt_id=$produkt_id,bestell_id=$bestell_id,title=Artikelnummer auswählen"
                             , "action=artikelnummer_setzen,anummer=$anummer" );
             } else {
               echo $anummer;
@@ -259,8 +259,8 @@ open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer
                     'window' => 'edit_produkt'
                   , 'class' => 'button'
                   , 'text' => 'Eintragen'
-                  , 'title' => 'in Foodsoft Datenbank uebernehmen'
-                  , 'confirm' => 'Artikel in Foodsoft Datenbank uebernehmen?'
+                  , 'title' => 'in Foodsoft Datenbank übernehmen'
+                  , 'confirm' => 'Artikel in Foodsoft Datenbank übernehmen?'
                   )
                 , array(
                     'lieferanten_id' => $lieferanten_id

@@ -682,13 +682,13 @@ function check_5() {
     if( $runtime_editable ) {
       ?>
         <th colspan='4'>Laufzeit-Konfiguration in der Datenbank:
-          <div class='small'>Diese Variablen k&ouml;nnen jederzeit angepasst werden</div>
+          <div class='small'>Diese Variablen können jederzeit angepasst werden</div>
         </th>
       <?php
     } else {
       ?>
         <th colspan='4'>Installations-Konfiguration in der Datenbank:
-          <div class='small'>Diese Variablen bitte nur bei Neuinstallation setzen, danach nicht mehr &auml;ndern!</div>
+          <div class='small'>Diese Variablen bitte nur bei Neuinstallation setzen, danach nicht mehr ändern!</div>
         </th>
       <?php
     }
@@ -880,7 +880,7 @@ function check_6() {
     ?>
       <td class='warn'>keine Gruppen vorhanden
         <div class='small'>
-          Um dich in die Foodsoft einloggen zu k&ouml;nnen, sollte hier mindestens eine erste Gruppe
+          Um dich in die Foodsoft einloggen zu können, sollte hier mindestens eine erste Gruppe
           eingetragen werden!
         </div>
       </td>
@@ -892,7 +892,7 @@ function check_6() {
   </table>
   <div style='padding:1em;'>
   <h4> Gruppe eintragen </h4>
-  Hier kannst Du eine erste Gruppe eintragen, oder Gruppendaten &uuml;berschreiben:
+  Hier kannst Du eine erste Gruppe eintragen, oder Gruppendaten überschreiben:
   <ul>
     <li>
       Diese Funktion dient normalerweise nur zum Eintrag einer ersten Gruppe, als die
@@ -900,7 +900,7 @@ function check_6() {
       viel komfortabler anzulegen
     </li>
     <li>
-      WARNUNG: schon vorhandene Daten einer Gruppe werden hier einfach kommentarlos &uuml;berschrieben
+      WARNUNG: schon vorhandene Daten einer Gruppe werden hier einfach kommentarlos überschrieben
     </li>
     <li>
       Du kannst hier also im Notfall auch ein Gruppenpasswort neu setzen
@@ -940,7 +940,7 @@ foreach( $checks as $f => $title ) {
         if( $result ) {
           ?> <div class='warn' style='padding:1ex;'> Fehler! <?php
         } elseif( $changes ) {
-          ?> <div class='alert' style='padding:1ex;'> Korrekturen werden ausgef&uuml;hrt... <?php
+          ?> <div class='alert' style='padding:1ex;'> Korrekturen werden ausgeführt... <?php
         } else {
           ?> <div class='ok' style='padding:1ex;'> keine Fehler gefunden! <?php
         }
@@ -1007,7 +1007,7 @@ if( count( $changes ) == 0 ) {
   ?>
   <input type='hidden' name='action' value='repair'>
   <div style='text-align:left;padding:1em 1em 2em 1em;'>
-    <input type='submit' style='padding:1ex;' value='Abschicken' title='Abspeichern und/oder &Auml;nderungen vornehmen'>
+    <input type='submit' style='padding:1ex;' value='Abschicken' title='Abspeichern und/oder Änderungen vornehmen'>
   </div>
   <?php
 } else {

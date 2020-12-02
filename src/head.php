@@ -41,7 +41,7 @@ open_div( $headclass, "id='header'" );
     open_td( '', "style='text-align:right;padding-top:1em;'" );
       if( $angemeldet ) {
         if( $login_dienst > 0 ) {
-          // fuer dienste: noch dienstkontrollblatteintrag aktualisieren:
+          // für dienste: noch dienstkontrollblatteintrag aktualisieren:
           echo fc_action( 'window=dienstkontrollblatt,class=button,text=Abmelden,img=', 'action=abmelden' );
           // "<a class='button' href='index.php?window=dienstkontrollblatt&action=abmelden'>Abmelden</a>";
         } else {

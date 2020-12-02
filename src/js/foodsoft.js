@@ -33,7 +33,7 @@ function uncheckAll( form_id ) {
   //   s.className = 'button';
 }
 
-// neuesfenster: neues (grosses) Fenster oeffnen (fuer wiki)
+// neuesfenster: neues (großes) Fenster öffnen (für wiki)
 //
 function neuesfenster(url,name) {
   f=window.open(url,name,"dependent=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes,scrollbars=yes");

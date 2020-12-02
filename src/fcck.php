@@ -1,6 +1,6 @@
 <?php
 
-// fcck.php: konsistenzcheck fuer Datenbanken, entfernt verwaiste Eintraege, etc...
+// fcck.php: konsistenzcheck für Datenbanken, entfernt verwaiste Einträge, etc...
 //
 // Timo, 2008
 
@@ -93,7 +93,7 @@ global $db_handle;
     $vorschlaege = mysqli_query(
       $db_handle,
       "SELECT * FROM bestellvorschlaege WHERE gesamtbestellung_id='$bestell_id' ORDER BY produkt_id"
-    ) or error ( __LINE__, __FILE__, "Suche in bestellvorschlaegen fehlgeschlagen" );
+    ) or error ( __LINE__, __FILE__, "Suche in Bestellvorschlägen fehlgeschlagen" );
     echo "
       <table>
         <tr>
@@ -132,7 +132,7 @@ global $db_handle;
     $db_handle,
     "SELECT * FROM bestellvorschlaege
      WHERE gesamtbestellung_id='$bestell_id' AND produkt_id='$produkt_id' "
-  ) or error ( __LINE__, __FILE__, "Suche in bestellvorschlaegen fehlgeschlagen" );
+  ) or error ( __LINE__, __FILE__, "Suche in Bestellvorschlägen fehlgeschlagen" );
   $vorschlag = mysqli_fetch_array( $vorschlaege )
     or error ( __LINE__, __FILE__, "Bestellvorschlag nicht gefunden" );
   

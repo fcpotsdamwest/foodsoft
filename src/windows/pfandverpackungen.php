@@ -55,7 +55,7 @@ open_table( 'layout hfill' );
 close_table();
 medskip();
 
-// ab hier muss ein Lieferant ausgewaehlt sein, sonst Ende:
+// ab hier muss ein Lieferant ausgewählt sein, sonst Ende:
 //
 if( ! $lieferanten_id )
   return;
@@ -180,7 +180,7 @@ foreach( sql_lieferantenpfand( $lieferanten_id, $abrechnung_id ) as $row ) {
   $summe_leer_brutto += $row['pfand_leer_brutto_soll'];
 }
 
-// zwischensummen nach MWSt-Saetzen ausgeben (erleichtert Abgleich mit Terra-Rechnungen):
+// zwischensummen nach MWSt-Sätzen ausgeben (erleichtert Abgleich mit Terra-Rechnungen):
 //
 if( $abrechnung_id ) {
   foreach( sql_lieferantenpfand( $lieferanten_id, $abrechnung_id, 'mwst' ) as $row ) {
