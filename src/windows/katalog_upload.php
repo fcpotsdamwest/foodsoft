@@ -18,7 +18,7 @@ need_http_var( 'katalogkw', 'w' );
 
 open_div( '', '', "Katalog einlesen: Lieferant: {$lieferant['name']} / gültig: $katalogkw" );
 
-if ($_FILES['katalog']['error'] != UPLOAD_ERR_OK) {
+if (isset($_FILES['katalog']['error'])) {
   $phpFileUploadErrors = array(
       0 => 'There is no error, the file uploaded with success',
       1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
@@ -33,7 +33,11 @@ if ($_FILES['katalog']['error'] != UPLOAD_ERR_OK) {
   $code = $_FILES['katalog']['error'];
   $message = $phpFileUploadErrors[$code];
 
-  error ("Fehler beim Upload: $message (Code $code)");
+  if ( $code === 0 ) {
+    echo "{$message}\n";
+  } else {
+    error ("Fehler beim Upload: $message (Code $code)");
+  }
 }
 
 function katalog_update(
