@@ -5,6 +5,8 @@ assert( $angemeldet ) or exit();
 
 setWikiHelpTopic( "foodsoft:bestellen" );
 
+get_http_var( 'vertical_scroll', 'w', '' );
+
 if( hat_dienst(4) ) {
   $gruppen_id = $basar_id;
   $kontostand = 250.0;
@@ -85,7 +87,8 @@ switch( $action ) {
       change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $m['fest'], $m['toleranz'], $m['vormerken'] );
     }
     logger( "Bestellung speichern: $bestell_id" );
-    $js_on_exit[] = "alert( 'Bestellung wurde eingetragen!' );";
+    $js_on_exit[] = "if ( verticalScroll ) window.scrollTo(0, verticalScroll);";
+    $js_on_exit[] = "showInSnackbar('Bestellung wurde eingetragen!')";
     break;
   case 'delete':
     need_http_var( 'produkt_id', 'U' );
@@ -157,6 +160,8 @@ if( ! $readonly ) {
     var toleranz           = new Array();
     var toleranz_andere    = new Array();
     var verteilmult        = new Array();
+
+    const verticalScroll = <?php print ( isset($vertical_scroll) ? (int)$vertical_scroll : 0 ); ?>;
 
     function init_produkt( produkt, _gebindegroesse, _preis, _fest, _toleranz, _fest_andere, _toleranz_andere, zuteilung_fest, zuteilung_toleranz, _verteilmult ) {
       gebindegroesse[produkt] = _gebindegroesse;
@@ -439,12 +444,32 @@ if( ! $readonly ) {
       if( gesamtpreis > kontostand ) {
         alert( 'Kontostand nicht ausreichend!' );
       } else {
-        document.forms['form_<?php echo $bestellform_id; ?>'].submit();
+        let orderForm = document.forms['form_<?php echo $bestellform_id; ?>'];
+        /* append hidden field holding the scroll position to the form */
+        let scrollInput = document.createElement('input');
+        scrollInput.name = 'vertical_scroll';
+        scrollInput.type = 'hidden';
+        scrollInput.value = `${document.scrollingElement.scrollTop}`;
+        orderForm.appendChild(scrollInput);
+        orderForm.submit();
       }
+    }
+
+    function showInSnackbar ( messageText ) {
+        let snackBar = document.querySelector("#snackbar");
+        snackBar.innerText = messageText;
+        snackBar.className += " show";
+        setTimeout(function() {
+            snackBar.className = snackBar.className.replace("show", "");
+        }, 1000);
     }
   </script>
   <?php
 
+  /* snackbar for one-off messages */
+  open_div( '', 'id="snackbar"');
+  close_div();
+  /* floating_submit_button */
   open_div( 'alert nodisplay tight', "id='floating_submit_button_$bestellform_id' style='width:100%'" );
     open_div( 'table', 'style="width:100%;"' );
       open_div( 'tr' );
