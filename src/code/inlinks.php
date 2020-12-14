@@ -208,7 +208,7 @@ function fc_window_defaults( $name ) {
       $parameters['text'] = 'Mitglieder';
       $parameters['title'] = 'zur Liste der Gruppenmitglieder...';
       $parameters['class'] = 'people';
-      $options = array_merge( $large_window_options, array( 'width' => '1000', 'height' => '600' ) );
+      $options = array_merge( $large_window_options, array( 'width' => '1000', 'height' => '800' ) );
       break;
     case 'gruppenpfand':
       $parameters['window'] = 'gruppenpfand';

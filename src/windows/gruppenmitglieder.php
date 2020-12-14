@@ -146,6 +146,26 @@ medskip();
 
 echo $avatar_msg;
 
+echo $pwmsg;
+if( $edit_pwd ) {
+  open_fieldset( 'small_form medskip', '', 'Passwort ändern', 'off' );
+    open_form( '', 'action=new_pwd' );
+      open_table('layout');
+        open_tr(); open_td( 'label', '', 'Passwort:');
+                   open_td( 'kbd', '', "<input type='password' size='24' name='newPass'>" );
+        open_tr(); open_td( 'label', '', 'nochmal das Passwort:');
+                   open_td( 'kbd', '', "<input type='password' size='24' name='newPass2'>" );
+        open_tr(); open_td( 'right', "colspan='2'" ); submission_button();
+      close_table();
+    close_form();
+  close_fieldset();
+}
+
+if( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) )
+  open_div( 'smallskip right', '', fc_link( 'gruppenkonto', "gruppen_id=$gruppen_id,text=Gruppenkonto..." ) );
+  
+medskip();
+
 memberform_view( $gruppen_id, $edit_names, $edit_dienst_einteilung );
 
 medskip();
@@ -165,24 +185,6 @@ if( hat_dienst(5) and ! $readonly ) {
 }
 medskip();
 
-echo $pwmsg;
-if( $edit_pwd ) {
-  open_fieldset( 'small_form medskip', '', 'Passwort ändern', 'off' );
-    open_form( '', 'action=new_pwd' );
-      open_table('layout');
-        open_tr(); open_td( 'label', '', 'Passwort:');
-                   open_td( 'kbd', '', "<input type='password' size='24' name='newPass'>" );
-        open_tr(); open_td( 'label', '', 'nochmal das Passwort:');
-                   open_td( 'kbd', '', "<input type='password' size='24' name='newPass2'>" );
-        open_tr(); open_td( 'right', "colspan='2'" ); submission_button();
-      close_table();
-    close_form();
-  close_fieldset();
-}
-medskip();
-
-if( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) )
-  open_div( 'smallskip right', '', fc_link( 'gruppenkonto', "gruppen_id=$gruppen_id,text=Gruppenkonto..." ) );
 close_fieldset();
 
 ?>
