@@ -4912,8 +4912,9 @@ function update_database( $version ) {
 }
 
 function wikiLink( $topic, $text, $head = false ) {
-  global $foodsoftdir;
-  if( ( $wikibase = getenv('wikibase') ) ) {
+  global $wikibase;
+  isset($wikibase) || $wikibase = getenv('wikibase');
+  if( isset( $wikibase ) ) {
     echo "
       <a class='wikilink' " . ( $head ? "id='wikilink_head' " : "" ) . "
         title='zur Wiki-Seite $topic'
@@ -4924,8 +4925,9 @@ function wikiLink( $topic, $text, $head = false ) {
 }
 
 function setWikiHelpTopic( $topic ) {
-  global $foodsoftdir, $js_on_exit;
-  if( ( $wikibase = getenv('wikibase') ) ) {
+  global $wikibase, $js_on_exit;
+  isset($wikibase) || $wikibase = getenv('wikibase');
+  if( isset( $wikibase ) ) {
     // head may not have been read (yet), so we postpone this:
     $js_on_exit[] = "document.getElementById('wikilink_head').href
           = \"javascript:neuesfenster('$wikibase/doku.php?id=$topic','wiki');\" ";
