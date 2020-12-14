@@ -147,10 +147,8 @@ function ean_links( $ean ) {
   if (!$ean)
     return '';
   $s = '';
-  $s .= "<a title='codecheck' target='_blank' href='http://www.codecheck.info/product.search?q=$ean'>[c]</a>";
-  $s .= "<a title='barcoo' target='_blank' href='http://barcoo.com/de/$ean'>[b]</a>";
+  $s .= "<a title='ecoinform' target='_blank' href='http://www.ecoinform.de/Suche.Liste;$ean.1.html'>[e]</a>";
   $s .= "<a title='Google' target='_blank' href='http://google.de/search?q=$ean'>[g]</a>";
-  // $s .= "<a target='_blank' href='http://upcdatabase.com/item/$ean'>[u]</a>";
   return $s;
 }
 
