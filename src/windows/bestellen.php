@@ -461,7 +461,7 @@ if( ! $readonly ) {
         snackBar.className += " show";
         setTimeout(function() {
             snackBar.className = snackBar.className.replace("show", "");
-        }, 1000);
+        }, 8000);
     }
   </script>
   <?php
