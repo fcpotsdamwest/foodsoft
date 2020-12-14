@@ -3,11 +3,7 @@
 // bestellschein.php: detailanzeige bestellschein / lieferschein, abhängig vom status der bestellung
 //
 
- 
-
-
 error_reporting(E_ALL);
-// $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
 
 assert( $angemeldet ) or exit();
 
@@ -44,6 +40,31 @@ get_http_var( 'besteller_name', 'H', $coopie_name );
 
 get_http_var( 'action', 'w', '' );
 $readonly && $action = '';
+
+function exportCsv() {
+    global $bestellung, $lieferant;
+    $produkte = sql_bestellung_produkte( $bestellung['id'] );
+    $fp = fopen('php://output', 'w');
+    $fileName = implode('_', ['Bestellung', $lieferant['name'], $lieferant['kundennummer'], $bestellung['lieferdatum_trad']]) . ".csv";
+    if ( $fp && $produkte ) {
+        header('Content-Type: text/csv');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        $head = ['produkt', 'bestell_nr', 'anzahl_gebinde'];
+        fputcsv($fp, $head);
+        foreach ($produkte as $produkt_row) {
+            $gebinde = $produkt_row['liefermenge'] / $produkt_row['gebindegroesse'];
+            if ( $gebinde < 1 ) continue;
+            $record = [
+                $produkt_row['produkt_name'],
+                $produkt_row['bestellnummer'],
+                $produkt_row['liefermenge'] / $produkt_row['gebindegroesse'],
+            ];
+            fputcsv($fp, $record);
+        }
+    }
+}
 
 switch( $action ) {
 
@@ -87,6 +108,9 @@ switch( $action ) {
     }
     break;
 
+  case 'export_csv':
+    exportCsv();
+    return;
   default:
     break;
 }
@@ -121,7 +145,6 @@ switch( $status ){    // anzeigedetails abhängig vom Status auswählen
         |= ( PR_COL_BESTELLMENGE | PR_COL_LIEFERMENGE | PR_COL_LIEFERGEBINDE | PR_COL_NETTOSUMME | PR_ROWS_NICHTGEFUELLT );
     }
     $title="Bestellschein";
-    // $selectButtons = array("zeigen" => "bestellschein", "pdf" => "bestellt_faxansicht" );
     break;
   case STATUS_VERTEILT:
   case STATUS_ABGERECHNET:
@@ -220,8 +243,22 @@ switch( $status ) {
 
 if( hat_dienst( 4 ) && ( $status > STATUS_BESTELLEN ) && ( $status < STATUS_ABGERECHNET ) ) {
   open_option_menu_row();
-    open_td( '', "colspan='2'", fc_link( 'bestellfax', "class=qquad href,bestell_id=$bestell_id,text=zur Faxansicht..." ) );
+    open_td( 'center', 'colspan=2');
+      open_span(
+        '',
+        'title="Bestelldaten zum Einlesen in Excel herunterladen"',
+        fc_link(
+          'bestellschein',
+          "class=qquad button href,download=bestellschein,bestell_id=$bestell_id,action=export_csv,text=CSV-Export"
+        )
+      );
+      open_span(
+        '',
+        'title="Bestelldaten mit Begleittext für Ausdruck/Faxversand vorbereiten"',
+        fc_link( 'bestellfax', "class=qquad button href,bestell_id=$bestell_id,text=Faxansicht" ) );
+    close_td();
   close_option_menu_row();
 }
+
 
 ?>
