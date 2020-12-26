@@ -1,4 +1,7 @@
 <?PHP
+
+global $angemeldet, $readonly;
+
 assert( $angemeldet ) or exit();
 
 setWikiHelpTopic( 'foodsoft:produktgruppen' );
@@ -15,7 +18,10 @@ switch( $action ) {
     break;
   case 'delete':
     need_http_var( 'produktgruppen_id', 'U' );
-    need( references_produktgruppe( $produktgruppen_id ) == 0, "Löschen nicht möglich: Produktgruppe wird benutzt!" );
+    need(
+      references_produktgruppe( $produktgruppen_id ) === 0,
+      "Löschen nicht möglich: Produktgruppe wird benutzt!"
+      );
     doSql( "DELETE FROM produktgruppen WHERE id=$produktgruppen_id" );
     break;
 }

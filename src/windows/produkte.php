@@ -2,6 +2,23 @@
 
 ?> <h1>Produktdatenbank ....</h1> <?php
 
+/**
+ * @param string $action
+ *   action to perform
+ *   * delete
+ * @param int $lieferanten_id
+ * @param int $options
+ *   Set of bitwise options
+ *   * OPTION_KATALOGABGLEICH (1)
+ *   * OPTION_PREISKONSISTENZTEST (2)
+ * @param int $produkt_id
+ */
+
+global
+  $angemeldet,
+  $input_event_handlers,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 
 setWikiHelpTopic( 'foodsoft:produkte' );
@@ -21,12 +38,22 @@ open_table('layout hfill' );
     open_table('menu');
       if( $lieferanten_id ) {
         if( $editable ) {
-           open_tr();
-             open_td( '', '', fc_link( 'edit_produkt'
-                     , "class=bigbutton,lieferanten_id=$lieferanten_id,title=Neues Produkt eintragen,text=Neues Produkt" ) );
+          open_tr();
+            open_td(
+              '',
+              '',
+              fc_link(
+                'edit_produkt',
+                "class=bigbutton,lieferanten_id=$lieferanten_id,title=Neues Produkt eintragen,text=Neues Produkt"
+              )
+            );
         }
         open_tr();
-          open_td( '', '', fc_link( 'katalog', "class=bigbutton,text=Lieferantenkatalog,lieferanten_id=$lieferanten_id" ) );
+          open_td(
+            '',
+            '',
+            fc_link( 'katalog', "class=bigbutton,text=Lieferantenkatalog,lieferanten_id=$lieferanten_id" )
+          );
       }
       open_tr();
         open_td( '', '', fc_link( 'catalogue_acronyms', "class=bigbutton,text=Katalog-Akronyme") );
@@ -34,16 +61,15 @@ open_table('layout hfill' );
         open_td( '', '', fc_link( 'self', "class=bigbutton,text=Seite aktualisieren" ) );
       open_tr();
         open_td( '', '', fc_link( 'index', "class=bigbutton" ) );
-      // braucht nicht mehr optional zu sein - preise sollten immer konsistent sein!
-      // open_tr();
-      //   open_td();
-      //     option_checkbox( 'options', OPTION_PREISKONSISTENZTEST, 'Preiskonsistenztest'
-      //                   , 'Soll die Preishistorie aller Einträge auf Inkonsistenzen geprüft werden?' );
       if( $lieferanten_id && sql_lieferant_katalogeintraege( $lieferanten_id ) ) {
         open_tr();
           open_td();
-            option_checkbox( 'options', OPTION_KATALOGABGLEICH, 'Abgleich mit Lieferantenkatalog'
-                           , 'Sollen alle Einträge mit dem Lieferantenkatalog verglichen werden?' );
+            option_checkbox(
+              'options',
+              OPTION_KATALOGABGLEICH,
+              'Abgleich mit Lieferantenkatalog',
+              'Sollen alle Einträge mit dem Lieferantenkatalog verglichen werden?'
+            );
       } else {
         $options &= ~OPTION_KATALOGABGLEICH;
       }
@@ -56,7 +82,9 @@ close_table();
 // ab hier muss ein Lieferant ausgewählt sein, sonst Ende:
 //
 if( ! $lieferanten_id )
+{
   return;
+}
 
 bigskip();
 
@@ -68,7 +96,7 @@ bigskip();
 
 get_http_var('action','w','');
 $editable or $action = '';
-if( $action == 'delete' ) {
+if( $action === 'delete' ) {
   need_http_var('produkt_id','u');
   sql_delete_produkt( $produkt_id );
 }
@@ -163,15 +191,24 @@ open_table('list hfill');
         open_td( 'center', "colspan='5'", '(kein aktueller Preiseintrag)' );
       }
       open_td( 'top oneline', '' );
-        if( $editable )
-          echo fc_link( 'edit_produkt', "produkt_id=$id" );
+        if( $editable ) {
+          echo fc_link('edit_produkt', "produkt_id=$id");
+        }
         echo fc_link( 'produktpreise', "produkt_id=$id,text=" );
-        if( $editable and ( $references == 0 ) ) {
-          echo fc_action( array( 'class' => 'drop', 'title' => 'Produkt Löschen', 'confirm' => 'Soll das Produkt wirklich GELÖSCHT werden?' )
-                        , array( 'action' => 'delete', 'produkt_id' => $id ) );
+        if( $editable && $references === 0 ) {
+          echo fc_action(
+            [
+              'class' => 'drop',
+              'title' => 'Produkt Löschen',
+              'confirm' => 'Soll das Produkt wirklich GELÖSCHT werden?'
+            ],
+            [
+              'action' => 'delete',
+              'produkt_id' => $id
+            ]
+          );
         }
     open_tr( 'groupofrows_bottom' );
-      // open_td();
       open_td( '', "colspan='$cols'" );
         if( $options & OPTION_PREISKONSISTENZTEST )
           produktpreise_konsistenztest( $id );

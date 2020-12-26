@@ -1,4 +1,35 @@
 <?PHP
+/**
+ * editLieferant.php
+ *
+ * Edit supplier information
+ *
+ * @param string $action
+ * * save
+ * @param int $lieferanten_id
+ * @param int $ro
+ *   Display page in readonly mode
+ * @param string $ansprechpartner
+ * @param string $bestellmodalitaeten
+ * @param string $fax
+ * @param string $katalogformat
+ * @param string $kundennummer
+ * @param string $liefertage
+ * @param string $mail
+ * @param string $name
+ * @param string $ort
+ * @param string $strasse
+ * @param string $telefon
+ * @param string $url
+
+ * @param string $action
+ */
+
+global
+  $angemeldet,
+  $db_handle,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 
 setWikiHelpTopic( 'foodsoft:lieferant_edieren' );
@@ -6,7 +37,7 @@ setWindowSubtitle( 'Stammdaten Lieferant' );
 
 $editable = hat_dienst(4,5);
 get_http_var( 'ro', 'u', 0, true );
-if( $ro or $readonly )
+if( $ro || $readonly )
   $editable = false;
 
 $msg = '';
@@ -31,7 +62,7 @@ get_http_var('katalogformat','w',$row);
 
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';
-if( $action == 'save' ) {
+if( $action === 'save' ) {
   $values = array(
     'name' => $name
   , 'strasse' => $strasse
@@ -47,20 +78,20 @@ if( $action == 'save' ) {
   , 'katalogformat' => $katalogformat
   );
   if( ! $name ) {
-    $problems = $problems . "<div class='warn'>Kein Name eingegeben!</div>";
+    $problems .= "<div class='warn'>Kein Name eingegeben!</div>";
   } else {
     if( $lieferanten_id ) {
       if( sql_update( 'lieferanten', $lieferanten_id, $values ) ) {
-        $msg = $msg . "<div class='ok'>Änderungen gespeichert</div>";
+        $msg .= "<div class='ok'>Änderungen gespeichert</div>";
       } else {
-        $problems = $problems . "<div class='warn'>Änderung fehlgeschlagen: " . mysqli_error($db_handle) . '</div>';
+        $problems .= "<div class='warn'>Änderung fehlgeschlagen: " . mysqli_error($db_handle) . '</div>';
       }
     } else {
       if( ( $lieferanten_id = sql_insert( 'lieferanten', $values ) ) ) {
         $self_fields['lieferanten_id'] = $lieferanten_id;
-        $msg = $msg . "<div class='ok'>Lieferant erfolgreich angelegt:</div>";
+        $msg .= "<div class='ok'>Lieferant erfolgreich angelegt:</div>";
       } else {
-        $problems = $problems . "<div class='warn'>Eintrag fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
+        $problems .= "<div class='warn'>Eintrag fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
       }
     }
   }
@@ -88,7 +119,7 @@ open_form( '', 'action=save' );
           $selected = false;
           $options = '';
           foreach( array( 'terra_xls', 'bode', 'rapunzel', 'midgard', 'grell', 'bnn' ) as $parser ) {
-            if( $katalogformat == $parser ) {
+            if( $katalogformat === $parser ) {
               $checked = 'selected';
               $selected = true;
             } else {
@@ -101,19 +132,19 @@ open_form( '', 'action=save' );
           } else {
             echo "<option value='keins' checked>(bitte Katalogformat wählen)</option>";
           }
-          echo "$options";
+          echo $options;
         close_select();
       open_tr();
         open_td( 'right', "colspan='2'" );
-          if( $lieferanten_id > 0 )
+          if( $lieferanten_id > 0 ) {
             echo fc_link( 'lieferantenkonto', "lieferanten_id=$lieferanten_id,text=Lieferantenkonto..." );
+          }
           qquad();
-          if( $editable )
+          if( $editable ) {
             submission_button();
-          else
+          } else {
             close_button();
+          }
     close_table();
   close_fieldset();
 close_form();
-
-?>

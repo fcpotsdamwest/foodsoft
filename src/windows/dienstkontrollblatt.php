@@ -1,15 +1,32 @@
 <?php
 
-// dienstkontrollblatt.php
-//
+/**
+ * dienstkontrollblatt.php
+ *
+ * @param string $action
+ * * abmelden (page was invoked during logout)
+ * @param int $id_to
+ *   last ID to display
+ */
+
+global
+  $angemeldet,
+  $coopie_name,
+  $db_handle,
+  $dienstkontrollblatt_id,
+  $login_dienst,
+  $notiz,
+  $telefon;
+
 assert( $angemeldet ) or exit();
 
 get_http_var('action','w','');
 
-if( ( $action == 'abmelden' ) && ( $login_dienst >= 0 ) )  {
+if( $action === 'abmelden' && $login_dienst >= 0 )  {
   $row = false;
-  if( $login_dienst > 0 and $dienstkontrollblatt_id > 0 )
-    $row = current( sql_dienstkontrollblatt( $dienstkontrollblatt_id ) );
+  if( $login_dienst > 0 && $dienstkontrollblatt_id > 0 ) {
+    $row = current(sql_dienstkontrollblatt($dienstkontrollblatt_id));
+  }
   if( $row ) {
     open_form( '', 'login=logout' );
       open_fieldset( 'small_form', '', 'Abmeldung im Dienstkontrollblatt' );
@@ -43,13 +60,15 @@ $result = mysqli_query(
   "SELECT id FROM dienstkontrollblatt ORDER BY id DESC LIMIT 5"
 );
 $row = mysqli_fetch_array( $result );
-if( ! $row )
+if( ! $row ){
   error( "konnte dienstkontrollblatt nicht lesen" );
+}
 $id_max = $row['id'];
 get_http_var( 'id_to', 'u', $id_max, true );
 $id_from = $id_to - 10;
-if( $id_from < 1 )
+if( $id_from < 1 ){
   $id_from = 1;
+}
 
 $result = sql_dienstkontrollblatt( $id_from, $id_to );
 
@@ -67,11 +86,26 @@ echo "<h1>Dienstkontrollblatt</h1>";
 if( $id_from > 1 ) {
   $n = ( $id_from > 10 ) ? $id_from : 10;
   open_tr();
-    open_th('', "colspan='8'", fc_link( '', "class=button,id_to=$n,text= &lt; &lt; &lt;  Blättern &lt; &lt; &lt; " ) );
+    open_th(
+      '',
+      "colspan='8'",
+      fc_link( '', "class=button,id_to=$n,text= &lt; &lt; &lt;  Blättern &lt; &lt; &lt; " )
+    );
 }
 foreach( $result as $row ) {
   open_tr();
-    open_td('','', fc_link( 'self', array( 'title' => 'Zentrieren', 'id_to' => $row['id'] + 5, 'text' => $row['id'] ) ) );
+    open_td(
+      '',
+      '',
+      fc_link(
+        'self',
+        [
+          'title' => 'Zentrieren',
+          'id_to' => $row['id'] + 5,
+          'text' => $row['id']
+        ]
+      )
+    );
     open_td('','', $row['datum'] );
     open_td('','', $row['zeit'] );
     open_td('','', $row['dienst'] );
@@ -82,11 +116,14 @@ foreach( $result as $row ) {
 }
 if( $id_to < $id_max ) {
   $n = $id_to + 10;
-  if( $n > $id_max )
+  if( $n > $id_max ) {
     $n = $id_max;
+  }
   open_tr();
-    open_th('',"colspan='8'", fc_link( '', "class=button,id_to=$n,text= &gt; &gt; &gt;  Blättern &gt; &gt; &gt; " ) );
+    open_th(
+      '',
+      "colspan='8'",
+      fc_link( '', "class=button,id_to=$n,text= &gt; &gt; &gt;  Blättern &gt; &gt; &gt; " )
+    );
 }
 close_table();
-
-?>

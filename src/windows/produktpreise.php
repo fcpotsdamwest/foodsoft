@@ -1,10 +1,35 @@
 <?php
-//
-// produktpreise.php:
-//  - zeigt preishistorie
-//  - vergleich mit katalog (wenn vorhanden)
-//  - erlaubt neuen preiseintrag
-//
+/**
+ * produktpreise.php
+ *
+ * - Show price history
+ * - Compare to supplier catalogue (if present)
+ * - Allow for creating a new price entry
+ *
+ * @param string $action
+ *   action to process:
+ *   * artikelnummer_setzen
+ *   * delete_price
+ *   * katalog_gueltig
+ *   * katalog_ungueltig
+ *   * neuer_preiseintrag
+ *   * preiseintrag_waehlen
+ *   * zeitende_setzen
+ * @param int $anummer
+ * @param int $bestell_id (optional)
+ * @param int|string $day
+ * @param string $message
+ * @param int|string $month
+ * @param int $preis_id
+ * @param int $produkt_id
+ * @param int|string $vortag
+ * @param int|string $year
+ *
+ */
+
+global
+  $angemeldet,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 
@@ -110,7 +135,7 @@ open_fieldset( 'big_form', '', "Foodsoft-Datenbank:" );
       open_th( 'unit', "title='Liefer-Einheit: für Abgleich mit Rechnungen und Katalog'", '/ L-Einheit' );
       open_th( '', "title='MWSt in Prozent'", 'MWSt' );
       open_th( '', "title='Pfand je V-Einheit'", 'Pfand' );
-      open_th( '', "title='Wieviel wir beim Lieferanten auf einmal bestellen müssen'", 'Gebindegröße' );
+      open_th( '', "title='Wie viel wir beim Lieferanten auf einmal bestellen müssen'", 'Gebindegröße' );
       open_th( 'mult', "title='V-Preis: mit Pfand und Mehrwertsteuer'", 'V-Preis' );
       open_th( 'unit', "title='Verteil-Einheit: fürs Bestellen und Verteilen bei uns'", '/ V-Einheit' );
     open_tr();

@@ -1,10 +1,17 @@
 <?php
-//
-// bestellschein.php: detailanzeige gesamtlieferschein, abhängig vom status der bestellung
+/**
+ * gesamtlieferschein.php
+ *
+ * display details of total order sheet, depending on order status
+ *
+ * @param int $abrechnung_id
+ */
 //
 
 error_reporting(E_ALL);
 // $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
+
+global $angemeldet;
 
 assert( $angemeldet ) or exit();
 
@@ -76,8 +83,9 @@ open_table('list');
       }
     }
     $rowcount = count( $produktbestellungen );
-    if( $rowcount < 1 )
+    if( $rowcount < 1 ) {
       continue;
+    }
     open_tr();
     $rowcount++;
     open_td( 'bold top', "rowspan='$rowcount'", $stammdaten['name'] );
@@ -86,8 +94,9 @@ open_table('list');
     $liefermenge_summe = 0;
     $first = true;
     foreach( $produktbestellungen as $p ) {
-      if( ! $first )
+      if( ! $first ) {
         open_tr();
+      }
       $first = false;
       $liefermenge = $p['liefermenge'];
       $netto = $liefermenge * $p['nettopreis'];
@@ -99,10 +108,25 @@ open_table('list');
       open_td( 'center', '', $p['lieferung'] );
       open_td( 'center', '', $p['artikelnummer'] );
       open_td( 'right', '', $p['bestellnummer'] );
-      open_td( 'mult', '', fc_link( 'produktdetails', array( 'class' => 'href'
-      , 'produkt_id' => $produkt_id, 'bestell_id' => $p['bestell_id'], 'text' => price_view( $p['nettolieferpreis'] ) ) ) );
+      open_td(
+        'mult',
+        '',
+        fc_link(
+          'produktdetails',
+          [
+            'class' => 'href',
+            'produkt_id' => $produkt_id,
+            'bestell_id' => $p['bestell_id'],
+            'text' => price_view( $p['nettolieferpreis'] )
+          ]
+        )
+      );
       open_td( 'unit', '', " / " . $p['liefereinheit_anzeige'] );
-      open_td( 'mult', '', sprintf( '%.3lf', $p['liefermenge'] * $p['kan_liefermult_anzeige'] / $p['lv_faktor'] ) );
+      open_td(
+        'mult',
+        '',
+        sprintf( '%.3f', $p['liefermenge'] * $p['kan_liefermult_anzeige'] / $p['lv_faktor'] )
+      );
       open_td( 'unit', '', $p['kan_liefereinheit_anzeige'] );
       open_td( 'number', '', price_view( $netto ) );
       open_td( 'number', '', price_view( $brutto ) );
@@ -121,5 +145,3 @@ open_table('list');
 
 
 close_table();
-
-?>

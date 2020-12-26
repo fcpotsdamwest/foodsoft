@@ -1,7 +1,29 @@
 <?php
-//
-// konto.php: Bankkonto-Verwaltung
-//
+/**
+ * konto.php: Bankkonto-Verwaltung
+ *
+ * @param string $action
+ *   action to perform
+ *   * buchung_bank_anfangsguthaben
+ *   * buchung_bank_bank
+ *   * buchung_bank_sonderausgabe
+ *   * buchung_gruppe_bank
+ *   * buchung_lieferant_bank
+ *   * cancel_payment
+ *   * finish_transaction
+ * @param string $auszug
+ *   statement ID in format <year>-<nr>, e.g. 2019-01
+ * @param int $auszug_jahr
+ *   statement year
+ * @param int $auszug_nr
+ *   statement number
+ * @param int $konto_id
+ * @param int $transaction_id
+ */
+
+global
+  $angemeldet,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 $editable = ( hat_dienst(4) and ! $readonly );
@@ -12,7 +34,7 @@ setWikiHelpTopic( 'foodsoft:kontoverwaltung' );
 
 $konten = sql_konten();
 
-if( count($konten) == 1 ) {
+if( count($konten) === 1 ) {
   $row = current( $konten );
   $konto_id = $row['id'];
 } else {
@@ -38,8 +60,14 @@ open_table( 'layout hfill' );
     open_table('menu');
       if( $editable ) {
         open_tr();
-          open_td( '', '', fc_link( 'edit_konto'
-                     , "class=bigbutton,title=Neues Bankkonto eintragen,text=Neues Konto" ) );
+          open_td(
+            '',
+            '',
+            fc_link(
+              'edit_konto',
+              "class=bigbutton,title=Neues Bankkonto eintragen,text=Neues Konto"
+            )
+          );
       }
       open_tr();
         open_td( '', '', fc_link( 'self', "class=bigbutton,text=Seite aktualisieren" ) );
@@ -131,7 +159,7 @@ open_table('layout hfill' );
     }
 
   $ungebuchte_einzahlungen = sql_ungebuchte_einzahlungen();
-  if( $editable and $ungebuchte_einzahlungen and $auszug_jahr and $auszug_nr ) {
+  if( $editable && $ungebuchte_einzahlungen && $auszug_jahr && $auszug_nr ) {
     open_td( 'floatright' );
       ?> <h4>ungebuchte Einzahlungen:</h4> <?php
 
@@ -159,9 +187,19 @@ open_table('layout hfill' );
               if( $editable ) {
                 form_finish_transaction( $trans['id'] );
                 echo "<hr>";
-                open_div( 'right', '', fc_action( array( 'title' => 'diese ungebuchte Gutschrift stornieren', 'text' => 'löschen'
-                                                       , 'class' => 'button drop', 'confirm' => 'Gutschrift wirklich löschen?' )
-                                                 , "action=cancel_payment,transaction_id={$trans['id']}" ) );
+                open_div(
+                  'right',
+                  '',
+                  fc_action(
+                    [
+                      'title' => 'diese ungebuchte Gutschrift stornieren',
+                      'text' => 'löschen',
+                      'class' => 'button drop',
+                      'confirm' => 'Gutschrift wirklich löschen?'
+                    ],
+                    "action=cancel_payment,transaction_id={$trans['id']}"
+                  )
+                );
               }
         }
       close_table();
@@ -172,8 +210,10 @@ close_table();
 bigskip();
 
 
-if( ! $auszug_jahr or ! $auszug_nr )
+if( ! $auszug_jahr || ! $auszug_nr )
+{
   return;
+}
 
 ////////////////////////////////
 // anzeige eines kontoauszugs:
@@ -185,13 +225,15 @@ echo "<h3>$kontoname - Auszug $auszug_jahr / $auszug_nr</h3>";
 
 if( $editable ) {
   open_fieldset( 'small_form', '', 'Transaktion eintragen', 'off' );
-    alternatives_radio( array(
-      'gruppe_bank_form' => "Einzahlung / Auszahlung Gruppe"
-    , 'lieferant_bank_form' => "Überweisung / Lastschrift Lieferant"
-    , 'bank_bank_form' => "Überweisung auf ein anderes Konto der FC"
-    , 'sonderausgabe_bank_form' => "Überweisung/Abbuchung Sonderausgabe"
-    , 'anfangsguthaben_bank_form' => "Anfangskontostand erfassen"
-    ) );
+    alternatives_radio(
+      [
+        'gruppe_bank_form' => "Einzahlung / Auszahlung Gruppe",
+        'lieferant_bank_form' => "Überweisung / Lastschrift Lieferant",
+        'bank_bank_form' => "Überweisung auf ein anderes Konto der FC",
+        'sonderausgabe_bank_form' => "Überweisung/Abbuchung Sonderausgabe",
+        'anfangsguthaben_bank_form' => "Anfangskontostand erfassen",
+      ]
+    );
 
     open_div( 'nodisplay', "id='gruppe_bank_form'" );
       formular_buchung_gruppe_bank();
@@ -259,7 +301,7 @@ foreach( sql_kontoauszug( $konto_id, $auszug_jahr, $auszug_nr ) as $row ) {
           $gruppen_id = $konterbuchung['gruppen_id'];
           $lieferanten_id=$konterbuchung['lieferanten_id'];
           if( $gruppen_id ) {
-            if( $gruppen_id == sql_muell_id() ) {
+            if( $gruppen_id === sql_muell_id() ) {
               $typ = $konterbuchung['transaktionstyp'];
               div_msg( '', fc_link( 'verlust_details', array(
                            'detail' => $typ, 'class' => 'href', 'text' => transaktion_typ_string( $typ ) ) ) );

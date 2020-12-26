@@ -1,11 +1,19 @@
 <?php
-//
-// verteilung.php
-//
-// zeigt verteilung eines oder aller produkte einer bestellung auf die gruppen an
-// und erlaubt Änderung der verteilmengen.
+/**
+ * verteilung.php
+ *
+ * zeigt verteilung eines oder aller produkte einer bestellung auf die gruppen an
+ * und erlaubt Änderung der verteilmengen.
+ *
+ * @param int $bestell_id
+ * @param int $produkt_id (optional)
+ * @param int $ro
+ */
 
-//error_reporting(E_ALL); // alle Fehler anzeigen
+global
+  $angemeldet,
+  $readonly;
+
 
 assert( $angemeldet ) or exit();
 need_http_var('bestell_id','u',true);
@@ -13,12 +21,12 @@ get_http_var('produkt_id','u',0, true);
 
 $status = sql_bestellung_status( $bestell_id );
 
-$editable = ( $status == STATUS_VERTEILT and hat_dienst(1,3,4,5) );
+$editable = ( $status === STATUS_VERTEILT || hat_dienst(1,3,4,5) );
 
 nur_fuer_dienst(1,3,4,5);
 
 get_http_var( 'ro', 'u', 0, true );
-if( $ro or $readonly )
+if( $ro || $readonly )
   $editable = false;
 
 setWikiHelpTopic( "foodsoft:verteilung" );
@@ -34,7 +42,7 @@ bestellung_overview( $bestell_id );
 // aktionen verarbeiten; hier: liefer/verteilmengen ändern:
 //
 get_http_var( 'action', 'w', '' );
-$editable or $action = '';
+$editable || $action = '';
 switch( $action ) {
   case 'update_distribution':
     update_distribution( $bestell_id, $produkt_id );
@@ -53,7 +61,7 @@ function update_distribution( $bestell_id, $produkt_id ) {
     global $$feldname;
     if( get_http_var( $feldname, 'f' ) ) {
       $liefermenge_form = $$feldname;
-      if( $liefermenge != $liefermenge_form ) {
+      if( $liefermenge !== $liefermenge_form ) {
         sql_change_liefermenge( $bestell_id, $produkt_id, $liefermenge_form / $verteilmult );
       }
     }
@@ -66,7 +74,7 @@ function update_distribution( $bestell_id, $produkt_id ) {
       if( $mengen ) {
         $toleranzmenge = $mengen['toleranzbestellmenge'] * $verteilmult;
         $festmenge = $mengen['gesamtbestellmenge'] * $verteilmult - $toleranzmenge;
-        if( $gruppen_id == sql_muell_id() ) {
+        if( $gruppen_id === sql_muell_id() ) {
           $verteilmenge = $mengen['muellmenge'] * $verteilmult;
         } else {
           $verteilmenge = $mengen['verteilmenge'] * $verteilmult;
@@ -81,7 +89,7 @@ function update_distribution( $bestell_id, $produkt_id ) {
       if( get_http_var( $feldname, 'f' ) ) {
         $menge_form = $$feldname;
         // echo "[$feldname, $menge_form, $verteilmenge]<br>";
-        if( $verteilmenge != $menge_form ) {
+        if( $verteilmenge !== $menge_form ) {
           sql_change_verteilmenge( $bestell_id, $produkt_id, $gruppen_id, $menge_form / $verteilmult );
         }
       }
@@ -100,8 +108,9 @@ open_table('list');
   distribution_tabellenkopf(); 
 
   foreach( sql_bestellung_produkte( $bestell_id, $produkt_id ) as $produkt ) {
-    if( ( $produkt['liefermenge'] < 0.001 ) and ( $produkt['verteilmenge'] < 0.001 ) )
+    if( ( $produkt['liefermenge'] < 0.001 ) && ( $produkt['verteilmenge'] < 0.001 ) ) {
       continue;
+    }
     $produkt_id = $produkt['produkt_id'];
 
     distribution_produktdaten( $bestell_id, $produkt_id );

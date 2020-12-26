@@ -4,9 +4,9 @@
 
 
 function checkAll( form_id ) {
-  var o = document.forms[ 'form_'+form_id ].elements;
+  const o = document.forms[ 'form_'+form_id ].elements;
   if (o) {
-    for (i=0; i<o.length; i++) {
+    for (let i=0; i<o.length; i++) {
       if (o[i].type == 'checkbox')
         o[i].checked = 1;
     }
@@ -19,9 +19,9 @@ function checkAll( form_id ) {
 }
 
 function uncheckAll( form_id ) {
-  var o = document.forms[ 'form_'+form_id ].elements;
+  const o = document.forms[ 'form_'+form_id ].elements;
   if (o){
-    for (i=0; i<o.length; i++) {
+    for (let i=0; i<o.length; i++) {
       if (o[i].type == 'checkbox')
         o[i].checked = 0;
     }
@@ -36,18 +36,18 @@ function uncheckAll( form_id ) {
 // neuesfenster: neues (großes) Fenster öffnen (für wiki)
 //
 function neuesfenster(url,name) {
-  f=window.open(url,name,"dependent=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes,scrollbars=yes");
+  const f = window.open(url,name,"dependent=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes,scrollbars=yes");
   f.focus();
 }
 
 function drop_col(self,spalten) {
-  i = document.getElementById('select_drop_cols').selectedIndex;
-  s = document.getElementById('select_drop_cols').options[i].value;
+  const i = document.getElementById('select_drop_cols').selectedIndex;
+  const s = document.getElementById('select_drop_cols').options[i].value;
   window.location.href = self + '&spalten=' + ( spalten - parseInt(s) );
 }
 function insert_col(self,spalten) {
-  i = document.getElementById('select_insert_cols').selectedIndex;
-  s = document.getElementById('select_insert_cols').options[i].value;
+  const i = document.getElementById('select_insert_cols').selectedIndex;
+  const s = document.getElementById('select_insert_cols').options[i].value;
   window.location.href = self + '&spalten=' + ( spalten + parseInt(s) );
 }
 
@@ -59,6 +59,7 @@ function closeCurrentWindow() {
 
 function on_change( id ) {
   if( id ) {
+    let s;
     if( s = document.getElementById( 'submit_button_'+id ) )
       s.className = 'button';
     if( s = document.getElementById( 'reset_button_'+id ) )
@@ -70,6 +71,7 @@ function on_change( id ) {
 
 function on_reset( id ) {
   if( id ) {
+    let s;
     if( s = document.getElementById( 'submit_button_'+id ) )
       s.className = 'button inactive';
     if( s = document.getElementById( 'reset_button_'+id ) )
@@ -80,15 +82,15 @@ function on_reset( id ) {
 }
 
 function submit_form( form_id ) {
-  f = document.getElementById( 'form_'+form_id );
-  // calling f.submit() explicitely will not trigger the onsubmit() handler, so we call it explicitely:
+  const f = document.getElementById( 'form_'+form_id );
+  // calling f.submit() will not trigger the onsubmit() handler implicitly, so we call it explicitly:
   if( f.onsubmit )
     f.onsubmit();
   f.submit();
 }
 
 function post_action( action, message ) {
-  f = document.forms['update_form'];
+  const f = document.forms['update_form'];
   f.action.value = action;
   f.message.value = message;
   if( f.onsubmit )
@@ -97,7 +99,7 @@ function post_action( action, message ) {
 }
 
 function set_footbar( enabled ) {
-  var footbar = document.getElementById( 'footbar' );
+  const footbar = document.getElementById( 'footbar' );
   if (enabled)
   {
     footbar.style.display="block";
@@ -110,11 +112,11 @@ function set_footbar( enabled ) {
 }
 
 function updateWindowHeight() {
-  var spaceForScrollbar = 16;
-  var overlap = 0.05;
-  var footbar = $('footbar');
-  var footbarHeight = footbar.offsetHeight;
-  var windowHeight = document.viewport.getHeight();
+  const spaceForScrollbar = 16;
+  const overlap = 0.05;
+  const footbar = $('footbar');
+  const footbarHeight = footbar.offsetHeight;
+  const windowHeight = document.viewport.getHeight();
   
   scroller.setPageHeight((1-overlap) * (windowHeight - footbarHeight - spaceForScrollbar));
 }
@@ -147,49 +149,6 @@ function installTextFieldChangeHandler(element, handler, captureEnter) {
         'keypress', 
         function(event) {handleTextFieldKeyPress(event, handler);});
 }
-
-// experimenteller code - funktioniert noch nicht richtig...
-// 
-// var child_windows = new Array();
-// var child_counter = 0;
-// 
-// function window_open( url, name, options, focus ) {
-//   var w, i;
-//   w = window.open( url, name, options );
-//   if( focus )
-//     w.focus();
-//   for( i = 0; i < child_counter; i++ ) {
-//     if( child_windows[i].name == name )
-//       return w;
-//   }
-//   child_windows[ child_counter++ ] = w;
-//   return w;
-// }
-//   
-// 
-// function notify_down() {
-//   var m;
-//   m = document.forms['update_form'].message.value;
-//   for( i = 0; i < child_counter; i++ ) {
-//     child_windows[i].document.forms['update_form'].message.value = m;
-//     if( confirm( 'down to: ' + i + ' ' + child_windows[i].name ) )
-//       child_windows[i].notify_down();
-//   }
-// }
-// 
-// function notify_up() {
-//   var m;
-//   m = document.forms['update_form'].message.value;
-//   if( opener && ( opener != window ) && opener.document.forms ) {
-//     opener.document.forms['update_form'].message.value = m;
-//     if( confirm( 'weitermachen: ' + opener.name ) )
-//       opener.notify_up();
-//   } else {
-//     alert( 'top reached: passing message down...' );
-//     notify_down();
-//   }
-// }
-
 
 var Scroller = Class.create({
   initialize: function() {

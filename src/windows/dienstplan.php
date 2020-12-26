@@ -1,7 +1,41 @@
 <?php
+/**
+ * dienstplan.php
+ *
+ * @param string $action
+ * * abtauschen
+ * * akzeptieren
+ * * bestaetigen
+ * * diensteErstellen
+ * * diensteTagLoeschen
+ * * dienstLoeschen
+ * * dienstEinfuegen
+ * * gruppeAendern
+ * * personAendern
+ * * moveUp
+ * * moveDown
+ * * ueernehmen
+ * @param int $dienstanzahl
+ * @param string $dienstinterval
+ * @param string $message
+ * @param int $options
+ * @param string $plan_dienst
+ *   one of (1/2|3|4)
+ * @param int $personen_1
+ * @param int $personen_3
+ * @param int $personen_4
+ * @param int $startdatum_day
+ * @param int $startdatum_month
+ * @param int $startdatum_year
+ * @param int $tausch_id
+ */
 
 //error_reporting(E_ALL);
 // $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
+
+global
+  $angemeldet,
+  $readonly;
 
 get_http_var( 'plan_dienst', '/^[0-9\/]+$/', '1/2', true ); // für anzeige rotationsplan
 get_http_var( 'options', 'u', 0, true );
@@ -78,7 +112,7 @@ switch( $action ) {
     get_http_var( 'message', 'u', 0 ) or $message = 0;
     $abgesprochen = $message;
     $dienst = sql_dienst( $id );
-    if( $dienst["status"]=="Offen" || $abgesprochen ) {
+    if( $dienst["status"] === "Offen" || $abgesprochen ) {
       sql_dienst_akzeptieren( $id, $abgesprochen );
     } else {
       open_div( 'warn' );
@@ -183,7 +217,7 @@ if( hat_dienst(5) ) {
     ?> Rotationsplan für <?php
      open_select( 'plan_dienst', 'autoreload' );
        foreach( array( '1/2', '3', '4' ) as $dienst ) {
-         $selected = ( $plan_dienst == $dienst ? 'selected' : '' );
+         $selected = ( $plan_dienst === $dienst ? 'selected' : '' );
          echo "<option value='$dienst' $selected>Dienst $dienst</option>";
        }
      close_select();
@@ -242,22 +276,26 @@ open_table( 'list' );
       $dienst = next( $dienste );
       continue;
     }
-    if( $dienst["lieferdatum"] != $currentDate ) {
+    if( $dienst["lieferdatum"] !== $currentDate ) {
       $currentDate = $dienst["lieferdatum"];
       open_tr();
       open_th( 'top' );
         open_div( '', '', $currentDate );
         if( hat_dienst(5) && ! $readonly ) {
-          open_div( 'bigskip center', ''
-            , fc_action( "update,title=Dienste für ganzen Liefertag löschen,class=drop,text=,confirm=Alle Dienste dieses Tages wirklich löschen?"
-                       , "action=diensteTagLoeschen,message={$dienst['id']}" )
+          open_div(
+            'bigskip center',
+            '',
+            fc_action(
+              "update,title=Dienste für ganzen Liefertag löschen,class=drop,text=,confirm=Alle Dienste dieses Tages wirklich löschen?",
+              "action=diensteTagLoeschen,message={$dienst['id']}"
+            )
           );
         }
     }
     foreach( $dienstnamen as $d ) {
       open_td( 'top' );
         open_table( 'inner layout hfill tight' );
-          while( $dienst and ( $dienst['dienst'] == $d ) and ( $dienst['lieferdatum'] == $currentDate ) ) {
+          while( $dienst && $dienst['dienst'] === $d && $dienst['lieferdatum'] === $currentDate ) {
             open_tr();
             open_td();
               // echo "{$dienst['id']} , {$dienst['soon']}";
@@ -265,7 +303,7 @@ open_table( 'list' );
               smallskip();
             $dienst = next( $dienste );
           }
-          if( hat_dienst(5) && ! $readonly && ! $dienst['historic'] ) {
+          if( ! $readonly && ! $dienst['historic'] && hat_dienst(5) ) {
             open_tr();
             open_td( 'smallskip center', '',
               fc_action( "update,title=Dienst hinzufuegen,class=button,text= + "

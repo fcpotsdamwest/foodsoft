@@ -1,26 +1,38 @@
 <?php
+/**
+ * Render the landing site (with editable message board etc.)
+ *
+ * @param string $action
+ *   Action to execute with the message board (if any)(edit|save
+ * @param string $bulletinboard
+ *   The (new) content of the message board
+ */
+
+global
+  $bulletinboard,
+  $login_gruppen_id,
+  $member_showcase_count,
+  $member_showcase_title,
+  $readonly;
 
 setWikiHelpTopic( 'foodsoft:' );
 
 get_http_var( 'action', 'w', '' );
+
+/* cancel action in readonly mode */
 if( $readonly )
   $action = '';
-$ro_tag = 'readonly';
-switch( $action ) {
-  case 'edit':
-    $ro_tag = '';
-    break;
-  case 'save':
-    need_http_var( 'bulletinboard', 'H' );
-    $b = preg_split( '/\n/m', $bulletinboard . "\n\n\n\n\n\n\n" );
-    $bulletinboard = '';
-    $nl = '';
-    for( $i = 0; $i <= 7; ++$i ) {
-      $bulletinboard .= ( $nl . rtrim( preg_replace( '/\r/', '', $b[$i] ) ) );
-      $nl = "\n";
-    }
-    sql_update( 'leitvariable', array( 'name'=> 'bulletinboard' ), array( 'value' => $bulletinboard ) );
-    break;
+
+if ( $action === 'save' ) {
+  need_http_var( 'bulletinboard', 'H' );
+  $b = preg_split( '/\n/m', $bulletinboard . "\n\n\n\n\n\n\n" );
+  $bulletinboard = '';
+  $nl = '';
+  for( $i = 0; $i <= 7; ++$i ) {
+    $bulletinboard .= ( $nl . rtrim( preg_replace( '/\r/', '', $b[$i] ) ) );
+    $nl = "\n";
+  }
+  sql_update( 'leitvariable', array( 'name'=> 'bulletinboard' ), array( 'value' => $bulletinboard ) );
 }
 
 open_table( 'layout hfill' );

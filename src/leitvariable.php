@@ -139,15 +139,3 @@ $leitvariable = array(
   , 'cols' => '3'
   )
 );
-//
-// currently unused:
-//
-// , 'usb_device' => array(
-//     'meaning' => 'device in /dev des USB-sticks (für lokalen up/download ohne Netz)'
-//   , 'default' => false
-//   , 'comment' => 'zur Zeit unbenutzt: vorgesehen für offline-Betrieb auf lokalem PC: das device des USB-Sticks; auf Server: false'
-//   , 'runtime_editable' => 1
-//   , 'local' => true
-//   , 'cols' => '20'
-//   )
-?>

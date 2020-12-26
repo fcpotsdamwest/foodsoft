@@ -1,9 +1,32 @@
 <?PHP
+
+/**
+ * editBestellung.php
+ *
+ * Edit order metadata (period, surplus)
+ *
+ * @param string $action
+ * * save
+ * @param int $produkt_id
+ * @param int $ro
+ * @param int $lieferanten_id
+ * @param string $name
+ * @param int $produktgruppen_id
+ * @param string $notiz
+ * @param int $artikelnummer
+ * @param int $dauerbrenner
+ */
+
+global
+  $angemeldet,
+  $db_handle,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 
 $editable = hat_dienst(4);
 get_http_var( 'ro', 'u', 0, true );
-if( $ro or $readonly )
+if( $ro || $readonly )
   $editable = false;
 
 $msg = "";
@@ -33,19 +56,24 @@ $action = '';
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';
 
-if( $action == 'save' ) {
+if( $action === 'save' ) {
   get_http_var('dauerbrenner','u',0); // re-init: missing parameter will override $row!
-  $values = array(
-    'name' => $name
-  , 'produktgruppen_id' => $produktgruppen_id
-  , 'lieferanten_id' => $lieferanten_id
-  , 'artikelnummer' => $artikelnummer
-  , 'notiz' => $notiz
-  , 'dauerbrenner' => $dauerbrenner
-  );
+  $values = [
+    'name' => $name,
+    'produktgruppen_id' => $produktgruppen_id,
+    'lieferanten_id' => $lieferanten_id,
+    'artikelnummer' => $artikelnummer,
+    'notiz' => $notiz,
+    'dauerbrenner' => $dauerbrenner
+  ];
 
-  if( ! $name ) $problems .= "<div class='warn'>Das neue Produkt muß einen Name haben!</div>";
-  if( ! $produktgruppen_id ) $problems .= "<div class='warn'>Das neue Produkt muß zu einer Produktgruppe gehören!</div>";
+  if( ! $name ) {
+    $problems .= "<div class='warn'>Das neue Produkt muß einen Name haben!</div>";
+  }
+
+  if( ! $produktgruppen_id ) {
+    $problems .= "<div class='warn'>Das neue Produkt muß zu einer Produktgruppe gehören!</div>";
+  }
 
   // Wenn keine Fehler, dann einfügen...
   if( ! $problems ) {
@@ -126,5 +154,3 @@ open_form( '', 'action=save' );
     }
   close_fieldset();
 close_form();
-
-?>

@@ -8,7 +8,11 @@
 // - (these are really constants, but php doesn't not support array-valued constants)
 // - this file may be included from inside a function (from doku-wiki!), so we need `global':
 //
-global $large_window_options, $small_window_options, $pseudo_parameters;
+global
+  $large_window_options,
+  $pseudo_parameters,
+  $small_window_options;
+
 $large_window_options = array(
     'dependent' => 'yes'
   , 'toolbar' => 'yes'
@@ -46,8 +50,13 @@ $pseudo_parameters = array( 'img', 'attr', 'title', 'text', 'class', 'confirm', 
 //  - window_id: window name for target='...' or window.open()
 //  - text, title, class: default look and tooltip-help of the link
 //
-function fc_window_defaults( $name ) {
-  global $readonly, $login_dienst, $large_window_options, $small_window_options;
+function fc_window_defaults( $name ): ?array
+{
+  global
+    $large_window_options,
+    $login_dienst,
+    $readonly,
+    $small_window_options;
   $parameters = array();
   $options = $large_window_options;
   // echo "fc_window_defaults: $name<br>";
@@ -165,7 +174,7 @@ function fc_window_defaults( $name ) {
       $options = $large_window_options;
       break;
     //
-    // "grosse" Fenster:
+    // "große" Fenster:
     //
     case 'abrechnung':
       $parameters['window'] = 'abrechnung';
@@ -395,7 +404,8 @@ function fc_window_defaults( $name ) {
 // parameters_explode():
 // convert string "k1=v1,k2=k2,..." into array( k1 => v1, k2 => v2, ...)
 //
-function parameters_explode( $s ) {
+function parameters_explode( $s ): array
+{
   $r = array();
   $pairs = explode( ',', $s );
   foreach( $pairs as $pair ) {
@@ -413,7 +423,8 @@ function parameters_explode( $s ) {
 //   - anchor: append an #anchor to the url
 //   - url: return the value of this parameter immediately (overriding all others)
 //
-function fc_url( $parameters ) {
+function fc_url( $parameters ): string
+{
   global $pseudo_parameters, $form_id;
 
   $url = 'index.php?';
@@ -440,7 +451,8 @@ function fc_url( $parameters ) {
 // alink: compose from parts and return an <a href=...> hyperlink
 // $url may also contain javascript; if so, '-quotes but no "-quotes must be used in the js code
 //
-function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
+function alink( $url, $class = '', $text = '', $title = '', $img = false ): string
+{
   global $activate_safari_kludges, $activate_konqueror_kludges;
   $alt = '';
   if( $title ) {
@@ -491,7 +503,8 @@ function alink( $url, $class = '', $text = '', $title = '', $img = false ) {
 // as a special case, $parameters === NULL can be used to just open a browser window with no document
 // (this can be used in <form onsubmit='...', in combination with target=..., to submit a form into a new window)
 //
-function fc_link( $window = '', $parameters = array(), $options = array() ) {
+function fc_link( $window = '', $parameters = array(), $options = array() ): string
+{
   global $self_fields;
 
   // allow string or array form:
@@ -589,7 +602,8 @@ function fc_link( $window = '', $parameters = array(), $options = array() ) {
 // be used; from $get_parameters, only pseudo-parameters will take effect, and the only $post_parameters
 // which can be passed are 'action' and 'message'.
 //
-function fc_action( $get_parameters = array(), $post_parameters = array(), $options = array() ) {
+function fc_action( $get_parameters = array(), $post_parameters = array(), $options = array() ): string
+{
   global $print_on_exit, $self_post_fields, $pseudo_parameters;
 
   if( is_string( $get_parameters ) )
@@ -643,7 +657,8 @@ function fc_action( $get_parameters = array(), $post_parameters = array(), $opti
 
 // fc_openwindow(): pop-up $window here and now:
 //
-function fc_openwindow( $window, $parameters = array(), $options = array() ) {
+function fc_openwindow( $window, $parameters = array(), $options = array() ): void
+{
   if( is_string( $parameters ) )
     $parameters = parameters_explode( $parameters );
   $parameters['context'] = 'js';
@@ -652,9 +667,10 @@ function fc_openwindow( $window, $parameters = array(), $options = array() ) {
 
 // reload_immediately(): exit the current script and open $url instead:
 //
-function reload_immediately( $url ) {
+function reload_immediately( $url ): void
+{
   $url = preg_replace( '/&amp;/', '&', $url );  // doesn't get fed through html engine here
   open_javascript( "self.location.href = '$url';" );
   exit();
 }
-?>
+

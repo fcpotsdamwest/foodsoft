@@ -1,11 +1,42 @@
 <?php
-//
-// bestellschein.php: detailanzeige bestellschein / lieferschein, abhängig vom status der bestellung
-//
+/**
+ * bestellschein.php
+ *
+ * Show details of order/delivery sheet, depending on order status
+ *
+ * @param string $action
+ * * export_csv
+ * * insert
+ * * update
+ * @param int $bestell_id
+ * @param string $besteller_name
+ * @param string $fc_name
+ * @param string $fc_strasse
+ * @param string $fc_ort
+ * @param string $fc_kundennummer
+ * @param int $gruppen_id
+ * @param string $lieferant_anrede
+ * @param string $lieferant_email
+ * @param string $lieferant_fax
+ * @param string $lieferant_grussformel
+ * @param string $lieferant_name
+ * @param string $lieferant_ort
+ * @param string $lieferant_strasse
+ * @param string $produkt_id
+ * @param string $spalten
+ */
 
-error_reporting(E_ALL);
+// error_reporting(E_ALL);
 
-assert( $angemeldet ) or exit();
+global
+  $angemeldet,
+  $coopie_name,
+  $foodcoop_name,
+  $login_gruppen_id,
+  $specialgroups,
+  $wochentage;
+
+assert( $angemeldet ) || exit();
 
 need_http_var( 'bestell_id', 'U', true );
 
@@ -35,11 +66,7 @@ if( ! ( $fc_name = trim( $fc_name ) ) )
 get_http_var( 'fc_strasse', 'H', $lieferant['fc_strasse'] );
 get_http_var( 'fc_ort', 'H', $lieferant['fc_ort'] );
 get_http_var( 'fc_kundennummer', 'H', $lieferant['kundennummer'] );
-
 get_http_var( 'besteller_name', 'H', $coopie_name );
-
-get_http_var( 'action', 'w', '' );
-$readonly && $action = '';
 
 function exportCsv() {
     global $bestellung, $lieferant;
@@ -55,7 +82,9 @@ function exportCsv() {
         fputcsv($fp, $head);
         foreach ($produkte as $produkt_row) {
             $gebinde = $produkt_row['liefermenge'] / $produkt_row['gebindegroesse'];
-            if ( $gebinde < 1 ) continue;
+            if ( $gebinde < 1 ) {
+              continue;
+            }
             $record = [
                 $produkt_row['produkt_name'],
                 $produkt_row['bestellnummer'],
@@ -66,6 +95,8 @@ function exportCsv() {
     }
 }
 
+get_http_var( 'action', 'w', '' );
+$readonly && $action = '';
 switch( $action ) {
 
   case 'insert':
@@ -117,8 +148,8 @@ switch( $action ) {
 
 get_http_var( 'gruppen_id', 'u', 0, true );
 
-if( $gruppen_id and ! in_array( $gruppen_id, $specialgroups ) ) {
-  if( $gruppen_id != $login_gruppen_id )
+if( $gruppen_id && ! in_array( $gruppen_id, $specialgroups, TRUE ) ) {
+  if( $gruppen_id !== $login_gruppen_id )
     nur_fuer_dienst(4);
   $gruppen_name = sql_gruppenname($gruppen_id);
 }
@@ -153,7 +184,7 @@ switch( $status ){    // anzeigedetails abhängig vom Status auswählen
       $default_spalten |= ( PR_COL_BESTELLMENGE | PR_COL_LIEFERMENGE | PR_COL_ENDSUMME );
     } else {
       // ggf. liefermengen ändern lassen:
-      $editable = (!$readonly) && ( hat_dienst(1,3,4) && ( $status == STATUS_VERTEILT ) );
+      $editable = !$readonly && hat_dienst(1,3,4) && $status === STATUS_VERTEILT;
       $default_spalten
         |= ( PR_COL_BESTELLMENGE | PR_COL_LIEFERMENGE | PR_COL_LIEFERGEBINDE | PR_COL_NETTOSUMME | PR_ROWS_NICHTGEFUELLT );
     }
@@ -168,8 +199,6 @@ if( hat_dienst(0) ) {
 }
 
 get_http_var( 'spalten', 'w', $default_spalten, true );
-
-
 
 $abrechnung_id = $bestellung['abrechnung_id'];
 $bestell_id_set = sql_abrechnung_set( $abrechnung_id );
@@ -210,7 +239,7 @@ bestellschein_view(
   $spalten,    // welche Tabellenspalten anzeigen
   $gruppen_id, // Gruppenansicht (0: alle)
   true,        // angezeigte Spalten auswählen lassen
-  true         // Option: Anzeige nichtgelieferte zulassen
+  true         // Option: Anzeige nicht gelieferte zulassen
 );
 
 medskip();
@@ -241,7 +270,7 @@ switch( $status ) {
     break;
 }
 
-if( hat_dienst( 4 ) && ( $status > STATUS_BESTELLEN ) && ( $status < STATUS_ABGERECHNET ) ) {
+if( $status > STATUS_BESTELLEN && $status < STATUS_ABGERECHNET && hat_dienst(4) ) {
   open_option_menu_row();
     open_td( 'center', 'colspan=2');
       open_span(
