@@ -1,13 +1,33 @@
 <?php
-//
-// abrechnung.php:
-//
+/**
+ * abrechnung.php
+ *
+ * @param int $abrechnung_id
+ * @param int $action
+ * * save
+ * @param int $bestell_id
+ * @param int $extra_soll
+ * @param int $extra_text
+ * @param int $rechnung_abschluss
+ *   one of (reopen|yes) to indicate if balancing is finished
+ * @param int $rechnungsnummer
+ * @param int $bestell_id
+ * @param int $bestell_id
+ * @param int $bestell_id
+ * @param int $bestell_id
+ *
+ */
+
+global
+  $angemeldet,
+  $input_event_handlers,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 
 // flags:
-//   $teil_abrechnung: nur teil einer abrechnung mehrerer verbundener rechnungen: nicht edierbar!
-//   $gesamt_abrechnung: gesamtsicht ueber mehr als eine teil-abrechnung
+//   $teil_abrechnung: nur teil einer abrechnung mehrerer verbundener rechnungen: nicht änderbar!
+//   $gesamt_abrechnung: gesamtsicht über mehr als eine teil-abrechnung
 
 need_http_var( 'abrechnung_id', 'u', true );
 $teil_abrechnung = false;
@@ -23,7 +43,7 @@ if( $bestell_id ) {
 
 $bestell_id_set = sql_abrechnung_set( $abrechnung_id );
 $bestell_id_count = count( $bestell_id_set );
-if( $bestell_id_count == 1 ) {
+if( $bestell_id_count === 1 ) {
   $teil_abrechnung = false;
   $gesamt_abrechnung = false;
 }
@@ -38,14 +58,22 @@ need( $status >= STATUS_VERTEILT, "Bestellung ist noch nicht verteilt!" );
 need( $status < STATUS_ARCHIVIERT, "Bestellung ist bereits archiviert!" );
 
 foreach( $bestell_id_set as $b_id ) {
-  need( sql_bestellung_status( $b_id ) == $status,  "Inkonsistenz: Bestellungen mit unterschiedlichem Status sind zusammengefasst" );
-  need( sql_bestellung_lieferant_id( $b_id ) == $lieferant_id, "Inkonsistenz: Bestellungen verschiedener Lieferanten sind zusammengefasst" );
+  need(
+    sql_bestellung_status( $b_id ) === $status,
+    "Inkonsistenz: Bestellungen mit unterschiedlichem Status sind zusammengefasst"
+  );
+  need(
+    sql_bestellung_lieferant_id( $b_id ) === $lieferant_id,
+    "Inkonsistenz: Bestellungen verschiedener Lieferanten sind zusammengefasst"
+  );
 }
 
-$editable = ( hat_dienst(4)
-          and ! $readonly
-          and ! $teil_abrechnung
-          and ( $status <= STATUS_ABGERECHNET ) );
+$editable = (
+  hat_dienst(4) &&
+  ! $readonly &&
+  ! $teil_abrechnung &&
+  $status <= STATUS_ABGERECHNET
+);
 
 
 setWikiHelpTopic( 'foodsoft:Abrechnung' );
@@ -59,10 +87,10 @@ setWikiHelpTopic( 'foodsoft:Abrechnung' );
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';
 
-if( $action == 'save' ) {
-  if( $status == STATUS_ABGERECHNET ) {
+if( $action === 'save' ) {
+  if( $status === STATUS_ABGERECHNET ) {
     get_http_var( 'rechnung_abschluss', 'w', '' );
-    if( $rechnung_abschluss == 'reopen' ) {
+    if( $rechnung_abschluss === 'reopen' ) {
       foreach( $bestell_id_set as $b_id ) {
         sql_change_bestellung_status( $b_id, STATUS_VERTEILT );
       }
@@ -72,12 +100,12 @@ if( $action == 'save' ) {
     need_http_var( 'extra_text', 'H' );
     need_http_var( 'extra_soll', 'f' );
     foreach( $bestell_id_set as $b_id ) {
-      if( $b_id == $abrechnung_id ) {
-        sql_update( 'gesamtbestellungen', $b_id, array(
-          'rechnungsnummer' => $rechnungsnummer
-        , 'extra_text' => $extra_text
-        , 'extra_soll' => $extra_soll
-        ) );
+      if( $b_id === $abrechnung_id ) {
+        sql_update( 'gesamtbestellungen', $b_id, [
+          'rechnungsnummer' => $rechnungsnummer,
+          'extra_text' => $extra_text,
+          'extra_soll' => $extra_soll,
+        ]);
       } else {
         sql_update( 'gesamtbestellungen', $b_id, array(
           'rechnungsnummer' => $rechnungsnummer
@@ -88,7 +116,10 @@ if( $action == 'save' ) {
     }
     get_http_var( 'rechnung_abschluss', 'w', '' );
     if( $rechnung_abschluss == 'yes' ) {
-      need( abs( basar_wert_brutto( $bestell_id ) ) < 0.01 , "Abschluss noch nicht möglich: da sind noch Reste im Basar!" );
+      need(
+        abs( basar_wert_brutto( $bestell_id ) ) < 0.01,
+        "Abschluss noch nicht möglich: da sind noch Reste im Basar!"
+      );
       foreach( $bestell_id_set as $b_id ) {
         sql_change_bestellung_status( $b_id, STATUS_ABGERECHNET );
       }
@@ -139,12 +170,21 @@ if( $bestell_id_count > 1 ) {
 if( $gesamt_abrechnung ) {
   open_fieldset( '', "'style='padding:1em;'", "Gesamt-Abrechnung: $bestell_id_count Bestellungen" );
 } else {
-  open_fieldset( '', "'style='padding:1em;'", "Abrechnung: Bestellung " . $bestellung['name']
-                                   . fc_link( 'edit_bestellung', "bestell_id=$bestell_id" )
-                                   . " / Lieferant: " .lieferant_view( $lieferant_id ) );
+  open_fieldset(
+    '',
+    "'style='padding:1em;'",
+    "Abrechnung: Bestellung " .
+      $bestellung['name'] .
+      fc_link(
+        'edit_bestellung',
+        "bestell_id=$bestell_id"
+      ) .
+      " / Lieferant: " .
+      lieferant_view( $lieferant_id )
+  );
 }
 
-if( hat_dienst(4) and ! $readonly )
+if( !$readonly && hat_dienst(4) )
   open_form( '', 'action=save' );
 
 open_table( 'list', "style='width:98%'" );
@@ -252,15 +292,25 @@ if( $bestellung['aufschlag_prozent'] > 0 ) {
 
 if( $lieferant['anzahl_pfandverpackungen'] > 0 ) {
   open_tr();
-    open_td( '', "rowspan='2'", "Pfandabrechnung Lieferant: <div class='small'>(falls zutreffend, etwa bei Terra!)</div>" );
+    open_td(
+      '',
+      "rowspan='2'",
+      "Pfandabrechnung Lieferant: <div class='small'>(falls zutreffend, etwa bei Terra!)</div>"
+    );
     open_td( 'right', '', 'berechnet (Kauf):' );
     open_td( 'bold number', '', price_view( $pfand_voll_netto_soll ) );
     open_td( 'bold number', '', price_view( $pfand_voll_brutto_soll ) );
     if( $teil_abrechnung ) {
       open_td( 'italic small', "colspan='5'", 'Lieferantenpfand bitte in Gesamtabrechnung erfassen' );
     } else {
-      open_td( 'vcenter', "rowspan='2'"
-        , fc_link( 'pfandzettel', "abrechnung_id=$abrechnung_id,lieferanten_id=$lieferant_id,class=href,text=zum Pfandzettel..." ) );
+      open_td(
+        'vcenter',
+        "rowspan='2'",
+        fc_link(
+          'pfandzettel',
+          "abrechnung_id=$abrechnung_id,lieferanten_id=$lieferant_id,class=href,text=zum Pfandzettel..."
+        )
+      );
     }
 
   open_tr();
@@ -300,7 +350,7 @@ if( $lieferant['anzahl_pfandverpackungen'] > 0 ) {
         ?> Abrechnung durchgeführt: <?php
          echo sql_dienstkontrollblatt_name( $bestellung['abrechnung_dienstkontrollblatt_id'] ) .", "
               . $bestellung['abrechnung_datum'];
-        if( hat_dienst(4) && ( $status == STATUS_ABGERECHNET ) && ! $teil_abrechnung ) {
+        if( ! $teil_abrechnung && $status === STATUS_ABGERECHNET && hat_dienst(4) ) {
           qquad();
           echo "Nochmal öffnen:
             <input type='checkbox' name='rechnung_abschluss' value='reopen' $input_event_handlers>";
@@ -313,12 +363,18 @@ if( $lieferant['anzahl_pfandverpackungen'] > 0 ) {
       } else {
         if( hat_dienst(4) ) {
           if( abs( $warenwert_basar_brutto ) < 0.05 ) {
-            open_td( 'medskip right', "colspan='4' style='border-right:none;'"
-                     , "Rechnung abschliessen:
-                       <input type='checkbox' name='rechnung_abschluss' value='yes' $input_event_handlers>" );
+            open_td(
+              'medskip right',
+              "colspan='4' style='border-right:none;'",
+              "Rechnung abschliessen:
+                       <input type='checkbox' name='rechnung_abschluss' value='yes' $input_event_handlers>"
+            );
           } else {
-            open_td( 'medskip left smaller', "colspan='4' style='border-right:none;'"
-                     , " Reste im Basar --- bitte vor Abschluss leermachen!" );
+            open_td(
+              'medskip left smaller',
+              "colspan='4' style='border-right:none;'",
+              " Reste im Basar --- bitte vor Abschluss leermachen!"
+            );
           }
           open_td( 'right bottom medskip', "style='border-left:none;'" );
             submission_button();
@@ -328,7 +384,7 @@ if( $lieferant['anzahl_pfandverpackungen'] > 0 ) {
 
 close_table();
 
-if( hat_dienst(4) and ! $readonly )
+if( ! $readonly && hat_dienst(4) )
   close_form();
 
 close_fieldset();

@@ -1,5 +1,25 @@
 <?php
+/**
+ * basar.php
+ *
+ * @param string $action
+ *   perform the given action:
+ *   * basarzuteilung
+ * @param int $bestell_id
+ * @param int $bestellung<i>
+ * @param int $fieldcount
+ * @param int $gruppen_id
+ * @param string $orderby
+ * @param $produkt<n>
+ * @param $menge<n>
+ */
+
 //error_reporting(E_ALL); // alle Fehler anzeigen
+
+global
+  $angemeldet,
+  $muell_id,
+  $readonly;
 
 assert( $angemeldet ) or exit();  // aufruf nur per index.php?window=basar...
 
@@ -10,10 +30,10 @@ $editable = ( hat_dienst(4) and ! $readonly );
 
 get_http_var( 'action','w','' );
 $editable or $action = '';
-if( $action == 'basarzuteilung' ) {
+if( $action === 'basarzuteilung' ) {
   need_http_var('fieldcount','u' );
   need_http_var('gruppen_id','U', false );
-  if( $gruppen_id != sql_muell_id() ) {
+  if( $gruppen_id !== sql_muell_id() ) {
     need( sql_gruppe_aktiv( $gruppen_id ) , "Keine aktive Bestellgruppe ausgewählt!" );
   }
 
@@ -27,7 +47,7 @@ if( $action == 'basarzuteilung' ) {
     if( get_http_var( "menge$i", "f" ) ) {
       $pr = sql_produkt( array( 'bestell_id' => $b_id, 'produkt_id' => ${"produkt$i"} ) );
       $gruppen_menge = ${"menge$i"} / $pr['kan_verteilmult'];
-      if( $gruppen_menge > 0 or ( $gruppen_id == $muell_id ) )
+      if( $gruppen_menge > 0 || $gruppen_id === $muell_id )
         sql_basar2group( $gruppen_id, ${"produkt$i"}, ${"bestellung$i"}, $gruppen_menge );
     }
   }

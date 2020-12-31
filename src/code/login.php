@@ -1,36 +1,54 @@
 <?php
-//
-// login.php
-//
-// anmeldescript:
-//  - prueft, ob benutzer schon angemeldet (per cookie)
-//  - verarbeitet neuanmeldungen
-//  - per "login=logout" wird ein logout (löschen des cookie) erzwungen
-//  - falls nicht angemeldet: anmeldeformular wird ausgegeben
-//  - falls $from_dokuwiki==true wird index.php?window=wiki aufgerufen
-//
-// bei erfolgreicher anmeldung werden global gesetzt:
-//  - $angemeldet == TRUE
-//  - $login_gruppen_id
-//  - $login_gruppen_name
-//  - $session_id
-//  - $login_dienst (0, 1, 3, 4 oder 5)
-// falls $login_dienst > 0 außerdem:
-//  - $coopie_name
-//  - $dienstkontrollblatt_id
+/**
+ * login.php
+ *
+ * Login script
+ *
+ * - checks if user is already logged in (using a cookie)
+ * - displays a login form if not
+ * - processes new logins
+ * - processes logouts (per "login=logout" wird ein logout (löschen des cookie) erzwungen
+ * - if $from_dokuwiki==true, index.php?window=wiki is loaded
+ *
+ * Sets the following globals on successful login check:
+ * - $angemeldet = TRUE
+ * - $login_gruppen_id
+ * - $login_gruppen_name
+ * - $session_id
+ * - $login_dienst (0|1|3|4|5)
+ * - only if $login_dienst > 0:
+ *   - $coopie_name
+ *   - $dienstkontrollblatt_id
+ *
+ * GET params:
+ * @param string $login Action to process (login|logout|silentlogout)
+ * @param string $motd ???
+ */
+
+global
+  $angemeldet,
+  $foodsoftdir,
+  $FC_acronym;
 
 function init_login() {
-  global $angemeldet, $session_id, $login_gruppen_id, $login_gruppen_name
-       , $login_dienst, $dienstkontrollblatt_id, $coopie_name
-       , $reconfirmation_muted;
+  global
+    $angemeldet,
+    $coopie_name,
+    $dienstkontrollblatt_id,
+    $login_dienst,
+    $login_gruppen_id,
+    $login_gruppen_name,
+    $reconfirmation_muted,
+    $session_id;
+
   $angemeldet=FALSE;
-  $session_id = 0;
+  $coopie_name= FALSE;
+  $dienstkontrollblatt_id = FALSE;
+  $login_dienst = 0;
   $login_gruppen_id = FALSE;
   $login_gruppen_name = FALSE;
-  $login_dienst = 0;
-  $dienstkontrollblatt_id = FALSE;
-  $coopie_name= FALSE;
   $reconfirmation_muted = FALSE;
+  $session_id = 0;
 }
 
 function logout() {
@@ -46,7 +64,7 @@ $telefon ='';
 $name ='';
 $notiz ='';
 
-// pruefen, ob schon eingeloggt:
+// prüfen, ob schon eingeloggt:
 //
 if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 1 ) ) {
   sscanf( $_COOKIE['foodsoftkeks'], "%u_%s", $session_id, $cookie );
@@ -56,7 +74,7 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
   } elseif( $cookie != $row['cookie'] ) {
     $problems .= "<div class='warn'>Fehler im Keks: nicht angemeldet</div>";
   } else {
-    // anmeldung ist gueltig:
+    // anmeldung ist gültig:
     $login_gruppen_id = $row['login_gruppen_id'];
     $login_dienst = $row['dienst'];
     $dienstkontrollblatt_id = $row['dienstkontrollblatt_id'];
@@ -77,7 +95,7 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
   }
   if( ! $problems ) {  // login ok, weitermachen...
     $angemeldet = TRUE;
-  } else {  // irgendwas war falsch... zurueck auf los:
+  } else {  // irgendwas war falsch... zurück auf los:
     logout();
   }
 }
@@ -158,9 +176,9 @@ switch( $login ) {
 if( $angemeldet )
   return;
 
-// ab hier: benutzer ist nicht eingeloggt; wir setzen alles zurueck und zeigen das anmeldeformular:
+/* user is not logged in, hence we reset everything and present the login form */
 
-logout();  // nicht korrekt angemeldet: alles zuruecksetzen...
+logout();
 require_once("head.php");
 setWikiHelpTopic( ':' );
 
@@ -286,7 +304,8 @@ open_javascript( "
   document.observe('dom:loaded', pick_login_text);
 " );
 
-function nur_fuer_dienst() {
+function nur_fuer_dienst(): bool
+{
   global $login_dienst;
   for( $i = 0; $i < func_num_args(); $i++ ) {
     if( $login_dienst == func_get_arg($i) )
@@ -295,7 +314,8 @@ function nur_fuer_dienst() {
   div_msg( 'warn', 'Keine Berechtigung' );
   exit();
 }
-function hat_dienst() {
+function hat_dienst(): bool
+{
   global $login_dienst;
   for( $i = 0; $i < func_num_args(); $i++ ) {
     if( $login_dienst == func_get_arg($i) )

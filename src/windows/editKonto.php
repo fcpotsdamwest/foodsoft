@@ -1,12 +1,36 @@
 <?PHP
+/**
+ * editKonto.php
+ *
+ * Edit account
+ *
+ * @param string $action
+ * * save
+ * @param int $konto_id
+ * @param int $ro
+ *   Display page in readonly mode
+ * @param int $konto_id
+ * @param string $name
+ * @param int $blz
+ * @param int $kontonr
+ * @param string $url
+ * @param string $kommentar
+ */
+
+global
+  $angemeldet,
+  $db_handle,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 
 setWindowSubtitle( 'Konto edieren' );
 setWikiHelpTopic( 'foodsoft:konto_edieren' );
 $editable = hat_dienst(4);
 get_http_var( 'ro', 'u', 0, true );
-if( $ro or $readonly )
+if( $ro || $readonly ) {
   $editable = false;
+}
 
 $msg = '';
 $problems = '';
@@ -23,13 +47,13 @@ get_http_var('kommentar','H',$row);
 get_http_var( 'action', 'w', '' );
 $editable or $action = '';
 if( $action == 'save' ) {
-  $values = array(
-    'name' => $name
-  , 'blz' => $blz
-  , 'kontonr' => $kontonr
-  , 'url' => $url
-  , 'kommentar' => $kommentar
-  );
+  $values = [
+    'name' => $name,
+    'blz' => $blz,
+    'kontonr' => $kontonr,
+    'url' => $url,
+    'kommentar' => $kommentar
+  ];
   if( ! $name ) {
     $problems .= "<div class='warn'>Kein Name eingegeben!</div>";
   } else {
@@ -64,12 +88,11 @@ open_form( '', 'action=save' );
           if( $konto_id > 0 )
             echo fc_link( 'konto', "konto_id=$konto_id,text=Kontoübersicht..." );
           qquad();
-          if( $editable )
+          if( $editable ) {
             submission_button();
-          else
+          } else {
             close_button();
+          }
     close_table();
   close_fieldset();
 close_form();
-
-?>

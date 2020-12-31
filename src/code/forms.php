@@ -5,7 +5,7 @@
 // functions to output one row of a form
 //
 // - the line will usually contain two columns: one for the label, one for the input field
-// - if a $fieldname is alread part of $self_fields (ie, defining part of the current view), the value
+// - if a $fieldname is already part of $self_fields (ie, defining part of the current view), the value
 //   will just be printed and cannot be modified (only applies to types that can be in $self_fields)
 // - the last (second) column will not be closed; so e.g. a submission_button() can be appended
 //
@@ -59,7 +59,7 @@ function form_row_date( $label, $fieldname, $initial = 0 ) {
   $year = self_field( $fieldname.'_year' );
   $month = self_field( $fieldname.'_month' );
   $day = self_field( $fieldname.'_day' );
-  if( ($year !== NULL) and ($day !== NULL) and ($month !== NULL) ) {
+  if( ($year !== NULL) && ($day !== NULL) && ($month !== NULL) ) {
     $date = "$year-$month-$day";
     $fieldname = false;
   } else {
@@ -76,7 +76,7 @@ function form_row_date_time( $label, $fieldname, $initial = 0 ) {
   $day = self_field( $fieldname.'_day' );
   $hour = self_field( $fieldname.'_hour' );
   $minute = self_field( $fieldname.'_minute' );
-  if( ($year !== NULL) and ($day !== NULL) and ($month !== NULL) and ($hour !== NULL) and ($minute !== NULL) ) {
+  if( !( empty($year) || empty($day) || empty($month) || empty($hour) || empty($minute) ) ) {
     $datetime = "$year-$month-$day $hour:$minute";
     $fieldname = false;
   } else {
@@ -631,7 +631,8 @@ function formular_umbuchung_verlust( $typ = 0 ) {
   close_form();
 }
 
-function action_umbuchung_verlust() {
+function action_umbuchung_verlust(): bool
+{
   global $von_typ, $nach_typ, $valuta_day, $valuta_month, $valuta_year, $betrag, $notiz;
 
   need_http_var( 'von_typ', 'U' );
@@ -710,10 +711,6 @@ function action_gruppen_umlage() {
   }
 }
 
-function mod_onclick( $id ) {
-  return $id ? " onclick=\"document.getElementById('$id').className='modified';\" " : '';
-}
-
 function formular_artikelnummer( $produkt_id, $toggle = false, $bestell_id = 0 ) {
   $produkt = sql_produkt( $produkt_id );
   $anummer = $produkt['artikelnummer'];
@@ -753,37 +750,26 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
   //  - existierende Werte aus $produkt
   //  - vernünftigen Default
 
-  if( ! isset( $vorschlag['gebindegroesse'] ) )
-    $vorschlag['gebindegroesse'] = $preis_id ? $produkt['gebindegroesse'] : 1;
 
-  if( ! isset( $vorschlag['verteileinheit'] ) )
-    if( $preis_id )
+  if( ! isset( $vorschlag['verteileinheit'] ) ) {
+    if( $preis_id ) {
       $vorschlag['verteileinheit'] =
-        ( ( $produkt['kan_verteilmult'] > 0.0001 ) ? $produkt['kan_verteilmult'] : 1 )
-        . ( $produkt['kan_verteileinheit'] ? " {$produkt['kan_verteileinheit']} " : ' ST' );
-    else
+        ( ($produkt['kan_verteilmult'] > 0.0001 ) ? $produkt['kan_verteilmult'] : 1 ) .
+        ( $produkt['kan_verteileinheit'] ? " {$produkt['kan_verteileinheit']} " : ' ST' );
+    } else {
       $vorschlag['verteileinheit'] = '1 ST';
-
-  if( ! isset( $vorschlag['liefereinheit'] ) )
-    $vorschlag['liefereinheit'] = $preis_id ? "{$produkt['kan_liefermult']} {$produkt['kan_liefereinheit']}"
-                                           : $vorschlag['verteileinheit'];
-  if( ! isset( $vorschlag['lv_faktor'] ) )
-    $vorschlag['lv_faktor'] = 1;
-
-  if( ! isset( $vorschlag['mwst'] ) )
-    $vorschlag['mwst'] = $preis_id ? $produkt['mwst'] : $mwst_default;
-
-  if( ! isset( $vorschlag['pfand'] ) )
-    $vorschlag['pfand'] = $preis_id ? $produkt['pfand'] : '0.00';
-
-  if( ! isset( $vorschlag['lieferpreis'] ) )
-    $vorschlag['lieferpreis'] = $preis_id ? $produkt['nettolieferpreis'] : '0.00';
-
-  if( ! isset( $vorschlag['bestellnummer'] ) )
-    $vorschlag['bestellnummer'] = $preis_id ? $produkt['bestellnummer'] : '';
-
-  if( ! isset( $vorschlag['notiz'] ) )
-    $vorschlag['notiz'] = $produkt['notiz'];  // braucht _keinen_ gueltigen preiseintrag!
+    }
+  }
+  isset ( $vorschlag['liefereinheit'] ) || $vorschlag['liefereinheit'] = $preis_id
+    ? "{$produkt['kan_liefermult']} {$produkt['kan_liefereinheit']}"
+    : $vorschlag['verteileinheit'];
+  isset( $vorschlag['gebindegroesse'] ) || $vorschlag['gebindegroesse'] = $preis_id ? $produkt['gebindegroesse'] : 1;
+  isset( $vorschlag['lv_faktor'] )      || $vorschlag['lv_faktor'] = 1;
+  isset( $vorschlag['mwst'] )           || $vorschlag['mwst'] = $preis_id ? $produkt['mwst'] : $mwst_default;
+  isset( $vorschlag['pfand'] )          || $vorschlag['pfand'] = $preis_id ? $produkt['pfand'] : '0.00';
+  isset( $vorschlag['lieferpreis'] )    || $vorschlag['lieferpreis'] = $preis_id ? $produkt['nettolieferpreis'] : '0.00';
+  isset( $vorschlag['bestellnummer'] )  || $vorschlag['bestellnummer'] = $preis_id ? $produkt['bestellnummer'] : '';
+  isset( $vorschlag['notiz'] )          || $vorschlag['notiz'] = $produkt['notiz'];  // braucht _keinen_ gültigen preiseintrag!
 
   // restliche felder automatisch berechnen:
   //
@@ -806,7 +792,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
 
         <label class='qquad'>Pfand:</label>
            <input type='text' class='number' size='4' name='pfand' id='newpfand'
-            value='<?php printf( "%.2lf", $vorschlag['pfand'] ); ?>'
+            value='<?php printf( "%.2f", $vorschlag['pfand'] ); ?>'
             title='Pfand pro V-Einheit, bei uns immer 0.00 oder 0.16'
             onchange='preisberechnung_vorwaerts();'>
         <?php
@@ -819,7 +805,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
            <span onmouseover="help('L-Preis: Netto: der Einzelpreis aus dem Katalog des Lieferanten (ohne MWSt, ohne Pfand)');"
                  onmouseout="help(' ');" >
            <input title='Nettopreis' class='number' type='text' size='8' id='newlieferpreis' name='lieferpreis'
-             value='<?php printf( "%.2lf", $vorschlag['nettolieferpreis'] ); ?>'
+             value='<?php printf( "%.2f", $vorschlag['nettolieferpreis'] ); ?>'
              onchange='preisberechnung_vorwaerts();'>
            </span>
         <span style='padding:1ex;'>/</span>
@@ -845,7 +831,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
            <span onmouseover="help('Verbraucher-Preis: der Preis für die Gruppen (mit MWSt und Pfand) je Verteileinheit');"
                  onmouseout="help(' ');" >
            <input title='Preis incl. MWSt und Pfand' class='number' type='text' size='8' id='newvpreis' name='vpreis'
-             value='<?php printf( '%.4lf', $vorschlag['vpreis'] ); ?>'
+             value='<?php printf( '%.4f', $vorschlag['vpreis'] ); ?>'
              onchange='preisberechnung_rueckwaerts();'>
            </span>
         <span style='padding:1ex;'>/</span>

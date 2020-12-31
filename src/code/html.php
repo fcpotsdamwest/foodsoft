@@ -1,15 +1,16 @@
 <?php
 
-global $open_tags      /* keep track of open tags */
-     , $print_on_exit  /* print this just before </body> */
-     , $js_on_exit     /* javascript code to insert just before </body> */
-     , $html_id        /* draw-a-number-box to generate unique ids */
-     , $form_id        /* id of the currently open form (if any) */
-     , $input_event_handlers  /* insert into <input> and similar inside a form */
-     , $html_hints     /* online hints to display for fields */
-     , $table_level      /* nesting level for tables */
-     , $table_row_number /* stack of table row counters */
-;
+global
+  $open_tags,             /* keep track of open tags */
+  $print_on_exit,         /* print this just before </body> */
+  $js_on_exit,            /* javascript code to insert just before </body> */
+  $html_id,               /* draw-a-number-box to generate unique ids */
+  $form_id,               /* id of the currently open form (if any) */
+  $input_event_handlers,  /* insert into <input> and similar inside a form */
+  $html_hints,            /* online hints to display for fields */
+  $table_level,           /* nesting level for tables */
+  $table_row_number;      /* stack of table row counters */
+
 $open_tags = array();
 $print_on_exit = array();
 $js_on_exit = array();
@@ -18,14 +19,20 @@ $html_id = 0;
 $input_event_handlers = '';
 $form_id = '';
 
-global $td_title, $tr_title;  /* can be used to set title for next <td> or <tr> */
+global
+  $td_title,
+  $tr_title;  /* can be used to set title for next <td> or <tr> */
 $td_title = '';
 $tr_title = '';
 
 // set flags to activate workarounds for known browser bugs:
 //
 $browser = $_SERVER['HTTP_USER_AGENT'];
-global $activate_mozilla_kludges, $activate_safari_kludges, $activate_exploder_kludges, $activate_konqueror_kludges;
+global
+  $activate_exploder_kludges,
+  $activate_konqueror_kludges,
+  $activate_mozilla_kludges,
+  $activate_safari_kludges;
 $activate_safari_kludges = 0;
 $activate_mozilla_kludges = 0;
 $activate_exploder_kludges = 0;
@@ -42,7 +49,8 @@ if( preg_match ( '/safari/i', $browser ) ) {  // safari sends "Mozilla...safari"
 
 // new_html_id(): increment and return next unique id:
 //
-function new_html_id() {
+function new_html_id(): int
+{
   global $html_id;
   return ++$html_id;
 }
@@ -71,7 +79,7 @@ function close_tag( $tag ) {
       $hidden_input = '';
       break;
   }
-  if( $open_tags[$n] == $tag ) {
+  if( $open_tags[$n] === $tag ) {
     echo "</$tag>";
     unset( $open_tags[$n--] );
   } else {
@@ -443,7 +451,7 @@ function uncheck_all_button( $text = 'Alle abwählen', $title = '' ) {
 }
 
 function close_button( $text = 'Schließen' ) {
-  echo "<a class='button' onclick='if(opener) opener.focus(); closeCurrentWindow();'>$text</a>";
+  echo "<a class='button' onclick='if(opener) opener.focus(); window.close();'>$text</a>";
 }
 
 // open_select(): create <select> element
@@ -634,7 +642,8 @@ function close_option_menu_row() {
  *              whether to capture ENTER key press
  * @returns     corresponding "onchange" and "onkeypress" attributes
  */
-function textfield_on_change_handler( $handler, $capture_enter = true ) {
+function textfield_on_change_handler( $handler, $capture_enter = true ): string
+{
   $result = " onchange='$handler'";
   if ($capture_enter) {
     $result .= " onkeypress='handleTextFieldKeyPress(event, function() { $handler });'";
@@ -644,17 +653,18 @@ function textfield_on_change_handler( $handler, $capture_enter = true ) {
 
 /**
  * Send a PHP array as a JavaScript object via JSON
- * 
+ *
+ * @param string $name
+ *   name of the JavaScript variable, must contain "var " if desired
+ * @param array $value
+ *   the PHP array to send
+ * @return string
+ *   the correspoding JS code
  * @author Tilman Vogel
- * 
- * @param[in]   name
- *              name of the JavaScript variable, must contain "var " if desired
- * @param[in]   value
- *              the PHP array to send
- * @returns     the correspoding JS code
  */
-function toJavaScript( $name, $value ) {
-  return "$name = ".json_encode($value).";";
+function toJavaScript(string $name, array $value): string
+{
+  return "$name = " . json_encode( $value ) . ";";
 }
 
 ?>

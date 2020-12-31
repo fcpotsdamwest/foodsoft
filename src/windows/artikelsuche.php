@@ -1,12 +1,35 @@
 <?php
-// artikelsuche.php
-//
-// Timo, 2007, 2008
-//
-// verwaltet und sucht im lieferantenkatalog (soweit implementiert; aktuell: Terra, Bode, Rapunzel)
+/**
+ * artikelsuche.php
+ *
+ * Search in supplier catalogue
+ * (currently implemented suppliers: Bode, Rapunzel, Terra)
+ *
+ * @author: Timo, 2007, 2008
+ *
+ * @param string $action
+ * * delete
+ * * search
+ * @param int $anummer
+ * @param int $bnummer
+ * @param int $bestell_id
+ * @param int $katalogdatum
+ * @param int $katalogtyp
+ * @param int $lieferanten_id
+ * @param int $limit
+ * @param int $maxpreis
+ * @param int $minpreis
+ * @param int $name
+ * @param int $produkt_id
+ */
+
+global
+  $angemeldet,
+  $demoserver,
+  $readonly;
 
 assert( $angemeldet ) or exit();
-$editable = ( ! $readonly and hat_dienst(4) );
+$editable = ( ! $readonly && hat_dienst(4) );
 
 global $db_handle;
 
@@ -100,7 +123,7 @@ if( $action == 'delete' ) {
   doSql( "DELETE FROM lieferantenkatalog WHERE katalogdatum = '$katalogdatum' and katalogtyp='$katalogtyp'" );
 }
 
-if( $editable and ( ! $produkt_id ) ) {
+if( $editable && ! $produkt_id ) {
   $kataloge = doSql( "
     SELECT katalogdatum, katalogtyp
     FROM lieferantenkatalog
@@ -108,7 +131,14 @@ if( $editable and ( ! $produkt_id ) ) {
     GROUP BY katalogdatum, katalogtyp
     ORDER BY katalogtyp, katalogdatum
   " );
-  open_form( array( 'window' => 'katalog_upload', 'attr' => "enctype='multipart/form-data'", 'action' => 'upload', 'lieferanten_id' => $lieferanten_id ) );
+  open_form(
+    [
+      'window' => 'katalog_upload',
+      'attr' => "enctype='multipart/form-data'",
+      'action' => 'upload',
+      'lieferanten_id' => $lieferanten_id
+    ]
+  );
     open_fieldset( 'small_form', '', "Kataloge von $lieferant_name" );
 
       ?><h4>erfasste Kataloge (insgesamt <?php echo sql_lieferant_katalogeintraege( $lieferanten_id ); ?> Einträge):</h4> <?php
@@ -121,10 +151,22 @@ if( $editable and ( ! $produkt_id ) ) {
           open_tr();
             open_td( '', '', $row['katalogdatum'] );
             open_td( '', '', $row['katalogtyp'] );
-            open_td( '', '', fc_action( array( 'class' => 'drop', 'title' => 'Katalog löschen'
-                                             , 'confirm' => 'Soll der Katalog wirklich GELÖSCHT werden?' )
-                                      , array( 'action' => 'delete', 'katalogdatum' => $row['katalogdatum']
-                                                                   , 'katalogtyp' => $row['katalogtyp'] ) ) );
+            open_td(
+              '',
+              '',
+              fc_action(
+                [
+                  'class' => 'drop',
+                  'title' => 'Katalog löschen',
+                  'confirm' => 'Soll der Katalog wirklich GELÖSCHT werden?'
+                ],
+                [
+                  'action' => 'delete',
+                  'katalogdatum' => $row['katalogdatum'],
+                  'katalogtyp' => $row['katalogtyp']
+                ]
+              )
+            );
         }
       close_table();
 
@@ -221,8 +263,20 @@ open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer
           open_td( 'mult' );
             $anummer = $row['artikelnummer'];
             if ( $produkt_id > 0 ) {
-              echo fc_action( "window=produktpreise,class=button,text=$anummer,produkt_id=$produkt_id,bestell_id=$bestell_id,title=Artikelnummer auswählen"
-                            , "action=artikelnummer_setzen,anummer=$anummer" );
+              echo fc_action(
+                [
+                  'window' => 'produktpreise',
+                  'class' => 'button',
+                  'text' => $anummer,
+                  'produkt_id' => $produkt_id,
+                  'bestell_id' => $bestell_id,
+                  'title' => 'Artikelnummer auswählen'
+                ],
+                [
+                  'action' => 'artikelnummer_setzen',
+                  'anummer' => $anummer
+                ]
+              );
             } else {
               echo $anummer;
             }
@@ -247,7 +301,12 @@ open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer
           open_td( '', '',  "{$row['katalogtyp']} / {$row['katalogdatum']}" );
           if( ! $produkt_id ) {
             open_td( 'center' );
-            $fc_produkte = sql_produkte( array( 'artikelnummer' => $row['artikelnummer'], 'lieferanten_id' => $lieferanten_id ) );
+            $fc_produkte = sql_produkte(
+              [
+                'artikelnummer' => $row['artikelnummer'],
+                'lieferanten_id' => $lieferanten_id
+              ]
+            );
             if( $fc_produkte ) {
               foreach( $fc_produkte as $p ) {
                 open_div( '', '', fc_link( 'produktpreise', "text=,produkt_id={$p['produkt_id']}" ) );
@@ -255,18 +314,19 @@ open_fieldset( 'small_form', '', $produkt_id ?  "Katalogsuche nach Artikelnummer
             } else {
               if( hat_dienst(4) ) {
                 echo fc_action(
-                  array(
-                    'window' => 'edit_produkt'
-                  , 'class' => 'button'
-                  , 'text' => 'Eintragen'
-                  , 'title' => 'in Foodsoft Datenbank übernehmen'
-                  , 'confirm' => 'Artikel in Foodsoft Datenbank übernehmen?'
-                  )
-                , array(
-                    'lieferanten_id' => $lieferanten_id
-                  , 'name' => $row['name']
-                  , 'artikelnummer' => $row['artikelnummer']
-                ) );
+                  [
+                    'window' => 'edit_produkt',
+                    'class' => 'button',
+                    'text' => 'Eintragen',
+                    'title' => 'in Foodsoft Datenbank übernehmen',
+                    'confirm' => 'Artikel in Foodsoft Datenbank übernehmen?'
+                  ],
+                  [
+                    'lieferanten_id' => $lieferanten_id,
+                    'name' => $row['name'],
+                    'artikelnummer' => $row['artikelnummer']
+                  ]
+                );
               } else {
                 echo "-";
               }

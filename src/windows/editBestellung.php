@@ -1,4 +1,34 @@
 <?PHP
+/**
+ * editBestellung.php
+ *
+ * Edit order metadata (period, surplus)
+ *
+ * @param string $action
+ * * save
+ * @param int $aufschlag
+ * @param int $bestell_id
+ * @param int $bestellname
+ * @param int $endzeit_day
+ * @param int $endzeit_hour
+ * @param int $endzeit_minute
+ * @param int $endzeit_month
+ * @param int $endzeit_year
+ * @param int $lieferanten_id
+ * @param int $lieferung_day
+ * @param int $startzeit_hour
+ * @param int $startzeit_minute
+ * @param int $lieferung_month
+ * @param int $lieferung_year
+ * @param int $startzeit_day
+ * @param int $startzeit_month
+ * @param int $startzeit_year
+ */
+
+global
+  $angemeldet,
+  $aufschlag_default,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 
@@ -33,7 +63,7 @@ if( $bestell_id ) {  // existierende bestellvorlage bearbeiten:
     $problems .= "<div class='warn'>Keine Produkte ausgewählt!</div>";
   }
 }
-$editable = ( hat_dienst(4) and ( ! $readonly ) and ( $status < STATUS_ABGERECHNET ) );
+$editable = ( ! $readonly && hat_dienst(4) && $status < STATUS_ABGERECHNET );
 
 $lieferant_name = sql_lieferant_name( $lieferanten_id );
 
@@ -61,10 +91,10 @@ if( $action == 'save' ) {
   $endzeit = "$endzeit_year-$endzeit_month-$endzeit_day $endzeit_hour:$endzeit_minute:00";
   $lieferung = "$lieferung_year-$lieferung_month-$lieferung_day";
 
-  if( $bestellname == "" )
+  if( $bestellname === "" )
     $problems  .= "<div class='warn'>Die Bestellung muß einen Namen bekommen!</div>";
 
-  if( $problems == '' ) {
+  if( $problems === '' ) {
     if( $bestell_id ) {
       if( sql_update_bestellung( $bestellname, $startzeit, $endzeit, $lieferung, $bestell_id, $aufschlag ) ) {
         $done = true;
@@ -79,14 +109,20 @@ if( $action == 'save' ) {
       $vormerkungen = array();
       foreach( $bestellliste as $produkt_id ) {
         sql_insert_bestellvorschlag( $produkt_id, $bestell_id );
-        $vormerkungen = array_merge( $vormerkungen, sql_bestellzuordnungen( array(
-          'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN, 'produkt_id' => $produkt_id
-        ) ) );
+        $vormerkungen = array_merge(
+          $vormerkungen,
+          sql_bestellzuordnungen(
+            [
+              'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN,
+              'produkt_id' => $produkt_id
+            ]
+          )
+        );
       }
       // alle vormerkungen dieses lieferanten löschen:
-      sql_delete_bestellzuordnungen( array(
-        'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN, 'lieferanten_id' => $lieferanten_id
-      ) );
+      sql_delete_bestellzuordnungen(
+        [ 'art' => BESTELLZUORDNUNG_ART_VORMERKUNGEN, 'lieferanten_id' => $lieferanten_id ]
+      );
       $vorbestellungen_fest = 0;
       $vorbestellungen_toleranz = 0;
       foreach( $vormerkungen as $vormerkung ) {
@@ -94,7 +130,7 @@ if( $action == 'save' ) {
         $produkt_id = $vormerkung['produkt_id'];
         $menge = $vormerkung['menge'];
         $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
-        $keys = array( 'produkt_id' => $produkt_id, 'gruppenbestellung_id' => $gruppenbestellung_id );
+        $keys = [ 'produkt_id' => $produkt_id, 'gruppenbestellung_id' => $gruppenbestellung_id ];
         switch( $vormerkung['art'] ) {
           case BESTELLZUORDNUNG_ART_VORMERKUNG_FEST:
             change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $menge, -1, true );
@@ -122,7 +158,7 @@ if( $action == 'save' ) {
 }
 
 open_form( '', "action=save,lieferanten_id=$lieferanten_id" );
-  if( isset( $bestellliste ) and is_array( $bestellliste ) )
+  if( isset( $bestellliste ) && is_array( $bestellliste ) )
     foreach( $bestellliste as $produkt_id )
       hidden_input( 'bestellliste[]', $produkt_id );
   open_fieldset( 'small_form', '', 'Bestellvorlage' );
@@ -138,12 +174,11 @@ open_form( '', "action=save,lieferanten_id=$lieferanten_id" );
       form_row_betrag( 'Aufschlag:', ( $editable ? 'aufschlag' : false ), $aufschlag ); echo '%';
       open_tr();
         open_td('right', "colspan='2'");
-          if( $editable and ! $done )
+          if( $editable && ! $done ) {
             submission_button();
-          else
+          } else {
             close_button();
+          }
     close_table();
   close_fieldset();
 close_form();
-
-?>

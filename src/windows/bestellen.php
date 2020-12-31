@@ -1,5 +1,31 @@
 <?PHP
+/**
+ * bestellen.php
+ *
+ * @param string $action
+ * * bestellen
+ * * delete
+ * * produkt_hinzufuegen
+ * * update_prices
+ * @param int $bestell_id
+ * @param int $fest_<n>
+ * @param int $produkt_id
+ * @param int $toleranz_<n>
+ * @param int $vertical_scroll
+ *   Vertical scroll position captured on form submit, used to jump back to where you left off in the list
+ * @param int $vm_<n>
+ */
 error_reporting('E_ALL'); 
+
+global
+  $activate_mozilla_kludges,
+  $angemeldet,
+  $basar_id,
+  $login_gruppen_id,
+  $login_gruppen_name,
+  $mysqlheute,
+  $readonly,
+  $toleranzdefault;
 
 assert( $angemeldet ) or exit();
 
@@ -21,7 +47,7 @@ if( hat_dienst(4) ) {
 
 get_http_var('bestell_id','u',false,true );
 if( $bestell_id ) {
-  if( sql_bestellung_status( $bestell_id ) != STATUS_BESTELLEN )
+  if( sql_bestellung_status( $bestell_id ) !== STATUS_BESTELLEN )
     $bestell_id = 0;
 }
 
@@ -76,7 +102,7 @@ switch( $action ) {
       get_http_var( "toleranz_$n", 'u', 0 );
       $toleranz = ${"toleranz_$n"};
       get_http_var( "vm_$n", 'w', 'no' );
-      $vormerken = ( ${"vm_$n"} == 'yes' ? true : false );
+      $vormerken = ( ${"vm_$n"} === 'yes' );
       $bestellungen[$n] = array( 'fest' => $fest, 'toleranz' => $toleranz, 'vormerken' => $vormerken );
       $gesamtpreis += $produkt['endpreis'] * ( $fest + $toleranz );
     }
@@ -144,26 +170,37 @@ if( ! $readonly ) {
 
   ?>
   <script type="text/javascript">
-    var anzahl_produkte = <?php echo count( $produkte ); ?>;
-    var kontostand = <?php printf( "%.2lf", $kontostand ); ?>;
-    var gesamtpreis = 0.00;
-    var aufschlag = <?php printf( "%.2lf", $gesamtbestellung['aufschlag'] ); ?>;
-    var toleranz_default_faktor = <?php printf( "%.3lf", 0.001 + $toleranz_default / 100.0 ); ?>;
-    var gebindegroesse     = new Array();
-    var preis              = new Array();
-    var kosten             = new Array();
-    var fest_alt           = new Array();   // festbestellmenge der gruppe bisher
-    var fest               = new Array();   // festbestellmenge der gruppe aktuell
-    var fest_andere        = new Array();   // festbestellmenge anderer gruppen
-    var zuteilung_fest_alt = new Array();
-    var toleranz_alt       = new Array();
-    var toleranz           = new Array();
-    var toleranz_andere    = new Array();
-    var verteilmult        = new Array();
+    const anzahl_produkte = <?php echo count( $produkte ); ?>;
+    let kontostand = <?php printf( "%.2f", $kontostand ); ?>;
+    let gesamtpreis = 0.00;
+    const aufschlag = <?php printf( "%.2f", $gesamtbestellung['aufschlag'] ); ?>;
+    const toleranz_default_faktor = <?php printf( "%.3f", 0.001 + $toleranz_default / 100.0 ); ?>;
+    let gebindegroesse     = new Array();
+    let preis              = new Array();
+    let kosten             = new Array();
+    let fest_alt           = new Array();   // festbestellmenge der gruppe bisher
+    let fest               = new Array();   // festbestellmenge der gruppe aktuell
+    let fest_andere        = new Array();   // festbestellmenge anderer gruppen
+    let zuteilung_fest_alt = new Array();
+    let toleranz_alt       = new Array();
+    let toleranz           = new Array();
+    let toleranz_andere    = new Array();
+    let verteilmult        = new Array();
 
     const verticalScroll = <?php print ( isset($vertical_scroll) ? (int)$vertical_scroll : 0 ); ?>;
 
-    function init_produkt( produkt, _gebindegroesse, _preis, _fest, _toleranz, _fest_andere, _toleranz_andere, zuteilung_fest, zuteilung_toleranz, _verteilmult ) {
+    function init_produkt(
+      produkt,
+      _gebindegroesse,
+      _preis,
+      _fest,
+      _toleranz,
+      _fest_andere,
+      _toleranz_andere,
+      zuteilung_fest,
+      zuteilung_toleranz,
+      _verteilmult
+    ) {
       gebindegroesse[produkt] = _gebindegroesse;
       preis[produkt] = _preis;
       fest_alt[produkt] = _fest;
@@ -184,7 +221,7 @@ if( ! $readonly ) {
       var menge, quote, zuteilung_toleranz, kosten_neu, reminder, konto_rest, kontostand_neu;
       var id;
 
-      // bestellmenge berechnen: wieviel kann insgesamt bestellt werden:
+      // bestellmenge berechnen: Wie viel kann insgesamt bestellt werden:
       //
       festmenge = fest_andere[produkt] + fest[produkt];
       toleranzmenge = toleranz_andere[produkt] + toleranz[produkt];
@@ -279,7 +316,7 @@ if( ! $readonly ) {
       // anzeige gruppe aktualisieren:
       //
       s = fest[produkt] * verteilmult[produkt];
-      var toleranzNode = document.getElementById('t_'+produkt);
+      const toleranzNode = document.getElementById('t_'+produkt);
       
       // also show when tolerance changed for marking change by color
       if( toleranz[produkt] > 0 || toleranz_alt[produkt] != toleranz[produkt] ) {
@@ -289,16 +326,16 @@ if( ! $readonly ) {
         toleranzNode.firstChild.nodeValue = ' ';
       }
       
-      var festNode = document.getElementById('f_'+produkt);
+      const festNode = document.getElementById('f_'+produkt);
       festNode.firstChild.nodeValue = s;
       
       // highlight changes
       if (!init) {
-        set_class(festNode, 'changed', fest[produkt] != fest_alt[produkt]);
+        set_class(festNode, 'changed', fest[produkt] !== fest_alt[produkt]);
         set_class(
             toleranzNode, 
             'changed', 
-            fest[produkt] + toleranz[produkt] != fest_alt[produkt] + toleranz_alt[produkt]);
+            fest[produkt] + toleranz[produkt] !== fest_alt[produkt] + toleranz_alt[produkt]);
       }
 
       // update order form fields
@@ -366,8 +403,8 @@ if( ! $readonly ) {
     }
 
     function reminder_on() {
-      var reminder = document.getElementById('floating_submit_button_<?php echo $bestellform_id; ?>');
-      var footbar = document.getElementById('footbar');
+      const reminder = document.getElementById('floating_submit_button_<?php echo $bestellform_id; ?>');
+      const footbar = document.getElementById('footbar');
       while (footbar.firstChild) {
         footbar.removeChild(footbar.firstChild);
       }
@@ -376,7 +413,7 @@ if( ! $readonly ) {
       
       set_footbar(true);
       
-      id = document.getElementById('hinzufuegen');
+      const id = document.getElementById('hinzufuegen');
       while( id.firstChild ) {
         id.removeChild( id.firstChild );
       }
@@ -397,8 +434,7 @@ if( ! $readonly ) {
       zuteilung_berechnen( produkt, false );
     }
     function fest_plusplus( produkt ) {
-      var gebinde;
-      gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
+      const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       fest[produkt] = (gebinde+1) * gebindegroesse[produkt];
       zuteilung_berechnen( produkt, false );
     }
@@ -409,8 +445,7 @@ if( ! $readonly ) {
       }
     }
     function fest_minusminus( produkt ) {
-      var gebinde;
-      gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
+      const gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
       if( gebinde > 0 ) {
         fest[produkt] = gebinde * gebindegroesse[produkt];
         zuteilung_berechnen( produkt, false );
@@ -432,7 +467,7 @@ if( ! $readonly ) {
       }
     }
     function toleranz_auffuellen( produkt ) {
-      gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
+      const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       if( fest[produkt] - gebinde * gebindegroesse[produkt] > 0 ) {
         toleranz[produkt] = (gebinde+1) * gebindegroesse[produkt] - fest[produkt];
       } else {
@@ -440,7 +475,7 @@ if( ! $readonly ) {
       }
       zuteilung_berechnen( produkt, false );
     }
-    function bestellung_submit( produkt ) {
+    function bestellung_submit() {
       if( gesamtpreis > kontostand ) {
         alert( 'Kontostand nicht ausreichend!' );
       } else {
@@ -479,7 +514,7 @@ if( ! $readonly ) {
           echo "Gesamtpreis: ";
           open_div( '', 'id="gesamtpreis1" style="display:inline"', '-' );
           echo ", übrig: ";
-          open_div( '', 'id="konto_rest" style="display:inline"', sprintf( '%.2lf', $kontostand ) );
+          open_div( '', 'id="konto_rest" style="display:inline"', sprintf( '%.2f', $kontostand ) );
         close_div();
         open_div( 'alert right td' );
           echo "<a class='button' id='submit' href='javascript:bestellung_submit();'>Speichern</a>";
@@ -574,7 +609,7 @@ foreach( $produkte as $produkt ) {
   $kosten = $preis * ( $festmenge + $toleranzmenge );
   $gesamtpreis += $kosten;
  
-  $js_on_exit[] = sprintf( "init_produkt( %u, %u, %.2lf, %u, %u, %u, %u, %u, %u, %.3lf );\n"
+  $js_on_exit[] = sprintf( "init_produkt( %u, %u, %.2f, %u, %u, %u, %u, %u, %u, %.3f );\n"
   , $n, $gebindegroesse , $preis
   , $festmenge, $toleranzmenge
   , $festmenge_andere, $toleranzmenge_andere
@@ -585,21 +620,13 @@ foreach( $produkte as $produkt ) {
   
   $katalogeintrag = katalogsuche($produkt_id);
   
-  if( $produktgruppe != $produktgruppe_alt ) {
-    if( 0 * $activate_mozilla_kludges ) {
-      // mozilla can't handle rowspan in complex tables on first pass (grid lines get lost),
-      // so we set rowspan=1 first and modify later :-/
-      open_td( '', "rowspan='1' id='pg_$produktgruppe'", $produkt['produktgruppen_name'] );
-      $js_on_exit[] = "document.getElementById('pg_$produktgruppe').rowSpan = {$produktgruppen_zahl[$produktgruppe]}; ";
-    } else {
-      // other browsers get it right the first time, as it should be:
-      open_td( '', "rowSpan='{$produktgruppen_zahl[$produktgruppe]}'", $produkt['produktgruppen_name'] );
-    }
+  if( $produktgruppe !== $produktgruppe_alt ) {
+    open_td( '', "rowSpan='{$produktgruppen_zahl[$produktgruppe]}'", $produkt['produktgruppen_name'] );
     $produktgruppe_alt = $produktgruppe;
   }
 
-  hidden_input( "fest_$n", "$festmenge", "id='fest_$n'" );
-  hidden_input( "toleranz_$n", "$toleranzmenge", "id='toleranz_$n'" );
+  hidden_input( "fest_$n", (string)$festmenge, "id='fest_$n'" );
+  hidden_input( "toleranz_$n", (string)$toleranzmenge, "id='toleranz_$n'" );
 
   open_td();
     open_span('oneline', '', $produkt['produkt_name']);
@@ -610,7 +637,7 @@ foreach( $produkte as $produkt ) {
   $class = '';
   $title = '';
   if( hat_dienst(4) ) {
-    if( sql_aktueller_produktpreis_id( $n, $gesamtbestellung['lieferung'] ) != $produkt['preis_id'] ) {
+    if( sql_aktueller_produktpreis_id( $n, $gesamtbestellung['lieferung'] ) !== $produkt['preis_id'] ) {
       $preise_falsch[] = $n;
       $class .= 'outdated';
       $title = 'Preis nicht aktuell!';
@@ -644,11 +671,11 @@ foreach( $produkte as $produkt ) {
       open_tr();
         open_td( "mult $class" );
         echo fc_link( 'produktdetails', array( 'produkt_id' => $n, 'bestell_id' => $bestell_id
-                                          , 'text' => sprintf( '%.2lf', $preis ), 'class' => 'href' ) );
+                                          , 'text' => sprintf( '%.2f', $preis ), 'class' => 'href' ) );
         open_td( "unit $class", '', "/ {$produkt['verteileinheit']}" );
 
       open_tr();
-      if( $lv_faktor != 1 ) {
+      if( $lv_faktor !== 1 ) {
         open_td( "mult small $class", '', price_view( $preis * $produkt['lv_faktor'] ) );
         open_td( "unit small $class", '', "/ {$produkt['liefereinheit']}" );
       } else {
@@ -683,10 +710,11 @@ foreach( $produkte as $produkt ) {
   open_td( "center unit noleft noright", "colspan='1' id='tt_$n' " ); // toleranzwahl
     open_div( 'oneline left' );
       open_span( '', "id='t_$n'" );
-        if( $toleranzmenge > 0 )
-          echo mult2string( ( $festmenge + $toleranzmenge ) * $produkt['kan_verteilmult'] );
-        else
+        if( $toleranzmenge > 0 ) {
+          echo mult2string(($festmenge + $toleranzmenge) * $produkt['kan_verteilmult']);
+        } else {
           echo '&nbsp;';
+        }
       close_span();
       echo " {$produkt['kan_verteileinheit_anzeige']}";
     close_div();
@@ -709,7 +737,7 @@ foreach( $produkte as $produkt ) {
     echo "<input type='checkbox' onclick='reminder_on();' name='vm_$n' value='yes' $checked>";
   close_td();
 
-  open_td( "mult", "id='k_$n'", sprintf( '%.2lf', $kosten ) );
+  open_td( "mult", "id='k_$n'", sprintf( '%.2f', $kosten ) );
 
 
   // bestellungen aller gruppen:
@@ -732,15 +760,27 @@ foreach( $produkte as $produkt ) {
     open_div( 'oneline center' );
        // gebinde:
         open_span( 'mult', "id='gg_$n'", sprintf( '%u', $zuteilungen[gebinde] ) );
-        open_span( 'unit', '', "* (" . $produkt['gebindegroesse'] * $produkt['kan_verteilmult_anzeige'] . " {$produkt['kan_verteileinheit_anzeige']})" );
+        open_span(
+          'unit',
+          '',
+          "* (" . $produkt['gebindegroesse'] * $produkt['kan_verteilmult_anzeige'] . " {$produkt['kan_verteileinheit_anzeige']})" );
     close_div();
 
   if( hat_dienst(4) ) {
     open_td();
       echo fc_link( 'edit_produkt', "produkt_id=$produkt_id" );
-      echo fc_action( array( 'class' => 'drop', 'text' => '', 'title' => 'Bestellvorschlag löschen'
-                           , 'confirm' => 'Bestellvorschlag wirklich löschen?' )
-                    , array( 'action' => 'delete', 'produkt_id' => $produkt_id ) );
+      echo fc_action(
+        [
+          'class' => 'drop',
+          'text' => '',
+          'title' => 'Bestellvorschlag löschen',
+          'confirm' => 'Bestellvorschlag wirklich löschen?'
+        ],
+        [
+          'action' => 'delete',
+          'produkt_id' => $produkt_id
+        ]
+      );
     close_td();
   } else {
     open_td( '', "id='zt_$n'" );
@@ -755,7 +795,7 @@ foreach( $produkte as $produkt ) {
 
 open_tr('summe');
   open_td( '', "colspan='6'", 'Gesamtpreis:' );
-  open_td( 'number', "id='gesamtpreis2'", sprintf( '%.2lf', $gesamtpreis ) );
+  open_td( 'number', "id='gesamtpreis2'", sprintf( '%.2f', $gesamtpreis ) );
   open_td( '', "colspan='2'", '' );
 
 close_table();
@@ -796,9 +836,11 @@ if( ! $readonly ) {
             open_td('', '', '');
             open_td('', 'id="productLink"', '');
             open_td('right');
-              submission_button( 'Produkt hinzufügen', true
-                , "Produkt zur Bestellvorlage hinzufügen: bist du überzeugt, dass das Gebinde noch voll werden wird, "
-                  ."und dass du dich nicht lieber an der Bestellung eines schon teilweise gefüllten Gebindes beteiligen möchtest?"
+              submission_button(
+                'Produkt hinzufügen',
+                true,
+                "Produkt zur Bestellvorlage hinzufügen: bist du überzeugt, dass das Gebinde noch voll werden wird, " .
+                  "und dass du dich nicht lieber an der Bestellung eines schon teilweise gefüllten Gebindes beteiligen möchtest?"
               );
         close_table();
       close_form();

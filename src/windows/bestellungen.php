@@ -1,4 +1,23 @@
 <?php
+/**
+ * @param string $action
+ *   perform thw specified action:
+ *   * changeState
+ *   * combine
+ *   * delete
+ *   * split
+ * @param string $message
+ * @param string $orderBy
+ *   order table by (lieferant|lieferdatum|name|status)
+ * @param int $change_id
+ *
+ */
+
+global
+  $angemeldet,
+  $login_dienst,
+  $mysqljetzt,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 
@@ -20,7 +39,7 @@ switch( $orderby ) {
 }
 
 get_http_var( 'action', 'w', '' );
-$readonly and $action = '';
+$readonly && $action = '';
 switch( $action ) {
 
   case 'changeState':
@@ -124,7 +143,7 @@ open_table( 'list hfill' );
   open_th('','', fc_link( '', 'text=Lieferdatum,orderby=lieferdatum,class=href' ) );
   open_th('','','Summe');
   open_th('','','Detailansichten');
-  if( $login_dienst != 0 )
+  if( $login_dienst !== 0 )
     open_th('','','Aktionen');
   if( hat_dienst(4) )
     open_th('','','Abrechnung');
@@ -135,7 +154,7 @@ $abrechnung_id = -1;
 foreach( $bestellungen as $bestellung ) {
   $abrechnung_id = $bestellung['abrechnung_id'];
   if( $bestellung['abrechnung_id'] ) {
-    if( $bestellung['abrechnung_id'] != $bestellung['id'] )
+    if( $bestellung['abrechnung_id'] !== $bestellung['id'] )
       continue;
     $abrechnung_set = sql_abrechnung_set( $bestellung['abrechnung_id'] );
   } else {
@@ -160,21 +179,50 @@ foreach( $bestellungen as $bestellung ) {
         $views[] = fc_link( 'bestellschein', "class=href,bestell_id=$bestell_id,text=Bestellschein (vorläufig)" );
         if( hat_dienst(4) ) {
           if ( $row['bestellende'] < $mysqljetzt ) {
-            $actions[] = fc_action( array( 'text' => '>>> Bestellschein fertigmachen >>>'
-                                         , 'title' => 'Jetzt Bestellschein für Lieferanten fertigmachen?'
-                                         , 'confirm' => 'Jetzt Bestellschein für Lieferanten fertigmachen?' )
-                                  , array( 'action' => 'changeState'
-                                         , 'change_id' => $bestell_id, 'change_to' => STATUS_LIEFERANT ) );
-            $actions[] = fc_action( "title=Bestellung löschen,class=drop,text=löschen,confirm=Bestellung wirklich löschen?"
-                                  , "action=delete,delete_id=$bestell_id" );
+            $actions[] = fc_action(
+              [
+                'text' => '>>> Bestellschein fertigmachen >>>',
+                'title' => 'Jetzt Bestellschein für Lieferanten fertigmachen?',
+                'confirm' => 'Jetzt Bestellschein für Lieferanten fertigmachen?'
+              ],
+              [
+                'action' => 'changeState',
+                'change_id' => $bestell_id,
+                'change_to' => STATUS_LIEFERANT
+              ]
+            );
+            $actions[] = fc_action(
+              [
+                'title' => 'Bestellung löschen',
+                'class' => 'drop',
+                'text' => 'löschen',
+                'confirm' => 'Bestellung wirklich löschen?'
+              ],
+              [
+                'action' => 'delete',
+                'delete_id' => $bestell_id
+              ]
+            );
           } else {
             $actions[] = "
               <div class='alert qquad'>Bestellzeit läuft noch!</div>
             ";
           }
-          $actions[] = fc_link( 'bestellen', array( 'bestell_id' => $bestell_id
-                                        , 'class' => 'browse', 'text' => 'zum Bestellen...' ) );
-          $actions[] = fc_link( 'edit_bestellung', "bestell_id=$bestell_id,text=Stammdaten ändern..." );
+          $actions[] = fc_link(
+            'bestellen',
+            [
+              'bestell_id' => $bestell_id,
+              'class' => 'browse',
+              'text' => 'zum Bestellen...'
+            ]
+          );
+          $actions[] = fc_link(
+            'edit_bestellung',
+            [
+              'bestell_id' => $bestell_id,
+              'text' => 'Stammdaten ändern...'
+            ]
+          );
         }
         break;
   
@@ -211,7 +259,7 @@ foreach( $bestellungen as $bestellung ) {
           if( $abrechnung_set_count > 1 ) {
             $combs[] = fc_action( 'update,text=Trennen,confirm=Bestellung von Gesamtabrechnung abtrennen?', "action=split,message=$bestell_id" );
           }
-          if( $n == $abrechnung_set_count ) {
+          if( $n === $abrechnung_set_count ) {
             $combs[] = "<div class='bigskip'>&nbsp;</div>";
             if( $abrechnung_set_count > 1 ) {
               $combs[] = fc_link( 'gesamtlieferschein', "class=href,abrechnung_id=$abrechnung_id,text=Gesamt-Lieferschein" );
@@ -229,7 +277,7 @@ foreach( $bestellungen as $bestellung ) {
   
         $views[] = fc_link( 'abrechnung', "class=href,abrechnung_id=$abrechnung_id,bestell_id=$bestell_id,text=Abrechnung" );
   
-        if( $n == $abrechnung_set_count ) {
+        if( $n === $abrechnung_set_count ) {
           if( $abrechnung_set_count > 1 ) {
             $combs[] = fc_link( 'gesamtlieferschein', "class=href,abrechnung_id=$abrechnung_id,text=Gesamt-Lieferschein" );
             $combs[] = fc_link( 'abrechnung', "class=href,abrechnung_id=$abrechnung_id,text=Gesamt-Abrechnung" );
@@ -257,7 +305,7 @@ foreach( $bestellungen as $bestellung ) {
         open_div( 'right small oneline', '', "- ".$row['bestellende'] );
       open_td( '', '', $row['lieferung'] );
       open_td();
-        if( $rechnungsstatus == STATUS_ABGERECHNET ) {
+        if( $rechnungsstatus === STATUS_ABGERECHNET ) {
           open_div( '', '', price_view( sql_bestellung_rechnungssumme( $bestell_id ) ) );
           open_div( 'small', '', sql_dienstkontrollblatt_name( $abrechnung_dienstkontrollblatt_id ) );
         } else {
@@ -272,12 +320,13 @@ foreach( $bestellungen as $bestellung ) {
         } else {
           echo '-';
         }
-      if( $login_dienst != 0 ) {
+      if( $login_dienst !== 0 ) {
         open_td();
           if( $actions ) {
             open_ul('plain');
-              foreach( $actions as $action )
-                open_li( '', '',  $action ); 
+              foreach( $actions as $action ){
+                open_li( '', '',  $action );
+              }
             close_ul();
           } else {
             echo '-';
@@ -285,11 +334,12 @@ foreach( $bestellungen as $bestellung ) {
       }
   
       if( hat_dienst(4) ) {
-        open_td( ( ( $n == 1 ) ? '' : 'notop ' ) . ( ( $n == $abrechnung_set_count ) ? '' : ' nobottom' ) );
+        open_td( ( ( $n === 1 ) ? '' : 'notop ' ) . ( ( $n === $abrechnung_set_count ) ? '' : ' nobottom' ) );
         if( $combs ) {
           open_ul('plain');
-            foreach( $combs as $comb )
+            foreach( $combs as $comb ){
               open_li( '', '', $comb );
+            }
           close_ul();
         }
       }

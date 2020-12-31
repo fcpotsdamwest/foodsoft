@@ -1,6 +1,17 @@
 <?php
-  global $angemeldet, $login_gruppen_name, $coopie_name, $login_dienst
-       , $readonly, $foodsoftdir;
+  /**
+   * Header for main Foodsoft window
+   */
+
+  global
+    $angemeldet,
+    $coopie_name,
+    $foodcoop_name,
+    $foodsoftbase,
+    $foodsoftdir,
+    $login_dienst,
+    $login_gruppen_name,
+    $readonly;
 
 $headclass='head';
 $payloadclass='';

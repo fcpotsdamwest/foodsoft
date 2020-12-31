@@ -1,18 +1,46 @@
 <?php
+/**
+ * indeX.php
+ *
+ * Global entrypoint and base of every subpage of Foodsoft.
+ *
+ * @param string $download
+ *   if set, we render the page specified by $download 'as is', without any HTTP headers
+ * @param int|string $readonly
+ *   if set to a truthy value, the page is displayed in readonly mode
+ * @param string $window
+ *   label of the page to render, is mapped to a file in the windows/ subfolder
+ * @param string $window_id
+ *   ID of the browser window the page should be rendered in (main|...)
+ */
 
-$window = 'menu';     // preliminary settings for login script, or very early errors
+
+
+// preliminary settings for the login script or very early errors
+// the values will usually be replaced with the ones from GET parameters afterwards
+$window = 'menu';
 $window_id = 'main';
+
 require_once('code/common.php');
+// this sets:
+// $foodsoftdir
+// $mysqljetzt
 
 require_once( 'code/login.php' );
+// this sets:
+// $angemeldet
+// $login_gruppen_id
+
 if( ! $angemeldet ) {
   div_msg( 'warn', "Bitte erst <a href='/foodsoft/index.php'>Anmelden...</a>" );
   exit();
 }
 
-if( get_http_var( 'download','W' ) ) {  // Spezialfall: Datei-Download (.pdf, ...): ohne HTTP-header!
+if( get_http_var( 'download','W' ) ) {
+  /* display special 'page: file download - don't set HTTP-headers! */
+  global $download;
   $window = $download;
-  $self_fields['download'] = $window;
+  $self_fields['download'] = $download;
   include( "windows/$download.php" );
   exit();
 }
@@ -51,7 +79,7 @@ switch( $window_id ) {
       open_td( 'right' );
         echo $mysqljetzt;
         if( $readonly ) {
-          echo "<span style='font-weight:bold;color:440000;'> --- !!! Datenbank ist schreibgeschützt !!!</span>";
+          echo "<span style='font-weight:bold;color:#440000;'> --- !!! Datenbank ist schreibgeschützt !!!</span>";
         }
     close_table();
     close_div(); // payload
@@ -77,5 +105,3 @@ switch( $window_id ) {
 //
 get_itan( true );
 open_form( 'name=update_form', 'action=nop,message=' );
-
-?>

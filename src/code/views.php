@@ -2,7 +2,8 @@
 //This file defines views for foodsoft data
 
 
-function number_selector($name, $min, $max, $selected, $format, $to_stdout = true ){
+function number_selector($name, $min, $max, $selected, $format, $to_stdout = true ): string
+{
   global $input_event_handlers;
   $s = "<select name='$name' $input_event_handlers>";
   for ($i=$min; $i <= $max; $i++) { 
@@ -26,7 +27,8 @@ function number_selector($name, $min, $max, $selected, $format, $to_stdout = tru
  *   <prefix>_monat
  *   <prefix>_jahr
  */
-function date_time_selector($sql_date, $prefix, $show_time=true, $to_stdout = true ) {
+function date_time_selector($sql_date, $prefix, $show_time=true, $to_stdout = true ): string
+{
   echo "<!-- sql_date :$sql_date -->";
 	$datum = date_parse($sql_date);
 
@@ -55,7 +57,8 @@ function date_time_selector($sql_date, $prefix, $show_time=true, $to_stdout = tr
   return $s;
 }
 
-function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr, $to_stdout = true ){
+function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr, $to_stdout = true ): string
+{
   $s = number_selector($tag_feld, 1, 31, $tag,"%02d",false);
   $s .= '.';
   $s .= number_selector($monat_feld,1, 12, $monat,"%02d",false);
@@ -65,7 +68,8 @@ function date_selector($tag_feld, $tag, $monat_feld, $monat, $jahr_feld, $jahr, 
     echo $s;
   return $s;
 }
-function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout = true ){
+function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout = true ): string
+{
   $s =  number_selector($stunde_feld, 0, 23, $stunde,"%02d",false);
   $s .= '.';
   $s .= number_selector($minute_feld,0, 59, $minute,"%02d",false);
@@ -80,7 +84,8 @@ function time_selector($stunde_feld, $stunde, $minute_feld, $minute, $to_stdout 
 // they will return a suitable string, not print to stdout directly!
 //
 
-function int_view( $num, $fieldname = false, $size = 6, $transmit = true, $edit_if_fieldname = true ) {
+function int_view( $num, $fieldname = false, $size = 6, $transmit = true, $edit_if_fieldname = true ): string
+{
   global $input_event_handlers;
   $num = sprintf( "%d", $num );
   $transmit = $transmit ? "name='$fieldname'" : '';
@@ -91,9 +96,10 @@ function int_view( $num, $fieldname = false, $size = 6, $transmit = true, $edit_
     return "<span class='int number' $id>$num</span>";
 }
 
-function price_view( $price, $fieldname = false, $transmit = true, $edit_if_fieldname = true ) {
+function price_view( $price, $fieldname = false, $transmit = true, $edit_if_fieldname = true ): string
+{
   global $input_event_handlers;
-  $price = sprintf( "%.2lf", $price );
+  $price = sprintf( "%.2f", $price );
   $transmit = $transmit ? "name='$fieldname'" : '';
   $id = $fieldname ? "id='$fieldname'" : '';
   if( $fieldname && $edit_if_fieldname )
@@ -104,7 +110,8 @@ function price_view( $price, $fieldname = false, $transmit = true, $edit_if_fiel
 
 // mult_view: erlaube bis zu 3 nachkommastellen; aber nur anzeigen, wenn nötig:
 //
-function mult_view( $mult, $fieldname = false, $transmit = true, $edit_if_fieldname = true ) {
+function mult_view( $mult, $fieldname = false, $transmit = true, $edit_if_fieldname = true ): string
+{
   global $input_event_handlers;
   $mult = mult2string( $mult );
   $transmit = $transmit ? "name='$fieldname'" : '';
@@ -115,7 +122,8 @@ function mult_view( $mult, $fieldname = false, $transmit = true, $edit_if_fieldn
     return "<span class='number' $id>$mult</span>";
 }
 
-function gebindegroesse_view( $pr /* a row from table produktpreise */ ) {
+function gebindegroesse_view( $pr /* a row from table produktpreise */ ): string
+{
    $s = "{$pr['gebindegroesse']} * {$pr['verteileinheit_anzeige']}";
    if( $pr['verteileinheit_anzeige'] != $pr['liefereinheit_anzeige'] ) {
      $s .= "<span class='quad small'>(" . mult_view( $pr['gebindegroesse'] / $pr['lv_faktor'] ) . " * {$pr['liefereinheit_anzeige']})</span>";
@@ -123,7 +131,8 @@ function gebindegroesse_view( $pr /* a row from table produktpreise */ ) {
    return $s;
 }
 
-function string_view( $text, $length = 20, $fieldname = false, $attr = '', $edit_if_fieldname = true, $extra_class = '' ) {
+function string_view( $text, $length = 20, $fieldname = false, $attr = '', $edit_if_fieldname = true, $extra_class = '' ): string
+{
   global $input_event_handlers;
   $id = $fieldname ? "id='$fieldname'" : '';
   if( $fieldname && $edit_if_fieldname )
@@ -132,7 +141,8 @@ function string_view( $text, $length = 20, $fieldname = false, $attr = '', $edit
     return "<span class='string $extra_class' $id>$text</span>";
 }
 
-function ean_view( $ean, $length = 20, $fieldname = false, $attr = '', $with_links = false ) {
+function ean_view( $ean, $length = 20, $fieldname = false, $attr = '', $with_links = false ): string
+{
   global $input_event_handlers;
   if ( $fieldname )
     return "<input type='text' class='ean' size='$length' name='$fieldname' value='$ean' $attr $input_event_handlers>";
@@ -143,7 +153,8 @@ function ean_view( $ean, $length = 20, $fieldname = false, $attr = '', $with_lin
   return $s;
 }
 
-function ean_links( $ean ) {
+function ean_links( $ean ): string
+{
   if (!$ean)
     return '';
   $s = '';
@@ -152,7 +163,8 @@ function ean_links( $ean ) {
   return $s;
 }
 
-function date_time_view( $datetime, $fieldname = '' ) {
+function date_time_view( $datetime, $fieldname = '' ): string
+{
   global $mysqljetzt;
   if( ! $datetime )
     $datetime = $mysqljetzt;
@@ -164,7 +176,8 @@ function date_time_view( $datetime, $fieldname = '' ) {
     return "<span class='datetime'>$datetime</span>";
   }
 }
-function date_view( $date, $fieldname = '' ) {
+function date_view( $date, $fieldname = '' ): string
+{
   global $mysqlheute;
   if( ! $date )
     $date = $mysqlheute;
@@ -176,7 +189,8 @@ function date_view( $date, $fieldname = '' ) {
   }
 }
 
-function produktgruppe_view( $produktgruppen_id = 0, $fieldname = false ) {
+function produktgruppe_view( $produktgruppen_id = 0, $fieldname = false ): ?string
+{
   global $input_event_handlers, $window_id;
   if( $fieldname ) {
     return "<select name='$fieldname' $input_event_handlers>".optionen_produktgruppen( $produktgruppen_id )."</select>";
@@ -189,7 +203,8 @@ function produktgruppe_view( $produktgruppen_id = 0, $fieldname = false ) {
   }
 }
 
-function gruppe_view( $gruppen_id = 0, $fieldname = '', $keys = array( 'aktiv' => 'true' ), $option_0 = '' ) {
+function gruppe_view( $gruppen_id = 0, $fieldname = '', $keys = array( 'aktiv' => 'true' ), $option_0 = '' ): string
+{
   global $input_event_handlers, $window_id;
   if( $fieldname ) {
     return "<select name='$fieldname' $input_event_handlers>".optionen_gruppen( $gruppen_id, $keys, $option_0 )."</select>";
@@ -202,7 +217,8 @@ function gruppe_view( $gruppen_id = 0, $fieldname = '', $keys = array( 'aktiv' =
   }
 }
 
-function konto_view( $konto_id = 0, $fieldname = '' ) {
+function konto_view( $konto_id = 0, $fieldname = '' ): string
+{
   global $input_event_handlers, $window;
   if( $fieldname ) {
     return "<select name='$fieldname' $input_event_handlers>".optionen_konten( $konto_id )."</select>";
@@ -215,7 +231,8 @@ function konto_view( $konto_id = 0, $fieldname = '' ) {
   }
 }
 
-function kontoauszug_view( $konto_id = 0, $auszug_jahr = '', $auszug_nr = '', $fieldname = '' ) {
+function kontoauszug_view( $konto_id = 0, $auszug_jahr = '', $auszug_nr = '', $fieldname = '' ): string
+{
   global $window;
   if( $fieldname ) {
     return "Jahr: ".int_view( $auszug_jahr, $fieldname.'_jahr' )
@@ -230,7 +247,8 @@ function kontoauszug_view( $konto_id = 0, $auszug_jahr = '', $auszug_nr = '', $f
   }
 }
 
-function lieferant_view( $lieferant_id, $fieldname = '', $option_0 = '' ) {
+function lieferant_view( $lieferant_id, $fieldname = '', $option_0 = '' ): ?string
+{
   global $input_event_handlers, $window_id;
   if( $fieldname ) {
     return "<select name='$fieldname' $input_event_handlers>".optionen_lieferanten( $lieferant_id, $option_0 )."</select>";
@@ -700,11 +718,11 @@ function pick_group_text() {
     , "<td class='mult'>" 
         . fc_link( 'produktdetails', array(
             'class' => 'href', 'produkt_id' => $basar_row['produkt_id']
-          , 'text' => sprintf( "%.2lf", $basar_row['nettolieferpreis'] )
+          , 'text' => sprintf( "%.2f", $basar_row['nettolieferpreis'] )
           ) )
         ." </td>
           <td class='unit'>/ {$basar_row['liefereinheit_anzeige']} </td>
-          <td class='mult'>" . sprintf( "%8.2lf", $basar_row['bruttopreis'] ) . "</td>
+          <td class='mult'>" . sprintf( "%8.2f", $basar_row['bruttopreis'] ) . "</td>
           <td class='unit'>/ {$basar_row['verteileinheit_anzeige']} </td>
 
           <td class='mult'><b>$menge</b></td>
@@ -714,9 +732,9 @@ function pick_group_text() {
                , 'bestell_id' => $basar_row['gesamtbestellung_id'], 'produkt_id' => $basar_row['produkt_id']
             ) ) . "</td>
 
-          <td class='number' style='padding:0pt 1ex 0pt 1ex;'><b>" . sprintf( "%8.2lf", $wert ) . "</b></td>"
-            . ( $have_aufschlag ? "<td class='center'>".sprintf( "%.2lf%%", $basar_row['aufschlag_prozent'] )."</td>" : '' ) ."
-          <td class='mult'>" .sprintf( "%.2lf", $preis ). "</td>
+          <td class='number' style='padding:0pt 1ex 0pt 1ex;'><b>" . sprintf( "%8.2f", $wert ) . "</b></td>"
+            . ( $have_aufschlag ? "<td class='center'>".sprintf( "%.2f%%", $basar_row['aufschlag_prozent'] )."</td>" : '' ) ."
+          <td class='mult'>" .sprintf( "%.2f", $preis ). "</td>
           <td class='unit'>/ $kan_verteilmult $kan_verteileinheit</td>"
     , ( $editAmounts ?
                    "<td class='mult' style='padding:0pt 1ex 0pt 1ex;'>
@@ -1139,7 +1157,7 @@ function bestellschein_view(
 
         if( $spalten & PR_COL_LPREIS ) {
           open_td( 'mult', '', fc_link( 'produktdetails',
-            "class=href,bestell_id=$bestell_id,produkt_id=$produkt_id,text=".sprintf( "%.2lf", $nettolieferpreis ) ) );
+            "class=href,bestell_id=$bestell_id,produkt_id=$produkt_id,text=".sprintf( "%.2f", $nettolieferpreis ) ) );
           open_td( 'unit' );
             echo "/ {$produkte_row['liefereinheit_anzeige']}";
             if( $produkte_row['kan_liefereinheit'] != $produkte_row['kan_verteileinheit'] ) {
@@ -1185,7 +1203,7 @@ function bestellschein_view(
               open_span( 'bold', '', $gebinde );
               echo ' / ';
             }
-            printf( '%.2lf / %.2lf', $festbestellmenge / $gebindegroesse , $gesamtbestellmenge / $gebindegroesse );
+            printf( '%.2f / %.2f', $festbestellmenge / $gebindegroesse , $gesamtbestellmenge / $gebindegroesse );
           open_td( 'unit' );
             printf( ' * (%s %s)', $produkte_row['kan_verteilmult'] * $produkte_row['gebindegroesse'], $produkte_row['kan_verteileinheit'] );
         }
@@ -1276,7 +1294,8 @@ function bestellschein_view(
  * @return string
  *   HTML table
  */
-function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
+function bestellfax_html( $bestell_id, $spalten = 0xfffff ): string
+{
   $produkte = sql_bestellung_produkte( $bestell_id );
   $bestellung = sql_bestellung( $bestell_id );
 
@@ -1366,7 +1385,7 @@ function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
     if( $spalten & PR_COL_LPREIS ) {
       $zeile .=
         '<td class="right">' .
-          sprintf( '%.2lf', $nettolieferpreis ) .
+          sprintf( '%.2f', $nettolieferpreis ) .
         '</td>' .
         '<td>' .
           '/&thinsp;' . $produkte_row['liefereinheit_anzeige'] .
@@ -1375,7 +1394,7 @@ function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
     if( $spalten & PR_COL_NETTOSUMME ) {
       $zeile .=
         '<td class="right">' . 
-          sprintf( '%.2lf', $nettogesamtpreis ) .
+          sprintf( '%.2f', $nettogesamtpreis ) .
         '</td>';
     }
     $zeile .= '</tr>';
@@ -1464,7 +1483,7 @@ function distribution_produktdaten( $bestell_id, $produkt_id ) {
         if( $produkt['artikelnummer'] ) {
           printf( '/ A-Nr: %s ', $produkt['artikelnummer'] );
         }
-        printf( "/  Netto: %.2lf/%s / Endpreis: %.2lf/%s"
+        printf( "/  Netto: %.2f/%s / Endpreis: %.2f/%s"
           , $produkt['nettopreis']
           , $produkt['verteileinheit']
           , $produkt['endpreis']
@@ -1654,7 +1673,7 @@ function bestellung_overview( $bestell_id, $gruppen_id = 0 ) {
   if( $bestellung['aufschlag_prozent'] ) {
     open_tr();
       open_th('left', "title='prozentualer Aufschlag auf den Nettopreis aller Produkte'", 'Aufschlag der FC:');
-      open_td('','', sprintf( "%.2lf %%", $bestellung['aufschlag_prozent'] ) );
+      open_td('','', sprintf( "%.2f %%", $bestellung['aufschlag_prozent'] ) );
   }
     open_tr();
       open_th('left','','Lieferung:');
@@ -1709,7 +1728,7 @@ function abrechnung_kurzinfo( $bestell_id ) {
         </tr>
         <tr>
           <td class='small'>Rechnungssumme:</td>
-          <td class='small right'>". sprintf( '%.2lf', sql_bestellung_rechnungssumme($bestell_id) ) ."</td>
+          <td class='small right'>". sprintf( '%.2f', sql_bestellung_rechnungssumme($bestell_id) ) ."</td>
         </tr>
         <tr>
           <td class='small'>abgerechnet von:</td>
@@ -1914,11 +1933,23 @@ function auswahl_konto( $selected = 0 ) {
   close_table();
 }
 
+/**
+ * Generate a table with currently open order processes.
+ *
+ * @param int $bestell_id
+ *   Highlight the row containing the order with given $order_id (if among the current orders)
+ * @return void
+ */
 function auswahl_bestellung( $bestell_id = 0 ) {
-  global $mysqljetzt, $mysqlheute, $login_gruppen_id, $window;
-  $laufende_bestellungen = sql_bestellungen( '( rechnungsstatus = '. STATUS_BESTELLEN.' )
-                                                            and ( bestellstart <= NOW() ) ' );
-  if( !  $laufende_bestellungen ) {
+  global
+    $mysqlheute,
+    $mysqljetzt,
+    $login_gruppen_id,
+    $window;
+  $laufende_bestellungen = sql_bestellungen(
+          '( rechnungsstatus = '. STATUS_BESTELLEN.' ) and ( bestellstart <= NOW() )'
+  );
+  if( ! $laufende_bestellungen ) {
     div_msg( 'kommentar', 'Zur Zeit laufen leider keine Bestellungen!' );
     return;
   }
@@ -1979,7 +2010,8 @@ function auswahl_bestellung( $bestell_id = 0 ) {
  * Produziert ein neues select-Feld mit den möglichen
  * Diensten.
  */
-function dienst_selector($pre_select, $id=""){
+function dienst_selector($pre_select, $id=""): string
+{
   $s = "<select name='dienst_$id'>";
 	    
 	  //var_dump($_SESSION['DIENSTEINTEILUNG']);
@@ -2191,7 +2223,8 @@ function join_details( &$details, $prefix, $value, $context = false ) {
 }
 
 
-function catalogue_product_details( $catalogue_record ) {
+function catalogue_product_details( $catalogue_record ): string
+{
   if( !is_array($catalogue_record) || empty($catalogue_record) )
     return '';
   
@@ -2217,7 +2250,8 @@ function catalogue_product_details( $catalogue_record ) {
   return join('; ', $details);
 }
 
-function catalogue_acronym_view( $editable ) {
+function catalogue_acronym_view( $editable ): int
+{
   global $input_event_handlers, $foodsoftdir;
   
   $acronyms = mysql2array( doSql ("SELECT * from catalogue_acronyms "

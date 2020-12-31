@@ -1,4 +1,32 @@
 <?php
+/**
+ * editBuchung.php
+ *
+ * Edit accounting entry
+ *
+ * @param string $action
+ * * update
+ * @param int $auszug_1_jahr
+ * @param int $auszug_1_nr
+ * @param int $auszug_2_jahr
+ * @param int $auszug_2_nr
+ * @param int $buchung_id
+ * @param int $id_1
+ * @param int $id_2
+ * @param string $notiz
+ * @param int $soll
+ * @param int $transaktion_id
+ * @param int $typ_1
+ * @param int $typ_2
+ * @param int $valuta_day
+ * @param int $valuta_month
+ * @param int $valuta_year
+ */
+
+global
+  $angemeldet,
+  $dienstkontrollblatt_id,
+  $readonly;
 
 assert( $angemeldet ) or exit();
 
@@ -12,10 +40,11 @@ $problems = '';
 
 $muell_id = sql_muell_id();
 
-if( get_http_var( 'transaktion_id', 'U', NULL, true ) )
+if( get_http_var( 'transaktion_id', 'U', NULL, true ) ) {
   $buchung_id = -$transaktion_id;
-else
-  need_http_var( 'buchung_id','U', true );
+} else {
+  need_http_var('buchung_id', 'U', true);
+}
 
 $buchung = sql_get_transaction( $buchung_id ); 
 $k_id = $buchung['konterbuchung_id'];
@@ -38,7 +67,7 @@ if( $buchung_id < 0 ) {
     $k_id = $h;
   } else {  // beides sind gruppen-transaktionen
     // gruppe-13 buchungen möglichst als zweites anzeigen:
-    if( ( $buchung['gruppen_id'] == $muell_id ) and ($k_buchung['gruppen_id'] != $muell_id ) ) {
+    if( $buchung['gruppen_id'] === $muell_id && $k_buchung['gruppen_id'] !== $muell_id ) {
       $h = $buchung_id;
       $buchung_id = $k_id;
       $k_id = $h;
@@ -81,9 +110,9 @@ switch( $action ) {
       $mod_1['valuta'] = "$valuta_year-$valuta_month-$valuta_day";
       $mod_1['summe'] = $soll;
       if( $b1['gruppen_id'] == $muell_id ) {
-        if( in_array( $b1['transaktionstyp'], $selectable_types ) or ( $b1['transaktionstyp'] == TRANSAKTION_TYP_UNDEFINIERT ) ) {
+        if( in_array( $b1['transaktionstyp'], $selectable_types, TRUE ) || $b1['transaktionstyp'] === TRANSAKTION_TYP_UNDEFINIERT ) {
           need_http_var( 'typ_1', 'U' );
-          need( in_array( $typ_1, $selectable_types ) );
+          need( in_array( $typ_1, $selectable_types, TRUE ) );
           $mod_1['type'] = $typ_1;
         }
       }
@@ -100,10 +129,10 @@ switch( $action ) {
       $mod_2['notiz'] = $notiz;
       $mod_2['valuta'] = "$valuta_year-$valuta_month-$valuta_day";
       $mod_2['summe'] = - $soll;
-      if( $b2['gruppen_id'] == $muell_id ) {
-        if( in_array( $b2['transaktionstyp'], $selectable_types ) or ( $b2['transaktionstyp'] == TRANSAKTION_TYP_UNDEFINIERT ) ) {
+      if( $b2['gruppen_id'] === $muell_id ) {
+        if( in_array( $b2['transaktionstyp'], $selectable_types, TRUE ) || ( $b2['transaktionstyp'] === TRANSAKTION_TYP_UNDEFINIERT ) ) {
           need_http_var( 'typ_2', 'U' );
-          need( in_array( $typ_2, $selectable_types ) );
+          need( in_array( $typ_2, $selectable_types, TRUE ) );
           $mod_2['type'] = $typ_2;
         }
       }

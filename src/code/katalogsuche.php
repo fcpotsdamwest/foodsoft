@@ -22,12 +22,11 @@ function katalogsuche( $produkt ) {
   if( ! sql_lieferant_katalogeintraege( $produkt['lieferanten_id'] ) ) {
     return 1;
   }
-  if( ( $artikelnummer = adefault( $produkt, 'artikelnummer', 0 ) ) )
+  if( ( $artikelnummer = adefault( $produkt, 'artikelnummer', 0 ) ) ) {
     $where .= " AND ( artikelnummer = '$artikelnummer' ) ";
-  // elseif( ( $bestellnummer = adefault( $produkt, 'bestellnummer', 0 ) ) )
-  //  $where .= " AND bestellnummer='$bestellnummer' ";
-  else
+  } else {
     return 2;
+  }
 
   return sql_select_single_row( "SELECT * FROM lieferantenkatalog $where " , true );
 }
@@ -35,7 +34,7 @@ function katalogsuche( $produkt ) {
 
 // katalogabgleich
 //
-// rueckgabe:
+// rückgabe:
 //  0: ok
 //  1: Katalogeintrag weicht ab (oder kein Preiseintrag in der Foodsoft-Datenbank)
 //  2: Katalogsuche fehlgeschlagen
@@ -47,7 +46,8 @@ function katalogabgleich(
 , $display_level = 0  // 0: garnix, 1: abweichungen, 2: voller katalogeintrag
 , $editable = false
 , & $preiseintrag_neu = array() // aus Katalogeintrag Vorschlag für Preiseintrag generieren
-) {
+): int
+{
   global $mwst_default;
 
   $preis_id = sql_aktueller_produktpreis_id( $produkt_id );
@@ -97,7 +97,7 @@ function katalogabgleich(
     return 2;
   }
 
-  $have_mwst = false; // ist die mwst im katalog gelisted? (terra ja, andere nicht!)
+  $have_mwst = false; // ist die mwst im katalog gelistet? (terra ja, andere nicht!)
   switch( $katalogeintrag['katalogformat'] ) {
     case 'terra_xls':
       $have_mwst = true;
@@ -476,4 +476,3 @@ function update_preis( $produkt_id ) {
   }
 }
 
-?>

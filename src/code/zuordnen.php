@@ -793,7 +793,8 @@ function create_dienste( $start, $spacing, $zahl, $personenzahlen ) {
  * group is allowed to access based on the task
  * they are performing
  */
-function possible_areas(){
+function possible_areas(): array
+{
   global $exportDB;
 
   $areas = array();
@@ -868,7 +869,8 @@ function possible_areas(){
 //////////////////////////////
 
 $urandom_handle = false;
-function random_hex_string( $bytes ) {
+function random_hex_string( $bytes ): string
+{
   global $urandom_handle;
   if( ! $urandom_handle )
     need( $urandom_handle = fopen( '/dev/urandom', 'r' ), 'konnte /dev/urandom nicht öffnen' );
@@ -962,7 +964,8 @@ function dienstkontrollblatt_eintrag( $dienstkontrollblatt_id, $gruppen_id, $die
   }
 }
 
-function sql_dienstkontrollblatt( $from_id = 0, $to_id = 0, $gruppen_id = 0, $dienst = 0 ) {
+function sql_dienstkontrollblatt( $from_id = 0, $to_id = 0, $gruppen_id = 0, $dienst = 0 ): array
+{
   $to_id or $to_id = $from_id;
   $where = '';
   $and = 'WHERE';
@@ -1021,7 +1024,8 @@ function sql_muell_id() {
   return $muell_id;
 }
 
-function select_gruppenmitglieder() {
+function select_gruppenmitglieder(): string
+{
   return "
     SELECT bestellgruppen.name as gruppenname
          , bestellgruppen.id as gruppen_id
@@ -1051,15 +1055,18 @@ function sql_gruppenmitglied( $gruppenmitglieder_id, $allow_null = false ) {
   );
 }
 
-function sql_gruppenmitglieder( $filter = 'true', $orderby = 'gruppennummer' ) {
+function sql_gruppenmitglieder( $filter = 'true', $orderby = 'gruppennummer' ): array
+{
   return mysql2array( doSql( select_gruppenmitglieder() . " WHERE ( $filter ) ORDER BY $orderby " ) );
 }
 
-function sql_gruppe_mitglieder( $gruppen_id, $filter = 'gruppenmitglieder.aktiv' ) { 
+function sql_gruppe_mitglieder( $gruppen_id, $filter = 'gruppenmitglieder.aktiv' ): array
+{
   return sql_gruppenmitglieder( "(bestellgruppen.id = $gruppen_id) and ($filter) " );
 }
 
-function query_gruppen( $op, $keys = array(), $using = array(), $orderby = false ) {
+function query_gruppen( $op, $keys = array(), $using = array(), $orderby = false ): string
+{
   $selects = array();
   $filters = array();
   $joins = array();
@@ -1130,11 +1137,13 @@ function query_gruppen( $op, $keys = array(), $using = array(), $orderby = false
   }
   return get_sql_query( $op, 'bestellgruppen', $selects, $joins, $filters, $orderby, 'bestellgruppen.id' );
 }
-function select_gruppen( $keys = array(), $using = array(), $orderby = false ) {
+function select_gruppen( $keys = array(), $using = array(), $orderby = false ): string
+{
   return query_gruppen( 'SELECT', $keys, $using, $orderby );
 }
 
-function sql_gruppen( $keys = array(), $orderby = 'NOT(aktiv), gruppennummer' ) {
+function sql_gruppen( $keys = array(), $orderby = 'NOT(aktiv), gruppennummer' ): array
+{
   return mysql2array( doSql( select_gruppen( $keys, array(), $orderby ) ) );
 }
 
@@ -1146,7 +1155,8 @@ function sql_gruppenname( $gruppen_id ) {
   return sql_select_single_field( select_gruppen( array( 'gruppen_id' => $gruppen_id ) ), 'name' );
 }
 
-function sql_gruppennummer( $gruppen_id ) {
+function sql_gruppennummer( $gruppen_id ): int
+{
   return $gruppen_id % 1000;
 }
 
@@ -1158,7 +1168,8 @@ function sql_gruppe_aktiv( $gruppen_id ) {
 // sql_gruppe_letztes_login(), sql_gruppe_letzte_bestellung():
 // 2 Funktionen zum Ermitteln von Karteileichen:
 //
-function sql_gruppe_letztes_login( $gruppen_id ) {
+function sql_gruppe_letztes_login( $gruppen_id ): ?array
+{
   global $login_gruppen_id;
   need( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) );
   $result = doSql( "
@@ -1171,7 +1182,8 @@ function sql_gruppe_letztes_login( $gruppen_id ) {
   " );
   return mysqli_fetch_array( $result );
 }
-function sql_gruppe_letzte_bestellung( $gruppen_id ) {
+function sql_gruppe_letzte_bestellung( $gruppen_id ): ?array
+{
   global $login_gruppen_id;
   need( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) );
   $result = doSql( "
@@ -1185,7 +1197,8 @@ function sql_gruppe_letzte_bestellung( $gruppen_id ) {
   return mysqli_fetch_array( $result );
 }
 
-function sql_gruppe_offene_bestellungen( $gruppen_id ) {
+function sql_gruppe_offene_bestellungen( $gruppen_id ): array
+{
   need( hat_dienst(4,5) );
   return mysql2array( doSql( "
     SELECT gesamtbestellungen.name as name
@@ -1216,7 +1229,8 @@ function optionen_gruppen(
   $selected = 0,
   $keys = array( 'aktiv' => 'true' ),
   $option_0 = false
-) {
+): string
+{
   $output='';
   if( $option_0 ) {
     $output = "<option value='0'";
@@ -1288,7 +1302,11 @@ function check_new_group_nr( $newNummer, & $problems ){
  * Sockelbetrag entsprechend
  */
 function sql_delete_group_member( $gruppenmitglieder_id ) {
-  global $problems, $msg, $mysqlheute;
+  global
+    $db_handle,
+    $msg,
+    $mysqlheute,
+    $problems;
 
   need( hat_dienst(5), "Nur Dienst 5 darf Personen löschen");
 
@@ -1315,15 +1333,15 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
     , $mysqlheute
     , "Erstattung Sockeleinlage für ausgetretenes Mitglied " . $daten['vorname']
     ) ) {
-      $msg = $msg . "<div class='ok'>Änderung Sockeleinlage ausgetretenes Mitglied: {$daten['sockeleinlage']} Euro wurden erstattet.</div>";
+      $msg .= "<div class='ok'>Änderung Sockeleinlage ausgetretenes Mitglied: {$daten['sockeleinlage']} Euro wurden erstattet.</div>";
     } else {
-      $problems = $problems . "<div class='warn'>Verbuchen Änderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
+      $problems .= "<div class='warn'>Verbuchen Änderung Sockeleinlage fehlgeschlagen: " . mysqli_error($db_handle) . "</div>";
     }
   }
 
   // falls letztes mitglied der gruppe ausgetreten: sockelbetrag der Gruppe rückerstatten:
   $gruppendaten = sql_gruppe( $gruppen_id );
-  if( ( $gruppendaten['mitgliederzahl'] == 0 ) and ( $gruppendaten['sockeleinlage_gruppe'] > 0 ) ) {
+  if( ( $gruppendaten['mitgliederzahl'] == 0 ) && ( $gruppendaten['sockeleinlage_gruppe'] > 0 ) ) {
     if( sql_doppelte_transaktion(
       array( 'konto_id' => -1, 'gruppen_id' => $gruppen_id )
     , array( 'konto_id' => -1, 'gruppen_id' => $muell_id, 'transaktionsart' => TRANSAKTION_TYP_SOCKEL )
@@ -1487,7 +1505,8 @@ define( 'GRUPPEN_OPT_DETAIL', 16 );
 //
 ////////////////////////////////////
 
-function select_lieferanten( $id = false, $orderby = 'name' ) {
+function select_lieferanten( $id = false, $orderby = 'name' ): string
+{
   $where = ( $id ? "WHERE id=$id" : "" );
   return  "
     SELECT *
@@ -1498,7 +1517,8 @@ function select_lieferanten( $id = false, $orderby = 'name' ) {
   ";
 }
 
-function sql_lieferanten( $id = false ) {
+function sql_lieferanten( $id = false ): array
+{
   return mysql2array( doSql( select_lieferanten( $id ) ) );
 }
 
@@ -1510,7 +1530,8 @@ function sql_lieferant_name($id){
   return sql_select_single_field( select_lieferanten( $id ) , 'name' );
 }
 
-function optionen_lieferanten( $selected = false, $option_0 = false ) {
+function optionen_lieferanten( $selected = false, $option_0 = false ): string
+{
   $output = "";
   if( $option_0 ) {
     $output = "<option value='0'";
@@ -1552,7 +1573,8 @@ function sql_delete_lieferant( $lieferanten_id ) {
   logger( "Lieferant $lieferanten_id gelöscht" );
 }
 
-function sql_lieferant_offene_bestellungen( $lieferanten_id ) {
+function sql_lieferant_offene_bestellungen( $lieferanten_id ): array
+{
   return mysql2array( doSql( "
     SELECT gesamtbestellungen.name
       FROM gesamtbestellungen
@@ -1561,14 +1583,17 @@ function sql_lieferant_offene_bestellungen( $lieferanten_id ) {
   " ) );
 }
 
-function sql_lieferant_katalogeintraege( $lieferanten_id ) {
+function sql_lieferant_katalogeintraege( $lieferanten_id ): ?int
+{
   $lieferant = sql_lieferant( $lieferanten_id );
   $katalogformat = $lieferant['katalogformat'];
-  if( ( $katalogformat == 'keins' ) || ( $katalogformat == '' ) ) {
+  if( $katalogformat === 'keins' || $katalogformat === '' ) {
     return 0;
   }
-  return sql_count( 'lieferantenkatalog'
-                  , "(lieferanten_id = $lieferanten_id) and (katalogformat = '$katalogformat')" );
+  return sql_count(
+    'lieferantenkatalog',
+    "(lieferanten_id = $lieferanten_id) and (katalogformat = '$katalogformat')"
+  );
 }
 
 
@@ -1579,7 +1604,8 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
 ////////////////////////////////////
 
 
-function query_produkte( $op, $keys = array(), $using = array(), $orderby = false ) {
+function query_produkte( $op, $keys = array(), $using = array(), $orderby = false ): string
+{
   $have_price = false;
 
   $selects = array();
@@ -1705,15 +1731,18 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
   return get_sql_query( $op, 'produkte', $selects, $joins, $filters, $orderby );
 }
 
-function select_produkte( $keys = array(), $using = array(), $orderby = false ) {
+function select_produkte( $keys = array(), $using = array(), $orderby = false ): string
+{
   return query_produkte( 'SELECT', $keys, $using, $orderby );
 }
 
-function select_produkte_anzahl( $keys = array(), $using = array() ) {
+function select_produkte_anzahl( $keys = array(), $using = array() ): string
+{
   return query_produkte( 'COUNT', $keys, $using );
 }
 
-function sql_produkte( $keys = array(), $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name' ) {
+function sql_produkte( $keys = array(), $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name' ): array
+{
   $r = mysql2array( doSql( select_produkte( $keys, array(), $orderby ) ) );
   foreach( $r as & $p ) {
     if( isset( $p['preis_id'] ) ) {
@@ -1752,7 +1781,8 @@ function sql_delete_produkt( $produkt_id ) {
 }
 
 
-function sql_produktgruppen(){
+function sql_produktgruppen(): array
+{
   return mysql2array( doSql( "SELECT * FROM produktgruppen ORDER BY name"
   , LEVEL_ALL, "Konnte Produktgruppen nicht aus DB laden.." ) );
 }
@@ -1761,7 +1791,8 @@ function references_produktgruppe( $produktgruppen_id ) {
   return sql_count( 'produkte', "produktgruppen_id = $produktgruppen_id" );
 }
 
-function optionen_produktgruppen( $selected = 0 ) {
+function optionen_produktgruppen( $selected = 0 ): string
+{
   $output = "";
   foreach( sql_produktgruppen() as $pg ) {
     $id = $pg['id'];
@@ -1797,7 +1828,8 @@ define('STATUS_ABGERECHNET', 40 );
 define('STATUS_ABGESCHLOSSEN', 45 );
 define('STATUS_ARCHIVIERT', 50 );
 
-function rechnung_status_string( $state ) {
+function rechnung_status_string( $state ): string
+{
   switch( $state ) {
     case STATUS_BESTELLEN:
       return 'Bestellen';
@@ -1815,7 +1847,8 @@ function rechnung_status_string( $state ) {
   return "FEHLER: undefinierter Status: $state";
 }
 
-function sql_abrechnung_set( $abrechnung_id ) {
+function sql_abrechnung_set( $abrechnung_id ): array
+{
   $result = doSql( "SELECT id FROM gesamtbestellungen WHERE abrechnung_id = $abrechnung_id" );
   $r = array();
   while( $row = mysqli_fetch_array( $result ) ) {
@@ -1915,7 +1948,8 @@ function sql_change_bestellung_status( $bestell_id, $state ) {
  * @return array
  *   Array of assoc arrays, each representing one result row
  */
-function sql_bestellungen( $filter = 'true', $orderby = 'rechnungsstatus, abrechnung_id, bestellende DESC, name' ) {
+function sql_bestellungen( $filter = 'true', $orderby = 'rechnungsstatus, abrechnung_id, bestellende DESC, name' ): array
+{
   return mysql2array( doSql( "
     SELECT gesamtbestellungen.*
          , dayofweek( lieferung ) as lieferdatum_dayofweek
@@ -1935,7 +1969,8 @@ function sql_bestellungen( $filter = 'true', $orderby = 'rechnungsstatus, abrech
  *   Order data for that order ID.
  *
  */
-function sql_bestellung( $bestell_id ) {
+function sql_bestellung( $bestell_id ): array
+{
   $r = sql_bestellungen( "gesamtbestellungen.id = $bestell_id" );
   need( count($r) == 1 );
   return current($r);
@@ -1946,13 +1981,15 @@ function sql_bestellung( $bestell_id ) {
  *  liefert gesamtbestellungen, für die bereits ein verbindlicher vertrag besteht
  *  (ab STATUS_LIEFERANT)
  */
-function select_gesamtbestellungen_schuldverhaeltnis() {
+function select_gesamtbestellungen_schuldverhaeltnis(): string
+{
   return "
     SELECT * FROM gesamtbestellungen
     WHERE rechnungsstatus >= " . STATUS_LIEFERANT;
 }
 
-function select_gesamtbestellungen_unverbindlich() {
+function select_gesamtbestellungen_unverbindlich(): string
+{
   return "
     SELECT * FROM gesamtbestellungen
     WHERE rechnungsstatus < " . STATUS_LIEFERANT;
@@ -2065,7 +2102,8 @@ define( 'BESTELLZUORDNUNG_ART_ANY', 'BETWEEN 1 AND 99' );
 // define( 'BESTELLZUORDNUNG_ART_ZUTEILUNG_BASAR', 31 );
 
 
-function query_bestellzuordnungen( $op, $keys = array(), $using = array(), $orderby = false ) {
+function query_bestellzuordnungen( $op, $keys = array(), $using = array(), $orderby = false ): string
+{
   $selects = array();
   $filters = array();
   $joins = need_joins_array( $using, array(
@@ -2142,11 +2180,13 @@ function query_bestellzuordnungen( $op, $keys = array(), $using = array(), $orde
   return get_sql_query( $op, 'bestellzuordnung', $selects, $joins, $filters, $orderby );
 }
 
-function select_bestellzuordnungen( $keys = array(), $using = array(), $orderby = 'bestellzuordnung.zeitpunkt' ) {
+function select_bestellzuordnungen( $keys = array(), $using = array(), $orderby = 'bestellzuordnung.zeitpunkt' ): string
+{
   return query_bestellzuordnungen( 'SELECT', $keys, $using, $orderby );
 }
 
-function sql_bestellzuordnungen( $keys = array(), $orderby = 'bestellzuordnung.zeitpunkt' ) {
+function sql_bestellzuordnungen( $keys = array(), $orderby = 'bestellzuordnung.zeitpunkt' ): array
+{
   return mysql2array( doSql( select_bestellzuordnungen( $keys, array(), $orderby ) ) );
 }
 
@@ -2155,7 +2195,8 @@ function sql_delete_bestellzuordnungen( $keys = array() ) {
 }
 
 
-function select_bestellzuordnung_menge( $keys = array(), $using = array() ) {
+function select_bestellzuordnung_menge( $keys = array(), $using = array() ): string
+{
   return query_bestellzuordnungen( 'SUM', $keys, $using );
 }
 
@@ -2176,7 +2217,8 @@ function sql_bestellzuordnung_menge( $keys = array() ) {
 // $gruppen_id = 0: summe aller gruppen
 // $gruppen_id != 0: nur für diese gruppe (muell*, basar* sind dann nicht sinnvoll)
 //
-function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
+function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ): string
+{
   $basar_id = sql_basar_id();
   $muell_id = sql_muell_id();
 
@@ -2304,7 +2346,8 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
   ";
 }
 
-function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
+function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ): array
+{
   $result = doSql( select_bestellung_produkte( $bestell_id, $produkt_id, $gruppen_id, $orderby ), LEVEL_KEY );
   $r = mysql2array( $result );
   foreach( $r as $key => $val )
@@ -2406,7 +2449,8 @@ function preisdatenSetzen( $pr /* a row from produktpreise */ ) {
 // wo benötigt, ist sql_bestellung_produkte() schon aufgerufen; zwecks effizienz übergeben wir der funktion
 // eine Ergebniszeile, um den komplexen query in sql_bestellung_produkte() nicht wiederholen zu müssen:
 //
-function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte */ ) {
+function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte */ ): array
+{
   $produkt_id = $mengen['produkt_id'];
   $bestell_id = $mengen['gesamtbestellung_id'];
   $gebindegroesse = $mengen['gebindegroesse'];
@@ -2502,11 +2546,13 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
 }
 
 
-function select_liefermenge( $bestell_id, $produkt_id ) {
+function select_liefermenge( $bestell_id, $produkt_id ): string
+{
   return select_query( 'bestellvorschlaege', 'liefermenge', '', array( "gesamtbestellung_id = $bestell_id", "produkt_id = $produkt_id" ) );
 }
 
-function select_verteilmenge( $bestell_id, $produkt_id, $gruppen_id = 0 ) {
+function select_verteilmenge( $bestell_id, $produkt_id, $gruppen_id = 0 ): string
+{
   $keys = array( 'art' => BESTELLZUORDNUNG_ART_ZUTEILUNGEN, 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id );
   if( $gruppen_id ) {
     $keys['gruppen_id'] = $gruppen_id;
@@ -2516,11 +2562,13 @@ function select_verteilmenge( $bestell_id, $produkt_id, $gruppen_id = 0 ) {
   return select_bestellzuordnung_menge( $keys );
 }
 
-function select_muellmenge( $bestell_id, $produkt_id ) {
+function select_muellmenge( $bestell_id, $produkt_id ): string
+{
   return select_verteilmenge( $bestell_id, $produkt_id, sql_muell_id() );
 }
 
-function select_basarmenge( $bestell_id, $produkt_id ) {
+function select_basarmenge( $bestell_id, $produkt_id ): string
+{
   return "( SELECT (
                (". select_liefermenge( $bestell_id, $produkt_id ). ")
              - (" .select_verteilmenge( $bestell_id, $produkt_id ). ")
@@ -2551,7 +2599,8 @@ function sql_basarmenge( $bestell_id, $produkt_id ) {
  * select_basar:
  * produkte im basar (differenz aus liefer- und verteilmengen) berechnen:
  */
-function select_basar( $bestell_id = 0 ) {
+function select_basar( $bestell_id = 0 ): string
+{
   if( $bestell_id ) {
     $where = "WHERE gesamtbestellungen.id = $bestell_id";
   } else {
@@ -2582,7 +2631,8 @@ function select_basar( $bestell_id = 0 ) {
   " ;
 }
 
-function sql_basar( $bestell_id = 0, $order='produktname' ) {
+function sql_basar( $bestell_id = 0, $order='produktname' ): array
+{
   switch( $order ) {
     case 'datum':
       $order_by = 'lieferung';
@@ -2897,7 +2947,8 @@ function sql_bank_transaktion(
   ) );
 }
 
-function sql_link_transaction( $soll_id, $haben_id ) {
+function sql_link_transaction( $soll_id, $haben_id ): bool
+{
   logger( "sql_link_transaction: $soll_id, $haben_id" );
   if( $soll_id > 0 )
     sql_update( 'bankkonto', $soll_id, array( 'konterbuchung_id' => $haben_id ) );
@@ -2918,7 +2969,8 @@ function sql_link_transaction( $soll_id, $haben_id ) {
  *   konto_id == -1 bedeutet gruppen/lieferanten-transaktion, sonst bankkonto
  * flag $spende: einzige transaktion, die von nicht-diensten ausgeführt werden kann
  */
-function sql_doppelte_transaktion( $soll, $haben, $betrag, $valuta, $notiz, $spende = false ) {
+function sql_doppelte_transaktion( $soll, $haben, $betrag, $valuta, $notiz, $spende = false ): bool
+{
   global $dienstkontrollblatt_id, $login_gruppen_id;
 
   // open_div( 'ok', '', "doppelte_transaktion: $soll, $haben" );
@@ -2965,7 +3017,8 @@ function sql_doppelte_transaktion( $soll, $haben, $betrag, $valuta, $notiz, $spe
   return sql_link_transaction( $soll_id, $haben_id );
 }
 
-function sql_transactions( $gruppen_id, $lieferanten_id, $from_date = NULL, $to_date = NULL ) {
+function sql_transactions( $gruppen_id, $lieferanten_id, $from_date = NULL, $to_date = NULL ): array
+{
   $filter = "";
   $and = "WHERE";
   if( $gruppen_id ) {
@@ -3076,7 +3129,8 @@ function sql_bankkonto_saldo( $konto_id, $auszug_jahr = 0, $auszug_nr = FALSE ) 
   );
 }
 
-function sql_konten() {
+function sql_konten(): array
+{
   return mysql2array( doSql( "SELECT * FROM bankkonten ORDER BY name" ) );
 }
 
@@ -3088,7 +3142,8 @@ function sql_kontoname($konto_id){
   return $row['name'];
 }
 
-function optionen_konten( $selected = 0 ) {
+function optionen_konten( $selected = 0 ): string
+{
   $output = "";
   foreach( sql_konten() as $konto ) {
     $id = $konto['id'];
@@ -3105,7 +3160,8 @@ function optionen_konten( $selected = 0 ) {
   return $output;
 }
 
-function sql_kontoauszug( $konto_id, $auszug_jahr = 0, $auszug_nr = 0 ) {
+function sql_kontoauszug( $konto_id, $auszug_jahr = 0, $auszug_nr = 0 ): array
+{
   $filter = " WHERE ( konto_id = $konto_id ) ";
   $groupby = "GROUP BY konto_id, kontoauszug_jahr, kontoauszug_nr";
   if( $auszug_jahr ) {
@@ -3188,23 +3244,23 @@ function sql_pfandzuordnung_gruppe( $bestell_id, $gruppen_id, $anzahl_leer ) {
 // TRANSAKTION_TYP_xxx: dienen zur Klassifikation der BadBank-Buchungen,
 // die *SALDO*-typen auch für gruppen/lieferanten/bank:
 //
-define( 'TRANSAKTION_TYP_UNDEFINIERT', 0 );      // noch nicht zugeordnet
-define( 'TRANSAKTION_TYP_ANFANGSGUTHABEN', 1 );  // anfangsguthaben: gruppen, lieferanten und bank
+define( 'TRANSAKTION_TYP_UNDEFINIERT',               0 ); // noch nicht zugeordnet
+define( 'TRANSAKTION_TYP_ANFANGSGUTHABEN',           1 ); // anfangsguthaben: gruppen, lieferanten und bank
 define( 'TRANSAKTION_TYP_AUSGLEICH_ANFANGSGUTHABEN', 2 ); // Ausgleich/Umlage Differenz Anfangsguthaben
-define( 'TRANSAKTION_TYP_SPENDE', 3 );           // freiwillige Spende
-define( 'TRANSAKTION_TYP_SONDERAUSGABEN', 4 );   // Mitgliedsbeitrag Haus der Natur, Kontoführung, ...
-define( 'TRANSAKTION_TYP_UMLAGE', 5 );           // Verlustumlage auf alle Mitglieder
-define( 'TRANSAKTION_TYP_SOCKEL', 6 );           // geparkte Sockelbeträge
+define( 'TRANSAKTION_TYP_SPENDE',                    3 ); // freiwillige Spende
+define( 'TRANSAKTION_TYP_SONDERAUSGABEN',            4 ); // Mitgliedsbeitrag Haus der Natur, Kontoführung, ...
+define( 'TRANSAKTION_TYP_UMLAGE',                    5 ); // Verlustumlage auf alle Mitglieder
+define( 'TRANSAKTION_TYP_SOCKEL',                    6 ); // geparkte Sockelbeträge
 define( 'TRANSAKTION_TYP_AUSGLEICH_BESTELLVERLUSTE', 7 ); // Umlage Bestellverluste (auch: ein paar ganz alte Basarabrechnungen)
-define( 'TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN', 8 ); // Umlage Sonderausgaben
-define( 'TRANSAKTION_TYP_UMBUCHUNG_SPENDE', 9 );   // umbuchung von spenden nach TRANSAKTION_TYP_AUSGLEICH_*
-define( 'TRANSAKTION_TYP_UMBUCHUNG_UMLAGE', 10 );  // umbuchung von umlagen nach TRANSAKTION_TYP_AUSGLEICH_*
+define( 'TRANSAKTION_TYP_AUSGLEICH_SONDERAUSGABEN',  8 ); // Umlage Sonderausgaben
+define( 'TRANSAKTION_TYP_UMBUCHUNG_SPENDE',          9 ); // umbuchung von spenden nach TRANSAKTION_TYP_AUSGLEICH_*
+define( 'TRANSAKTION_TYP_UMBUCHUNG_UMLAGE',         10 ); // umbuchung von umlagen nach TRANSAKTION_TYP_AUSGLEICH_*
 
-define( 'TRANSAKTION_TYP_SALDO', 11 );             // saldo nach jahresabschluss
-define( 'TRANSAKTION_TYP_PFANDSALDO', 12 );        // pfandsaldo nach jahresabschluss
+define( 'TRANSAKTION_TYP_SALDO',                    11 ); // saldo nach jahresabschluss
+define( 'TRANSAKTION_TYP_PFANDSALDO',               12 ); // pfandsaldo nach jahresabschluss
 
 // die folgenden sind historisch und sollten nicht erzeugt werden (aber teils noch in der db vorhanden):
-define( 'TRANSAKTION_TYP_STORNO', 98 );          // Buchungen, die sich gegenseitig neutralisieren
+define( 'TRANSAKTION_TYP_STORNO',                   98 ); // Buchungen, die sich gegenseitig neutralisieren
 // define( 'TRANSAKTION_TYP_SONSTIGES', 99 ); // ... nicht mehr vorhanden! :-)
 
 
@@ -3261,17 +3317,17 @@ function transaktion_typ_string( $typ ) {
 // Beträge werden immer als 'soll' der fc, also schuld der fc
 // (an gruppen, lieferanten oder bank) zurückgegeben (ggf. also negativ)
 //
-define( 'OPTION_WAREN_NETTO_SOLL', 1 );       /* waren ohne pfand */
-define( 'OPTION_WAREN_BRUTTO_SOLL', 2 );      /* mit mwst, ohne pfand */
-define( 'OPTION_AUFSCHLAG_SOLL', 3 );         /* Aufschlag zur Kostendeckung der FC */
-define( 'OPTION_VPREIS_SOLL', 4 );          /* waren brutto inclusive pfand, aber _ohne_ aufschlag (nur gruppenseitig sinnvoll) */
-define( 'OPTION_PFAND_VOLL_BRUTTO_SOLL', 14 );   /* schuld aus kauf voller pfandverpackungen */
-define( 'OPTION_PFAND_VOLL_NETTO_SOLL', 15 );
-define( 'OPTION_PFAND_VOLL_ANZAHL', 16 );
-define( 'OPTION_PFAND_LEER_BRUTTO_SOLL', 17 );   /* schuld aus Rückgabe leerer pfandverpackungen */
-define( 'OPTION_PFAND_LEER_NETTO_SOLL', 18 ); 
-define( 'OPTION_PFAND_LEER_ANZAHL', 19 );
-define( 'OPTION_EXTRA_BRUTTO_SOLL', 20 );   /* sonstiges: Rabatte, Versandkosten, ... (nur lieferantenseitig sinnvoll) */
+define( 'OPTION_WAREN_NETTO_SOLL',        1 ); /* waren ohne pfand */
+define( 'OPTION_WAREN_BRUTTO_SOLL',       2 ); /* mit mwst, ohne pfand */
+define( 'OPTION_AUFSCHLAG_SOLL',          3 ); /* Aufschlag zur Kostendeckung der FC */
+define( 'OPTION_VPREIS_SOLL',             4 ); /* waren brutto inclusive pfand, aber _ohne_ aufschlag (nur gruppenseitig sinnvoll) */
+define( 'OPTION_PFAND_VOLL_BRUTTO_SOLL', 14 ); /* schuld aus kauf voller pfandverpackungen */
+define( 'OPTION_PFAND_VOLL_NETTO_SOLL',  15 );
+define( 'OPTION_PFAND_VOLL_ANZAHL',      16 );
+define( 'OPTION_PFAND_LEER_BRUTTO_SOLL', 17 ); /* schuld aus Rückgabe leerer pfandverpackungen */
+define( 'OPTION_PFAND_LEER_NETTO_SOLL',  18 );
+define( 'OPTION_PFAND_LEER_ANZAHL',      19 );
+define( 'OPTION_EXTRA_BRUTTO_SOLL',      20 ); /* sonstiges: Rabatte, Versandkosten, ... (nur lieferantenseitig sinnvoll) */
 
 
 
@@ -3358,7 +3414,8 @@ function select_bestellungen_soll_gruppen( $art, $using = array() ) {
  *   $using ist array von tabellen, die aus dem übergeordneten query benutzt werden sollen;
  *   auswirkung haben: 'gesamtbestellungen', 'lieferanten', 'pfandverpackungen'
 */
-function select_bestellungen_soll_lieferanten( $art, $using = array() ) {
+function select_bestellungen_soll_lieferanten( $art, $using = array() ): string
+{
   switch( $art ) {
     case OPTION_WAREN_BRUTTO_SOLL:
       $expr = "( bestellvorschlaege.liefermenge / produktpreise.lv_faktor * produktpreise.lieferpreis * ( 1.0 + produktpreise.mwst / 100.0 ) )";
@@ -3442,7 +3499,8 @@ function select_bestellungen_soll_lieferanten( $art, $using = array() ) {
  *   liefert als skalarer subquery schuld an gruppen aus gruppen_transaktion
  *   aus $using werden verwendet: 'bestellgruppen'
  */
-function select_transaktionen_soll_gruppen( $using = array() ) {
+function select_transaktionen_soll_gruppen( $using = array() ): string
+{
   return "
     SELECT IFNULL( sum( summe ), 0.0 )
       FROM gruppen_transaktion
@@ -3455,7 +3513,8 @@ function select_transaktionen_soll_gruppen( $using = array() ) {
  *   liefert als skalarer subquery schuld an lieferanten aus gruppen_transaktion
  *   aus $using werden verwendet: 'lieferanten'
  */
-function select_transaktionen_soll_lieferanten( $using = array() ) {
+function select_transaktionen_soll_lieferanten( $using = array() ): string
+{
   return "
     SELECT IFNULL( sum( summe ), 0.0 )
       FROM gruppen_transaktion
@@ -3464,37 +3523,44 @@ function select_transaktionen_soll_lieferanten( $using = array() ) {
   ) );
 }
 
-function select_waren_soll_gruppen( $using = array() ) {
+function select_waren_soll_gruppen( $using = array() ): string
+{
   return select_bestellungen_soll_gruppen( OPTION_WAREN_BRUTTO_SOLL, $using );
 }
 
-function select_pfand_soll_gruppen( $using = array() ) {
+function select_pfand_soll_gruppen( $using = array() ): string
+{
   return " SELECT (
       (" .select_bestellungen_soll_gruppen( OPTION_PFAND_LEER_BRUTTO_SOLL, $using ). ")
     + (" .select_bestellungen_soll_gruppen( OPTION_PFAND_VOLL_BRUTTO_SOLL, $using ). ")
     ) ";
 }
 
-function select_aufschlag_soll_gruppen( $using = array() ) {
+function select_aufschlag_soll_gruppen( $using = array() ): string
+{
   return select_bestellungen_soll_gruppen( OPTION_AUFSCHLAG_SOLL, $using );
 }
 
-function select_waren_soll_lieferanten( $using = array() ) {
+function select_waren_soll_lieferanten( $using = array() ): string
+{
   return select_bestellungen_soll_lieferanten( OPTION_WAREN_BRUTTO_SOLL, $using );
 }
 
-function select_pfand_soll_lieferanten( $using = array() ) {
+function select_pfand_soll_lieferanten( $using = array() ): string
+{
   return " SELECT (
       (" .select_bestellungen_soll_lieferanten( OPTION_PFAND_VOLL_BRUTTO_SOLL, $using ). ")
     + (" .select_bestellungen_soll_lieferanten( OPTION_PFAND_LEER_BRUTTO_SOLL, $using ). ")
     ) ";
 }
 
-function select_extra_soll_lieferanten( $using = array() ) {
+function select_extra_soll_lieferanten( $using = array() ): string
+{
   return select_bestellungen_soll_lieferanten( OPTION_EXTRA_BRUTTO_SOLL, $using );
 }
 
-function select_soll_lieferanten( $using = array() ) {
+function select_soll_lieferanten( $using = array() ): string
+{
   return " SELECT (
       (" .select_waren_soll_lieferanten( $using ). ")
     + (" .select_pfand_soll_lieferanten( $using ). ")
@@ -3503,7 +3569,8 @@ function select_soll_lieferanten( $using = array() ) {
     ) ";
 }
 
-function select_soll_gruppen( $using = array() ) {
+function select_soll_gruppen( $using = array() ): string
+{
   return " SELECT (
       (" .select_waren_soll_gruppen( $using ). ")
     + (" .select_pfand_soll_gruppen( $using ). ")
@@ -3546,7 +3613,8 @@ function sql_aufschlag_soll( $bestell_id = 0, $gruppen_id = 0 ) {
   );
 }
 
-function sql_gruppenpfand( $lieferanten_id = 0, $bestell_id = 0, $group_by = 'bestellgruppen.id' ) {
+function sql_gruppenpfand( $lieferanten_id = 0, $bestell_id = 0, $group_by = 'bestellgruppen.id' ): array
+{
   $on = '';
   if( $lieferanten_id ) {
     $on = " ON gesamtbestellungen.lieferanten_id = $lieferanten_id";
@@ -3574,7 +3642,8 @@ function sql_gruppenpfand( $lieferanten_id = 0, $bestell_id = 0, $group_by = 'be
   " ) );
 }
 
-function sql_lieferantenpfand( $lieferanten_id, $bestell_id = 0, $group_by = 'pfandverpackungen.id' ) {
+function sql_lieferantenpfand( $lieferanten_id, $bestell_id = 0, $group_by = 'pfandverpackungen.id' ): array
+{
   $more_on = '';
   if( $bestell_id ) {
     $more_on = "AND gesamtbestellungen.id = $bestell_id";
@@ -3612,7 +3681,8 @@ function sql_lieferantenpfand( $lieferanten_id, $bestell_id = 0, $group_by = 'pf
 // liefert verbindlichkeiten (positiv) _und_ forderungen (negativ) --- anders als bei gruppen!
 // (letztere kommen da aber ja nur sehr selten vor, anders als forderungen an gruppen...)
 //
-function sql_verbindlichkeiten_lieferanten() {
+function sql_verbindlichkeiten_lieferanten(): array
+{
   return mysql2array( doSql( "
     SELECT lieferanten.id as lieferanten_id
          , lieferanten.name as name
@@ -3644,7 +3714,8 @@ function verbindlichkeiten_gruppen_summe() {
   ", 'verbindlichkeiten' );
 }
 
-function sql_bestellungen_soll_gruppe( $gruppen_id, $bestell_id = 0 ) {
+function sql_bestellungen_soll_gruppe( $gruppen_id, $bestell_id = 0 ): array
+{
   $more_where = '';
   if( $bestell_id ) {
     need( sql_bestellung_status( $bestell_id ) >= STATUS_LIEFERANT );
@@ -3672,8 +3743,8 @@ function sql_bestellungen_soll_gruppe( $gruppen_id, $bestell_id = 0 ) {
   return mysql2array( doSql($query, LEVEL_ALL, "sql_bestellungen_soll_gruppe() fehlgeschlagen: ") );
 }
 
-
-function sql_bestellungen_soll_lieferant( $lieferanten_id, $bestell_id = NULL ) {
+function sql_bestellungen_soll_lieferant( $lieferanten_id, $bestell_id = NULL ): array
+{
   $where = '';
   $having = ( $bestell_id ? '' : 'HAVING ( waren_netto_soll <> 0 ) or ( pfand_voll_brutto_soll <> 0 ) or ( pfand_leer_brutto_soll <> 0 )' );
   $query = "
@@ -3706,7 +3777,6 @@ function sql_bestellung_soll_lieferant( $bestell_id ) {
   return current( $result );
 }
 
-
 function sql_bestellung_rechnungssumme( $bestell_id ) {
   return sql_select_single_field( "
     SELECT (
@@ -3732,7 +3802,6 @@ function sql_bestellung_pfandsumme( $bestell_id ) {
   ", 'pfand'
   );
 }
-
 
 function kontostand( $gruppen_id ) {
   global $specialgroups;
@@ -3811,7 +3880,8 @@ function lieferantenpfandkontostand( $lieferanten_id = 0 ) {
   );
 }
 
-function select_ungebuchte_einzahlungen( $gruppen_id = 0 ) {
+function select_ungebuchte_einzahlungen( $gruppen_id = 0 ): string
+{
   return "
     SELECT *
       , DATE_FORMAT(gruppen_transaktion.valuta,'%d.%m.%Y') AS valuta_trad
@@ -3822,7 +3892,8 @@ function select_ungebuchte_einzahlungen( $gruppen_id = 0 ) {
   ";
 }
 
-function sql_ungebuchte_einzahlungen( $gruppen_id = 0 ) {
+function sql_ungebuchte_einzahlungen( $gruppen_id = 0 ): array
+{
   return mysql2array( doSql( select_ungebuchte_einzahlungen( $gruppen_id ) ) );
 }
 
@@ -3834,12 +3905,12 @@ function sql_ungebuchte_einzahlungen_summe( $gruppen_id = 0 ) {
   );
 }
 
-
 //
 // verluste und spenden
 //
 
-function select_verluste( $type, $not = false ) {
+function select_verluste( $type, $not = false ): string
+{
   $muell_id = sql_muell_id();
   if( is_array( $type ) ) {
     $filter = ' type in (';
@@ -3866,7 +3937,8 @@ function select_verluste( $type, $not = false ) {
   ";
 }
 
-function sql_verluste( $type ) {
+function sql_verluste( $type ): array
+{
   return mysql2array( doSql( select_verluste( $type ) ) );
 }
 
@@ -3878,13 +3950,11 @@ function sql_verluste_summe( $type ) {
   );
 }
 
-
 /////////////////////////////////////////////
 //
 // produktpreise
 //
 /////////////////////////////////////////////
-
 
 // wichtige felder in tabelle produktpreise:
 //
@@ -3932,12 +4002,12 @@ function sql_verluste_summe( $type ) {
 //   Bauer/Kartoffeln      500 g      1 kg     (2 (automatisch)     25 (= 12.5kg ("1/4 Zentner"))
 //   Bode/Schokoriegel       1 VPE   45 g      (1 (manuell)         30 (= 30*45g = 30VPE)
 
-
 function references_produktpreis( $preis_id ) {
   return sql_count( 'bestellvorschlaege', "produktpreise_id=$preis_id" );
 }
 
-function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
+function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ): array
+{
   if( $zeitpunkt === true )
     $zeitpunkt = $GLOBALS['mysqljetzt'];
   if( $zeitpunkt ) {
@@ -3980,12 +4050,14 @@ function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
  *  liefert id des aktuellsten preises zu $produkt_id,
  *  oder 0 falls es NOW() keinen gültigen preis gibt:
  */
-function sql_aktueller_produktpreis_id( $produkt_id, $zeitpunkt = true ) {
+function sql_aktueller_produktpreis_id( $produkt_id, $zeitpunkt = true ): int
+{
   $row = sql_aktueller_produktpreis( $produkt_id, $zeitpunkt );
   return $row ? $row['id'] : 0;
 }
 
-function select_current_productprice_id( $product_id, $timestamp = true ) {
+function select_current_productprice_id( $product_id, $timestamp = true ): string
+{
   if( $timestamp === true )
     $timestamp = $GLOBALS['mysqljetzt'];
   if ($timestamp) {
@@ -4007,7 +4079,8 @@ function select_current_productprice_id( $product_id, $timestamp = true ) {
 //  - warnen, wenn kein aktuell gültiger preis vorhanden
 // rueckgabe: true, falls keine probleme, sonst false
 //
-function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id = false ) {
+function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id = false ): bool
+{
   global $mysqljetzt;
   need( $produkt_id );
   $rv = true;
@@ -4046,7 +4119,6 @@ function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id =
   }
   return $rv;
 }
-
 
 /**
  *  Erzeugt einen Produktpreiseintrag
@@ -4116,11 +4188,15 @@ function sql_insert_produktpreis (
 
 
 global $masseinheiten;
-$masseinheiten = array( 'g', 'ml', 'ST', 'GB', 'KI', 'PA', 'GL', 'BE', 'DO', 'BD', 'BT', 'KT', 'FL', 'EI', 'KA', 'SC', 'NE', 'EA', 'TA', 'TÜ', 'TÖ', 'SET', 'BTL', 'TU', 'KO', 'SCH', 'BOX', 'BX', 'VPE' );
+$masseinheiten = [
+  'g', 'ml', 'ST', 'GB', 'KI', 'PA', 'GL', 'BE', 'DO', 'BD', 'BT', 'KT', 'FL', 'EI', 'KA', 'SC', 'NE', 'EA', 'TA', 'TÜ',
+  'TÖ', 'SET', 'BTL', 'TU', 'KO', 'SCH', 'BOX', 'BX', 'VPE'
+];
 
 // kanonische_einheit: zerlegt $einheit in kanonische einheit und masszahl:
 // 
-function kanonische_einheit( $einheit, $die_on_error = true ) {
+function kanonische_einheit( $einheit, $die_on_error = true ): ?array
+{
   global $masseinheiten;
   $kan_einheit = NULL;
   $kan_mult = NULL;
@@ -4176,7 +4252,8 @@ function kanonische_einheit( $einheit, $die_on_error = true ) {
   return ( $kan_mult && $kan_einheit ) ? array( $kan_mult, $kan_einheit ) : NULL;
 }
 
-function optionen_einheiten( $selected ) {
+function optionen_einheiten( $selected ): string
+{
   global $masseinheiten;
   $output = '';
   foreach( $masseinheiten as $e ) {
@@ -4189,16 +4266,14 @@ function optionen_einheiten( $selected ) {
 }
 
 function mult2string( $mult ) {
-  $mult = preg_replace( '/0*$/', '', sprintf( '%.3lf', $mult ) );
+  $mult = preg_replace( '/0*$/', '', sprintf( '%.3f', $mult ) );
   return preg_replace( '/\.$/', '', $mult );
 }
-
 
 function sql_delete_produktpreis( $preis_id ) {
   need( references_produktpreis( $preis_id ) == 0 , 'Preiseintrag nicht löschbar, da er benutzt wird!' );
   doSql( "DELETE FROM produktpreise WHERE id=$preis_id" );
 }
-
 
 ////////////////////////////////////
 //
@@ -4209,7 +4284,8 @@ function sql_delete_produktpreis( $preis_id ) {
 function sql_katalogeintrag( $katalog_id, $allow_null = false ) {
   return sql_select_single_row( "SELECT * FROM lieferantenkatalog WHERE id=$katalog_id", $allow_null );
 }
-function sql_katalogname( $katalog_id, $allow_null = false ) {
+function sql_katalogname( $katalog_id, $allow_null = false ): string
+{
   $k = sql_katalogeintrag( $katalog_id, true );
   if( ! $k )
     return '';
@@ -4220,7 +4296,8 @@ function sql_katalogname( $katalog_id, $allow_null = false ) {
   }
 }
 
-function sql_catalogue_acronym( $context, $acronym ) {
+function sql_catalogue_acronym( $context, $acronym ): array
+{
   return mysql2array( doSql( 
             "SELECT * from `catalogue_acronyms` "
           . "WHERE `context`='$context' AND `acronym`='$acronym'") );
@@ -4292,11 +4369,11 @@ function sanitize_http_input() {
 
   if( ! $from_dokuwiki ) {
     foreach( $_GET as $key => $val ) {
-      need( isset( $foodsoft_get_vars[$key] ), "unerwartete Variable $key in URL uebergeben" );
+      need( isset( $foodsoft_get_vars[$key] ), "unerwartete Variable $key in URL übergeben" );
       need( checkvalue( $val, $foodsoft_get_vars[$key] ) !== false , "unerwarteter Wert für Variable $key in URL" );
     }
-    if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
+    if( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular übergeben' );
       sscanf( $_POST['itan'], "%u_%s", $t_id, $itan );
       need( $t_id, 'fehlerhaftes Formular übergeben' );
       $row = sql_select_single_row( "SELECT * FROM transactions WHERE id=$t_id", true );
@@ -4305,8 +4382,8 @@ function sanitize_http_input() {
         $_POST = array();
         echo "<div class='warn'>Warnung: mehrfach abgeschicktes Formular detektiert! (wurde nicht ausgewertet)</div>";
       } else {
-        need( $row['itan'] == $itan, 'ungültige iTAN übergeben' );
-        need( $row['session_id'] == $session_id, 'ungültige session_id' );
+        need( $row['itan'] === $itan, 'ungültige iTAN übergeben' );
+        need( $row['session_id'] === $session_id, 'ungültige session_id' );
         sql_update( 'transactions', $t_id, array( 'used' => 1 ) );
       }
     } else {
@@ -4315,7 +4392,6 @@ function sanitize_http_input() {
     $http_input_sanitized = true;
   }
 }
-
 
 /**
  * Check if $val is valid for the given type.
@@ -4378,31 +4454,37 @@ function checkvalue( $val, $typ){
   return $val;
 }
 
-// get_http_var
-//
-// Create a global variable <name> and populate it with the GET or POST parameter
-// of the same name, using the <default> value if set.
-//
-// - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
-// - typ: definierte $typ argumente:
-//   d : ganze Zahl
-//   u : nicht-negative ganze Zahl
-//   U : positive ganze Zahl (echt größer als 0)
-//   H : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
-//   R : raw: keine Einschränkung, keine Umwandlung
-//   f : Festkommazahl
-//   w : bezeichner: alphanumerisch und _; leerstring zugelassen
-//   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
-//   /.../: regex pattern. Wert wird außerdem ge-trim()-t
-// - default:
-//   - wenn array erwartet wird, kann der default ein array sein.
-//   - wird kein array erwartet, aber default is ein array, so wird $default[$name] versucht
-//
-// per POST übergebene variable werden nur berücksichtigt, wenn zugleich eine
-// unverbrauchte transaktionsnummer 'itan' übergeben wird (als Sicherung
-// gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
-//
-function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
+/**
+ * get_http_var
+ *
+ * Create a global variable <name> and populate it with the GET or POST parameter
+ * of the same name, using the <default> value if set
+ *
+ * @param string $name
+ * - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
+ * @param string $typ
+ *   type of the variable to Retrieve:
+ *   d : ganze Zahl
+ *   u : nicht-negative ganze Zahl
+ *   U : positive ganze Zahl (echt größer als 0)
+ *   H : wendet htmlspecialchars an (erlaubt sichere und korrekte ausgabe in HTML)
+ *   R : raw: keine Einschränkung, keine Umwandlung
+ *   f : Festkommazahl
+ *   w : bezeichner: alphanumerisch und _; leerstring zugelassen
+ *   W : bezeichner: alphanumerisch und _, mindestens ein zeichen
+ *   /.../: regex pattern. Wert wird außerdem ge-trim()-t
+ * @param array|int|null|string $default
+ *   Default value that is assumed if the parameter is not set in GET/POST vars
+ *   - for array type(s), default may be an array
+ *   - for scalar types, $default[$name] is tried if $default is an array
+ * @param bool $is_self_field
+ *
+ * per POST übergebene variable werden nur berücksichtigt, wenn zugleich eine
+ * unverbrauchte transaktionsnummer 'itan' übergeben wird (als Sicherung
+ * gegen mehrfache Absendung desselben Formulars per "Reload" Knopfs des Browsers)
+ */
+function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ): bool
+{
   global
     $http_input_sanitized,
     $self_fields,
@@ -4476,7 +4558,7 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
     $GLOBALS[$name] = $arry;
   } else {
       $new = checkvalue($arry, $typ);
-      if($new===FALSE){
+      if( $new === FALSE ){
         // error( 'unerwarteter Wert für Variable $name' );
         unset( $GLOBALS[$name] );
         return FALSE;
@@ -4496,7 +4578,8 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
 /**
  *
  */
-function need_http_var( $name, $typ, $is_self_field = false ) {
+function need_http_var( $name, $typ, $is_self_field = false ): bool
+{
   need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );
   return TRUE;
 }
@@ -4510,15 +4593,15 @@ function self_field( $name, $default = NULL ) {
 }
 
 /**
- * Database migration to the neXt version
+ * Database migration to the specified version
  * 
  * This function contains all changes in the DB schema across foodsoft versions.
  * 
  * @param int $version
  *   Current version that should be updated
- * @return
+ * @return void
  */
-function update_database( $version ) {
+function update_database( $version ): void {
   switch( $version ) {
     case 8:
       logger( 'starting update_database: from version 8' );
@@ -4911,7 +4994,18 @@ function update_database( $version ) {
 	}
 }
 
-function wikiLink( $topic, $text, $head = false ) {
+/**
+ * Generate a link (<a> element) to a wiki page
+ *
+ * @param string $topic
+ *   wiki page id, e.g. fc:dienste
+ * @param string $text
+ *   link text
+ * @param bool $head
+ *   Should this link go to the header of the page?
+ *   If yes, we're setting the special id 'wikilink_head' on the element.
+ */
+function wikiLink(string $topic, string $text, $head = false) {
   global $wikibase;
   isset($wikibase) || $wikibase = getenv('wikibase');
   if( isset( $wikibase ) ) {
@@ -4924,7 +5018,13 @@ function wikiLink( $topic, $text, $head = false ) {
   }
 }
 
-function setWikiHelpTopic( $topic ) {
+/**
+ * Set the main wiki help topic for the page (link is displayed in the page header)
+ *
+ * @param string $topic
+ *   wiki page id, e.g. fc:dienste
+ */
+function setWikiHelpTopic(string $topic) {
   global $wikibase, $js_on_exit;
   isset($wikibase) || $wikibase = getenv('wikibase');
   if( isset( $wikibase ) ) {
@@ -4938,48 +5038,61 @@ function setWikiHelpTopic( $topic ) {
 // auf <title> (fensterrahmen) kann offenbar nicht mehr zugegriffen werden(?), wir
 // können daher nur noch den subtitle (im fenster) setzen:
 //
-function setWindowSubtitle( $subtitle ) {
+function setWindowSubtitle( string $subtitle ) {
   open_javascript( replace_html( 'subtitle', "Foodsoft: $subtitle" ) );
 }
 
 global $itan;
 $itan = false;
 
-function set_itan() {
+/* Generate a fresh TAN, store it to the DB and to the global var */
+function set_itan(): void
+{
   global $itan, $session_id;
   $tan = random_hex_string(5);
-  $id = sql_insert( 'transactions' , array(
-    'used' => 0
-  , 'session_id' => $session_id
-  , 'itan' => $tan
-  ) );
+  $id = sql_insert(
+    'transactions',
+    [
+      'used' => 0,
+      'session_id' => $session_id,
+      'itan' => $tan,
+    ]
+  );
   $itan = $id.'_'.$tan;
 }
 
-function get_itan( $force_new = false ) {
+/**
+ * Retrieve the current iTAN or generate a new one
+ *
+ * @param false $force_new
+ * @return string
+ *   The requested iTAN
+ */
+function get_itan( $force_new = false ): string
+{
   global $itan;
-  if( $force_new or ! $itan )
+  if( $force_new || ! $itan )
     set_itan();
   return $itan;
 }
 
 /**
  * Generate HTML options elements for values with one option selected.
- * 
+ *
  * Each value may be a scalar or a tuple with 2 or 3 elements.
  * In the tuple case, the items are mapped to options attributes:
  * - [0] => value
  * - [1] => text label
  * - [2] => title (optional)
- * 
+ *
  * @param array $values
  * @param mixed $selected
- * 
+ *
  * @return string
  *   generated HTML
- * 
  */
-function optionen( $values, $selected ) {
+function optionen(array $values, $selected): string
+{
   $output = '';
   foreach( $values as $v ) {
     if( is_array( $v ) ) {
@@ -4998,22 +5111,6 @@ function optionen( $values, $selected ) {
   return $output;
 }
 
-
-////////////////////////////////////
-//
-// PDF-export
-//
-////////////////////////////////////
-
-function get_tmp_working_dir( $base = '/tmp' ) {
-  for( $retries = 0; $retries < 10; $retries++ ) {
-    $fqpath = $base . '/foodsoft.' . random_hex_string( 8 );
-    if( mkdir( $fqpath, 0700 ) )
-      return $fqpath;
-  }
-  return false;
-}
-
 // insert_html:
 // erzeugt javascript-code, der $element als Child vom element $id ins HTML einfügt.
 // $element is entweder ein string (erzeugt textelement), oder ein
@@ -5021,7 +5118,8 @@ function get_tmp_working_dir( $base = '/tmp' ) {
 //   - tag ist der tag-name (z.b. 'table')
 //   - attrs ist false, oder Liste von Paaren ( name, wert) gewünschter Attribute
 //   - childs ist entweder false, ein Textstring, oder ein Array von $element-Objekten
-function insert_html( $id, $element ) {
+function insert_html( $id, $element ): string
+{
   global $autoid;
   if( ! $autoid ) $autoid = 0;
 
@@ -5084,7 +5182,8 @@ function insert_html( $id, $element ) {
 }
 
 // replace_html: wie insert_html, löscht aber vorher alle Child-Elemente von $id
-function replace_html( $id, $element ) {
+function replace_html( $id, $element ): string
+{
   global $autoid;
   $autoid++;
   $output = "
@@ -5097,7 +5196,8 @@ function replace_html( $id, $element ) {
   return $output . insert_html( $id, $element );
 }
 
-function move_html( $id, $into_id ) {
+function move_html( $id, $into_id ): string
+{
   global $autoid;
   $autoid++;
   return "
@@ -5110,7 +5210,6 @@ function move_html( $id, $into_id ) {
   //   document.getElementById('$id').removeChild(child_$autoid);
 }
 
-
 ////////////////////////////////////
 //
 // social
@@ -5118,24 +5217,5 @@ function move_html( $id, $into_id ) {
 ////////////////////////////////////
 
 function get_avatar_url( $member_row ) {
-
   return $member_row['photo_url'];
-
-//   $d = '404';
-//   $email = $member_row['email'];
-//   /*
-//   if ($member_row['slogan'] || $member_row['url']) {
-//     $d = 'identicon';
-//     if (!$email) {
-//       $d = 'mm';
-//       $email = true;
-//     }
-//   }
-//   */
-//   if (!$email)
-//     return false;
-//   return checked_gravatar_url($email, 128, $d);
-
 }
-
-?>

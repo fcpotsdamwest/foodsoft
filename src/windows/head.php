@@ -1,13 +1,29 @@
 <?php
-// head.php
-//
-// kopf für kleine popup-Fenster
-// - $title (<title>) und $subtitle (im Fenster) werden angezeigt
-// - ein "Close" Knopf wird automatisch erzeugt
+/**
+ * head.php
+ *
+ * Page header for popup windows
+ *
+ * GET Parameters (optional):
+ * @param string $title
+ *   is set as <title>
+ * @param string $subtitle
+ *   is displayed as heading inside the window
+ * - a "Close" button is generated automatically
+ */
 
-global $angemeldet, $login_gruppen_name, $coopie_name
-     , $login_dienst, $title, $subtitle, $wikitopic, $readonly
-     , $area, $foodcoop_name;
+global
+    $angemeldet,
+    $area,
+    $coopie_name,
+    $foodcoop_name,
+    $foodsoftdir,
+    $login_dienst,
+    $login_gruppen_name,
+    $readonly,
+    $subtitle,
+    $title,
+    $wikitopic;
 
 if( ! $title ) $title = "FC $foodcoop_name - Foodsoft";
 if( ! $subtitle ) $subtitle = "FC $foodcoop_name - Foodsoft";
@@ -37,11 +53,15 @@ open_tag( 'body' );
 open_div( $headclass, "id='header' style='padding:0.5ex 1em 0.5ex 1ex;margin:0pt 0pt 1em 0pt;'" );
   open_table( $headclass, "width='100%'" );
     open_tr();
-      open_td( 'oneline', 'style="width:80px;"'
-                   , "<a class='close' title='Schließen' href='javascript:if(opener)opener.focus();window.close();'>
-                      </a><a class='print' title='Ausdrucken' href='javascript:window.print();'>
-                      </a><a class='reload' id='reload_button' title='Neu Laden' href='javascript:document.forms.update_form.submit();'>
-                      </a>" );
+      $headerButtons =
+          "<a class='close' title='Schließen' href='javascript:if(opener)opener.focus();window.close();'></a>" .
+          "<a class='print' title='Ausdrucken' href='javascript:window.print();'></a>" .
+          "<a class='reload' id='reload_button' title='Neu Laden' href='javascript:document.forms.update_form.submit();'></a>";
+      open_td(
+          'oneline',
+          'style="width:80px;"',
+          $headerButtons
+      );
       open_td( 'quad', "id='subtitle' ", $subtitle );
       open_td( '', "id=wikilink_head,style='text-align:right;'" );
         wikiLink( ( $area ? "foodsoft:$area" : 'start' ) , "Hilfe-Wiki...", true );
@@ -61,6 +81,7 @@ open_div( $headclass, "id='header' style='padding:0.5ex 1em 0.5ex 1ex;margin:0pt
   close_table();
 close_div();
 
+/* open div element for main payload (which is usually rendered by a file in the windows folder) */
 open_div( $payloadclass, "id='payload'" );
 
 ?>

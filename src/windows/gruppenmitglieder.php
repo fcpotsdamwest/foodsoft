@@ -1,5 +1,42 @@
 <?PHP
-  
+/**
+ * @param string $action
+ *   perform specified action
+ *   * delete
+ *   * edit
+ *   * insert
+ *   * new_pwd
+ *   * new_pwd
+ * @param int $avatar_delete_<id>
+ * @param int $dienst_<id>
+ * @param int $dienst_
+ *   dienst assignment for new group
+ * @param int $email_<id>
+ * @param int $gruppen_id
+ * @param int $gruppenname
+ * @param int $login_gruppen_id
+ * @param int $name_<id>
+ * @param int $newVorname
+ * @param int $newName
+ * @param int $newEmail
+ * @param int $newTelefon
+ * @param int $newPass
+ *   new password
+ * @param int $newPass2
+ *   new password (confirmation)
+ * @param int $notiz_<id>
+ * @param int $person_id
+ * @param int $slogan_<id>
+ * @param int $telefon_<id>
+ * @param int $url_<id>
+ * @param int $vorname_<id>>
+ */
+
+
+global
+  $angemeldet,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 // $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
 
@@ -12,11 +49,11 @@ $gruppe = sql_gruppe( $gruppen_id );
 $edit_names = FALSE;
 $edit_dienst_einteilung = FALSE;
 $edit_pwd = FALSE;
-if( ( $login_gruppen_id == $gruppen_id ) and ! $readonly ) {
+if( ( $login_gruppen_id === $gruppen_id ) && ! $readonly ) {
   $edit_names = TRUE;
   $edit_pwd = TRUE;
 }
-if( hat_dienst(5) and ! $readonly ) {
+if( hat_dienst(5) && ! $readonly ) {
   $edit_names = TRUE;
   $edit_dienst_einteilung=TRUE;
   $edit_pwd = TRUE;
@@ -32,7 +69,7 @@ switch( $action ) {
     need( $edit_pwd, "keine Berechtigung zur Passwortänderung!" );
     need_http_var('newPass', 'R');
     need_http_var('newPass2', 'R');
-    if($newPass!=$newPass2){
+    if( $newPass !== $newPass2 ) {
       $pwmsg = "<div class='warn' style='padding:1em;'>Eingaben nicht identisch! (Gruppenpasswort wurde nicht geändert)</div>";
     } else if( strlen( $newPass ) < 4 ) {
       $pwmsg = "<div class='warn' style='padding:1em;'>Passwort zu kurz! (Gruppenpasswort wurde nicht geändert)</div>";
@@ -58,16 +95,20 @@ switch( $action ) {
       } else {
         ${"dienst_$id"} = $row['diensteinteilung'];
       }
-      sql_update( 'gruppenmitglieder', $id, array(
-        'name' => ${"name_$id"}
-      , 'vorname' => ${"vorname_$id"}
-      , 'email' => ${"email_$id"}
-      , 'telefon' => ${"telefon_$id"}
-      , 'diensteinteilung' => ${"dienst_$id"}
-      , 'slogan' => ${"slogan_$id"}
-      , 'url' => ${"url_$id"}
-      , 'notiz' => ${"notiz_$id"}
-      ) );
+      sql_update(
+        'gruppenmitglieder',
+        $id,
+        [
+          'name' => ${"name_$id"},
+          'vorname' => ${"vorname_$id"},
+          'email' => ${"email_$id"},
+          'telefon' => ${"telefon_$id"},
+          'diensteinteilung' => ${"dienst_$id"},
+          'slogan' => ${"slogan_$id"},
+          'url' => ${"url_$id"},
+          'notiz' => ${"notiz_$id"}
+        ]
+      );
 
       if( ${"avatar_delete_$id"} ) {
         sql_update( 'gruppenmitglieder', $id, array( 'photo_url' => '' ) );
@@ -84,7 +125,7 @@ switch( $action ) {
           break;
         }
         if( filesize( $avatar_upload['tmp_name'] ) > 0x20000 ) {
-          $avatar_msg .= "<div class='warn' style='padding:1em;'>Bilddatei zu gross (Limit: 128kB)!</div>";
+          $avatar_msg .= "<div class='warn' style='padding:1em;'>Bilddatei zu groß (Limit: 128kB)!</div>";
           break;
         }
         $data = base64_encode( file_get_contents( $avatar_upload['tmp_name'] ) );
@@ -93,7 +134,7 @@ switch( $action ) {
         } else if( ( $avatar_upload['type'] == 'image/png' ) && ! strncmp( $data, 'iVBOR', 5 ) ) {
           $mimetype = 'image/png';
         } else {
-          $avatar_msg .= "<div class='warn' style='padding:1em;'>Bilddatei: Dateityp nicht unterstützt (bitte nur JPEG oder PNG!)(</div>";
+          $avatar_msg .= "<div class='warn' style='padding:1em;'>Bilddatei: Dateityp nicht unterstützt (bitte nur JPEG oder PNG!)</div>";
           break;
         }
        $imagesize = getimagesize( $avatar_upload['tmp_name'] );
@@ -161,8 +202,15 @@ if( $edit_pwd ) {
   close_fieldset();
 }
 
-if( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) )
-  open_div( 'smallskip right', '', fc_link( 'gruppenkonto', "gruppen_id=$gruppen_id,text=Gruppenkonto..." ) );
+if( $gruppen_id === $login_gruppen_id || hat_dienst(4,5) )
+  open_div(
+    'smallskip right',
+    '',
+    fc_link(
+      'gruppenkonto',
+      "gruppen_id=$gruppen_id,text=Gruppenkonto..."
+    )
+  );
   
 medskip();
 
@@ -177,8 +225,12 @@ if( hat_dienst(5) and ! $readonly ) {
         form_row_text( 'Name:', 'newName', 20 );
         form_row_text( 'Email:', 'newMail', 24 );
         form_row_text( 'Telefon:', 'newTelefon', 20 );
-        open_tr(); open_td( 'label', '', 'Diensteinteilung:'); open_td( 'kbd', '', dienst_selector('') ); 
-        open_tr(); open_td( 'right', "colspan='2'" ); submission_button();
+        open_tr();
+          open_td( 'label', '', 'Diensteinteilung:');
+          open_td( 'kbd', '', dienst_selector('') );
+        open_tr();
+          open_td( 'right', "colspan='2'" );
+          submission_button();
       close_table();
     close_form();
   close_fieldset();
@@ -186,5 +238,3 @@ if( hat_dienst(5) and ! $readonly ) {
 medskip();
 
 close_fieldset();
-
-?>

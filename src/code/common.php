@@ -1,9 +1,14 @@
 <?php
+/**
+ * - check configuration (and fail on problems)
+ */
 
-// if( ! isset( $foodsoftpath ) ) {
-//   $foodsoftpath = realpath( dirname( __FILE__ ) . '/../' );
-// }
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 global $foodsoftdir;   // nötig wenn aufruf aus wiki
+
 if( ! isset( $foodsoftdir ) ) {
   $foodsoftdir = preg_replace( '#/[^/]+$#', '', $_SERVER['SCRIPT_NAME'] );
   // ausnahme: aufruf aus dem wiki heraus:
@@ -11,6 +16,13 @@ if( ! isset( $foodsoftdir ) ) {
 }
 
 require_once('code/config.php');
+// this sets:
+// $allow_setup_from
+// $db_name
+// $db_pwd
+// $db_server
+// $db_user
+// $foodsoftdir
 
 if( $allow_setup_from ) {
   ?>
@@ -23,13 +35,13 @@ if( $allow_setup_from ) {
   exit(1);
 }
 
-// lese low-level Funktionen, die keine Datenbankverbindung benötigen:
-//
+/* import low-level modules not requiring a DB connection */
 require_once('code/err_functions.php');
 require_once('code/html.php');
 
-// verbindung gleich aufbauen:
+/* establish DB connection */
 global $db_handle;
+
 if(
   ! ( $db_handle = mysqli_connect($db_server,$db_user,$db_pwd ) ) ||
   ! mysqli_select_db( $db_handle, $db_name )
@@ -49,12 +61,20 @@ require_once('leitvariable.php');
 foreach( $leitvariable as $name => $props ) {
   global $$name;
   $result = mysqli_query( $db_handle, "SELECT * FROM leitvariable WHERE name='$name'" );
-  if( $result and ( $row = mysqli_fetch_array( $result ) ) ) {
+  if( $result && ( $row = mysqli_fetch_array( $result ) ) ) {
     $$name = $row['value'];
   } else {
     $$name = $props['default'];
   }
 }
+
+// the above code is setting:
+// $basar_id
+// $bulletin_board
+// $database_version
+// $motd (message of the day)
+// $muell_id
+// ...and more, see leitvariable.php
 
 global
   $mysqlheute,
@@ -77,7 +97,7 @@ $muell_id or error( "Spezielle Müll-Gruppe nicht gesetzt (in tabelle leitvariab
 $specialgroups[] = $basar_id;
 $specialgroups[] = $muell_id;
 
-// $self_fields: parameter, die in der url übergeben werden, werden hier gesammelt
+// $self_(post_)fields: for storing GET/POST parameters */
 global
   $self_fields,
   $self_post_fields;
@@ -95,14 +115,35 @@ global
   $login_gruppen_name,
   $session_id;
 
-  $angemeldet = false;
+$angemeldet = false;
 
 require_once('structure.php');
+// this sets: $tables
+
 require_once('code/views.php');
+// this sets:
+// PR_COL_* constants
+// PR_ROW_* constants
+
 require_once('code/inlinks.php');
+// this imports just functions
+
 require_once('code/zuordnen.php');
+// this sets:
+// $from_dokuwiki
+// $itan
+// $masseinheiten
+// $wochentage
+// BESTELLZUORDNUNG_ART_* constants
+// GRUPPEN_OPT_* constants
+// PFAND_OPT_* constants
+// STATUS_* constants (indicating order status)
+
 require_once('code/forms.php');
+// this imports just functions
+
 require_once('code/katalogsuche.php');
+// this imports just functions
 
 update_database($database_version);
 

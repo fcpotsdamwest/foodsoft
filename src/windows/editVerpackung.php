@@ -1,4 +1,20 @@
 <?PHP
+/**
+ * editVerpackung.php
+ *
+ * @param string $action
+ * * save
+ * @param int $verpackung_id
+ * @param int $name
+ * @param int $wert
+ * @param int $mwst
+ * @param int $lieferanten_id
+ */
+global
+  $angemeldet,
+  $db_handle,
+  $readonly;
+
 assert( $angemeldet ) or exit();
 
 $editable = ( hat_dienst(4) and ! $readonly );
@@ -76,8 +92,12 @@ open_form( '', 'action=save' );
           }
     close_table();
 
-    if( $verpackung_id and $editable and ! $done )
-      open_div( 'kommentar', '', "Hinweis: Änderungen (Preis, MWSt) wirken sich auch rückwirkend auch auf alte Abrechnungen aus!" );
+    if( $verpackung_id && $editable && ! $done )
+      open_div(
+        'kommentar',
+        '',
+        "Hinweis: Änderungen (Preis, MWSt) wirken sich auch rückwirkend auch auf alte Abrechnungen aus!"
+      );
 
   close_fieldset();
 close_form();
