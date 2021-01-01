@@ -145,7 +145,12 @@ function katalog_update(
 // und um mit der existierenden datenbank kompatibel zu bleiben:
 //
 function upload_bnn( $katalogformat ) {
-  global $db_handle, $katalogkw, $lieferanten_id;
+  global
+    $db_handle,
+    $katalog_mwst_reduziert,
+    $katalog_mwst_standard,
+    $katalogkw,
+    $lieferanten_id;
 
   $klines = file( $_FILES['katalog']['tmp_name'] );
 
@@ -277,10 +282,10 @@ function upload_bnn( $katalogformat ) {
 
     switch( trim( $splitline[33] ) ) {
       case '1':
-        $mwst = "5.00";
+        $mwst = $katalog_mwst_reduziert;
         break;
       case '2':
-        $mwst = "16.00";
+        $mwst = $katalog_mwst_standard;
         break;
       default:
         break;

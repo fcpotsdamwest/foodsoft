@@ -4906,8 +4906,35 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 31 ) );
       logger( 'update_database: update to version 31 successful' );
+    
+    case 31:
+      /* Version 1032: add config items for VAT to the `leitvariable` table
+       ` (as we are out of sync with upstream here, we use a different version count)
+       */
+      logger( 'starting update_database: from version 31' );
 
+      sql_insert(
+        'leitvariable', [
+          'name' => 'katalog_mwst_reduziert',
+          'value' => '7.00',
+          'comment' => 'Reduzierter MwSt-Satz beim BNN-Import',
+        ]
+      );
+      sql_insert(
+        'leitvariable', [
+          'name' => 'katalog_mwst_standard',
+          'value' => '19.00',
+          'comment' => 'Standard-MwSt-Satz beim BNN-Import',
+        ]
+      );
 
+      sql_update(
+        'leitvariable',
+        [ 'name' => 'database_version' ],
+        [ 'value' => 1032 ]
+      );
+
+      logger( 'update_database: update to version 1032 successful' );
 	}
 }
 
