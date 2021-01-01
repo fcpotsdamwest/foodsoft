@@ -161,15 +161,15 @@ function upload_bnn( $katalogformat ) {
 
   $tag = 'Tr'; // Bode, Grell: nur ein Katalog, entspricht "Trocken" bei Terra
 
-  if( preg_match( '/;"Terra Naturkost /', $fuehrungssatz ) ) {
+  if( preg_match( '/;"?Terra Naturkost /', $fuehrungssatz ) ) {
     // Terra: unterscheidet 4 Kataloge:
-    if( preg_match( '/;"[^"]*(Obst|O&G)/', $fuehrungssatz ) )
+    if( preg_match( '/;"?[^"]*(Obst|O&G)/', $fuehrungssatz ) )
       $tag = 'OG';
-    else if( preg_match( '/;"(Naturdrog|Drog)/', $fuehrungssatz ) )
+    else if( preg_match( '/;"?(Naturdrog|Drog)/', $fuehrungssatz ) )
       $tag = 'drog';
-    else if( preg_match( '/;"Trocken/', $fuehrungssatz ) )
+    else if( preg_match( '/;"?Trocken/', $fuehrungssatz ) )
       $tag = 'Tr';
-    else if( preg_match( '/;"Frisch/', $fuehrungssatz ) )
+    else if( preg_match( '/;"?Frisch/', $fuehrungssatz ) )
       $tag = 'Fr';
     else
       error( 'Terra: Katalogformat nicht erkannt' );
