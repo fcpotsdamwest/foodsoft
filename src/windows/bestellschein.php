@@ -41,8 +41,23 @@ get_http_var( 'besteller_name', 'H', $coopie_name );
 get_http_var( 'action', 'w', '' );
 $readonly && $action = '';
 
+function encodeCSV(&$value, $key){
+    $value = iconv('UTF-8', 'Windows-1252', $value);
+}
+
+/**
+ * Generate a CSV export file with order data
+ *
+ * This was created for use with Terra for now
+ * Some implementation details were adjusted according to Terra requests:
+ * - use semicolon as CSV delimiter/separator
+ * - use WINDOWS-1252 encoding
+ * - the seletion of exported data columns fits the structure of Terra
+ *   fax order forms
+ */
 function exportCsv() {
     global $bestellung, $lieferant;
+    $separator = ';';
     $produkte = sql_bestellung_produkte( $bestellung['id'] );
     $fp = fopen('php://output', 'w');
     $fileName = implode('_', ['Bestellung', $lieferant['name'], $lieferant['kundennummer'], $bestellung['lieferdatum_trad']]) . ".csv";
@@ -52,7 +67,8 @@ function exportCsv() {
         header('Pragma: no-cache');
         header('Expires: 0');
         $head = ['produkt', 'bestell_nr', 'anzahl_gebinde'];
-        fputcsv($fp, $head);
+        array_walk($head, 'encodeCSV');
+        fputcsv($fp, $head, $separator);
         foreach ($produkte as $produkt_row) {
             $gebinde = $produkt_row['liefermenge'] / $produkt_row['gebindegroesse'];
             if ( $gebinde < 1 ) continue;
@@ -61,7 +77,8 @@ function exportCsv() {
                 $produkt_row['bestellnummer'],
                 $produkt_row['liefermenge'] / $produkt_row['gebindegroesse'],
             ];
-            fputcsv($fp, $record);
+            array_walk($record, 'encodeCSV');
+            fputcsv($fp, $record, $separator);
         }
     }
 }
