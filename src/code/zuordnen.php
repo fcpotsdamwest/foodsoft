@@ -4116,9 +4116,40 @@ function sql_insert_produktpreis (
 
 
 global $masseinheiten;
-$masseinheiten = array( 'g', 'ml', 'ST', 'GB', 'KI', 'PA', 'GL', 'BE', 'DO', 'BD', 'BT', 'KT', 'FL', 'EI', 'KA', 'SC', 'NE', 'EA', 'TA', 'TÜ', 'TÖ', 'SET', 'BTL', 'TU', 'KO', 'SCH', 'BOX', 'BX', 'VPE' );
+$masseinheiten = array(
+    'BD',
+    'BE',
+    'BOX',
+    'BT',
+    'BTL', // Beutel
+    'BX',
+    'DO',
+    'EA',
+    'EI',
+    'FL',
+    'g',   // Gramm
+    'GB',
+    'GL',
+    'KA',
+    'KI',
+    'KO',
+    'KT',
+    'ml',
+    'NE',
+    'PA',
+    'SC',
+    'SCH',
+    'SET',
+    'ST',
+    'TA',
+    'TO',  // Topf
+    'TU',
+    'TÖ',
+    'TÜ',
+    'VPE', // Verpackungseinheit
+);
 
-// kanonische_einheit: zerlegt $einheit in kanonische einheit und masszahl:
+// kanonische_einheit: zerlegt $einheit in kanonische einheit und maßzahl:
 // 
 function kanonische_einheit( $einheit, $die_on_error = true ) {
   global $masseinheiten;

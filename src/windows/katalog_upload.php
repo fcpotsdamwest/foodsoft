@@ -315,7 +315,8 @@ function upload_bnn( $katalogformat ) {
     $netto = $splitline[37];
     $netto = sprintf( "%.2lf", preg_replace( '/,/', '.', trim( $netto ) ) );
 
-    if( ( $netto < 0.01 ) || ( $mwst < 0 ) || ! ( list( $m, $e ) = kanonische_einheit( $einheit, false ) ) ) {
+    /* Allow for products with price/VAT 0, e.g. deposit form pad */
+    if( ( $netto < 0 ) || ( $mwst < 0 ) || ! ( list( $m, $e ) = kanonische_einheit( $einheit, false ) ) ) {
       open_div( 'warn', '', "Fehler bei Auswertung der Zeile: [einheit:$einheit,netto:$netto,mwst:$mwst] $line " );
       continue;
     }
