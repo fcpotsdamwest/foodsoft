@@ -58,6 +58,8 @@ if( ! $bestell_id )
 $lieferanten_id = $gesamtbestellung['lieferanten_id'];
 $lieferant = sql_lieferant( $lieferanten_id );
 
+$scroll_to_product = null;
+
 get_http_var( 'action', 'w', '' );
 if( $readonly )
   $action = '';
@@ -65,6 +67,8 @@ switch( $action ) {
   case 'produkt_hinzufuegen':
     need_http_var( 'produkt_id', 'U' );
     sql_insert_bestellvorschlag( $produkt_id, $bestell_id );
+    $scroll_to_product = $produkt_id;
+    $js_on_exit[] = "scrollToMarkedProduct();";
     break;
   case 'bestellen':
     $gesamtpreis = 0;
@@ -463,6 +467,12 @@ if( ! $readonly ) {
             snackBar.className = snackBar.className.replace("show", "");
         }, 8000);
     }
+    
+    function scrollToMarkedProduct() {
+      const markedProduct = document.querySelector('#scroll-me-into-view');
+      markedProduct.scrollIntoView({behavior: 'auto', block: 'center'});
+      markedProduct.classList.add('background-flash');
+    }
   </script>
   <?php
 
@@ -601,7 +611,11 @@ foreach( $produkte as $produkt ) {
   hidden_input( "fest_$n", "$festmenge", "id='fest_$n'" );
   hidden_input( "toleranz_$n", "$toleranzmenge", "id='toleranz_$n'" );
 
-  open_td();
+    if ( $produkt_id === $scroll_to_product ) {
+        open_td('', 'id="scroll-me-into-view"');
+    } else {
+        open_td();
+    }
     open_span('oneline', '', $produkt['produkt_name']);
     open_span('small floatright', 'title="Quelle: Lieferantenkatalog"', catalogue_product_details($katalogeintrag) );
     open_div('small', '', $produkt['notiz']);

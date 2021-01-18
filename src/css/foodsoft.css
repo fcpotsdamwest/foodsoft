@@ -1254,3 +1254,26 @@ td {
   -moz-animation-name: blink;
   -moz-animation-timing-function: ease-in-out;
 }
+
+@-webkit-keyframes background_flash {
+  from { background-color: #ff00007f; }
+  to { background-color: inherit; }
+}
+@-moz-keyframes background_flash {
+  from { background-color: #ff00007f; }
+  to { background-color: inherit; }
+}
+@-o-keyframes background_flash {
+  from { background-color: #ff00007f; }
+  to { background-color: inherit; }
+}
+@keyframes background_flash {
+  from { background-color: #ff00007f; }
+  to { background-color: inherit; }
+}
+td.background-flash {
+  -webkit-animation: background_flash 0.8s ease-in-out 1s 2; /* Safari 4+ */
+  -moz-animation:    background_flash 0.8s ease-in-out 1s 2; /* Fx 5+ */
+  -o-animation:      background_flash 0.8s ease-in-out 1s 2; /* Opera 12+ */
+  animation:         background_flash 0.8s ease-in-out 1s 2; /* IE 10+ */
+}
