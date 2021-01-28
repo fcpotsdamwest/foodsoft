@@ -18,6 +18,27 @@ need_http_var( 'katalogkw', 'w' );
 
 open_div( '', '', "Katalog einlesen: Lieferant: {$lieferant['name']} / gültig: $katalogkw" );
 
+if (isset($_FILES['katalog']['error'])) {
+  $phpFileUploadErrors = array(
+      0 => 'There is no error, the file uploaded with success',
+      1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+      2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+      3 => 'The uploaded file was only partially uploaded',
+      4 => 'No file was uploaded',
+      6 => 'Missing a temporary folder',
+      7 => 'Failed to write file to disk.',
+      8 => 'A PHP extension stopped the file upload.',
+  );
+
+  $code = $_FILES['katalog']['error'];
+  $message = $phpFileUploadErrors[$code];
+
+  if ( $code === 0 ) {
+    echo "{$message}\n";
+  } else {
+    error ("Fehler beim Upload: $message (Code $code)");
+  }
+}
 
 function katalog_update(
   $lieferant_id, $tag, $katalogkw
@@ -179,10 +200,10 @@ function upload_bnn( $katalogformat ) {
   $pattern = '/^\d+;[ANWRXV];/';
   $splitat = '/;/';
 
-  $n = 0;
+  $lineCount = 0;
   $success = 0;
   foreach ( $klines as $line ) {
-    if( $n++ > 9999 )
+    if( $lineCount++ > 9999 )
       break;
     $line = iconv( "CP850", "UTF-8", $line );
 
@@ -294,7 +315,8 @@ function upload_bnn( $katalogformat ) {
     $netto = $splitline[37];
     $netto = sprintf( "%.2lf", preg_replace( '/,/', '.', trim( $netto ) ) );
 
-    if( ( $netto < 0.01 ) || ( $mwst < 0 ) || ! ( list( $m, $e ) = kanonische_einheit( $einheit, false ) ) ) {
+    /* Allow for products with price/VAT 0, e.g. deposit form pad */
+    if( ( $netto < 0 ) || ( $mwst < 0 ) || ! ( list( $m, $e ) = kanonische_einheit( $einheit, false ) ) ) {
       open_div( 'warn', '', "Fehler bei Auswertung der Zeile: [einheit:$einheit,netto:$netto,mwst:$mwst] $line " );
       continue;
     }
@@ -307,7 +329,7 @@ function upload_bnn( $katalogformat ) {
     $success++;
   }
 
-  logger( "$katalogformat-Katalog erfasst: $tag / $katalogkw: erfolgreich geparst: $success Zeilen von $n" );
+  logger( "$katalogformat-Katalog erfasst: $tag / $katalogkw: erfolgreich geparst: $success Zeilen von $lineCount" );
   open_div( 'ok', '', 'finis.' );
 }
 
