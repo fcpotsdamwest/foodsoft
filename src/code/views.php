@@ -144,11 +144,12 @@ function ean_view( $ean, $length = 20, $fieldname = false, $attr = '', $with_lin
 }
 
 function ean_links( $ean ) {
-  if (!$ean)
-    return '';
+  $external_link_attributes = "ref='external noopener noreferrer' target='_blank'";
   $s = '';
-  $s .= "<a title='ecoinform' target='_blank' href='http://www.ecoinform.de/Suche.Liste;$ean.1.html'>[e]</a>";
-  $s .= "<a title='Google' target='_blank' href='http://google.de/search?q=$ean'>[g]</a>";
+  if (isset($ean)) {
+    $s .= "<a $external_link_attributes title='ecoinform' href='http://www.ecoinform.de/Suche.Liste;$ean.1.html'>[e]</a>";
+    $s .= "<a $external_link_attributes title='Google' href='http://google.de/search?q=$ean'>[g]</a>";
+  }
   return $s;
 }
 
@@ -2180,7 +2181,7 @@ function join_details( &$details, $prefix, $value, $context = false ) {
   {
     if ( $context && $acronym_details = current(sql_catalogue_acronym($context, $value))) {
       if ($acronym_details['url']) {
-        $value = "<a title='$value' "
+        $value = "<a rel='external noopener noreferrer' target='_blank' title='$value' "
             . "href='{$acronym_details['url']}'>{$acronym_details['definition']}</a>";
       } else {
         $value = "<span title='$value'>{$acronym_details['definition']}</span>";

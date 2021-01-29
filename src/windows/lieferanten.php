@@ -49,7 +49,7 @@ foreach( sql_lieferanten() as $row ) {
     open_td('','', $row['fax'] );
     open_td('','', $row['mail'] );
     if( $row['url'] )
-      open_td('','',"<a href='{$row['url']}' title='zur Webseite des Lieferanten' target='_new'>{$row['url']}</a>" );
+      open_td('','',"<a rel='external noopener noreferrer' href='{$row['url']}' title='zur Webseite des Lieferanten' target='_blank'>{$row['url']}</a>" );
     else
       open_td('','','-');
     open_td('number','', price_view( $kontostand ) );
