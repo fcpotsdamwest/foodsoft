@@ -21,8 +21,7 @@ wd_clean || DIRTY='-dirty'
 echo "<a rel="noreferrer noopener" target="_blank" href='http://github.com/fcpotsdamwest/foodsoft/commit/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >src/version.txt
 
 EOF
-  git ls-files src/ | xargs stat -c "chmod %a %n"
-  # find . -path ./.git -prune -o -exec stat -c "chmod %a %n" \{} \;
+  git ls-files | xargs stat -c "chmod %a %n"
   echo "chmod 700 .git"
 } > deploy.sh
 

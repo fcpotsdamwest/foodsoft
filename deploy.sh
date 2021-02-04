@@ -16,6 +16,32 @@ DIRTY=""
 wd_clean || DIRTY='-dirty'
 echo "<a rel="noreferrer noopener" target="_blank" href='http://github.com/fcpotsdamwest/foodsoft/commit/$COMMIT_FULL'>$BRANCH-$COMMIT$DIRTY</a>" >src/version.txt
 
+chmod 644 .gitattributes
+chmod 644 .gitignore
+chmod 644 GITHOOKS
+chmod 644 INSTALL
+chmod 644 README.md
+chmod 644 ToDo.txt
+chmod 644 apache.sample.conf
+chmod 644 db/mwst.sql
+chmod 755 deploy.sh
+chmod 644 dev/.env.sample
+chmod 644 dev/db/config/foodsoft.cnf
+chmod 644 dev/docker-compose.yml
+chmod 644 dev/web/Containerfile.php7
+chmod 644 dev/web/Containerfile.php8
+chmod 644 dev/web/assets/foodsoft.conf
+chmod 644 dev/web/assets/start-web.sh
+chmod 644 docs/files_und_skripte
+chmod 644 docs/links_und_parameter
+chmod 644 dokuwiki_auth_plugin/authfoodsoft/README
+chmod 644 dokuwiki_auth_plugin/authfoodsoft/auth/authentication.php
+chmod 644 dokuwiki_auth_plugin/authfoodsoft/lang/en/lang.php
+chmod 644 dokuwiki_auth_plugin/authfoodsoft/plugin.info.txt
+chmod 755 git-hooks/post-checkout
+chmod 755 git-hooks/post-commit
+chmod 755 git-hooks/post-merge
+chmod 755 git-hooks/pre-commit
 chmod 644 src/code/common.php
 chmod 644 src/code/config.php
 chmod 644 src/code/err_functions.php
