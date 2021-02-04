@@ -8,8 +8,6 @@ reduziert falsch-positive Antworten
 
 Preishistorie in Scrollbox
 
-Neuen Preiseintrag sofort aktivieren
-
 Gruppenkontostand / Daten jede Woche einmal in Archiv mailen
 
 Wunderrechner: Verteilmengen an gegebenen bekannten Basarbestand anpassen.
@@ -26,4 +24,3 @@ need php5_mysql
 need php5_posix
 
 git: testing...
-
