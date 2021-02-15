@@ -148,22 +148,22 @@ if( ! $readonly ) {
 
   ?>
   <script type="text/javascript">
-    var anzahl_produkte = <?php echo count( $produkte ); ?>;
-    var kontostand = <?php printf( "%.2lf", $kontostand ); ?>;
-    var gesamtpreis = 0.00;
-    var aufschlag = <?php printf( "%.2lf", $gesamtbestellung['aufschlag'] ); ?>;
-    var toleranz_default_faktor = <?php printf( "%.3lf", 0.001 + $toleranz_default / 100.0 ); ?>;
-    var gebindegroesse     = new Array();
-    var preis              = new Array();
-    var kosten             = new Array();
-    var fest_alt           = new Array();   // festbestellmenge der gruppe bisher
-    var fest               = new Array();   // festbestellmenge der gruppe aktuell
-    var fest_andere        = new Array();   // festbestellmenge anderer gruppen
-    var zuteilung_fest_alt = new Array();
-    var toleranz_alt       = new Array();
-    var toleranz           = new Array();
-    var toleranz_andere    = new Array();
-    var verteilmult        = new Array();
+    const anzahl_produkte = <?php echo count( $produkte ); ?>;
+    let kontostand = <?php printf( "%.2lf", $kontostand ); ?>;
+    let gesamtpreis = 0.00;
+    const aufschlag = <?php printf( "%.2lf", $gesamtbestellung['aufschlag'] ); ?>;
+    const toleranz_default_faktor = <?php printf( "%.3lf", 0.001 + $toleranz_default / 100.0 ); ?>;
+    let gebindegroesse     = [];
+    let preis              = [];
+    let kosten             = [];
+    let fest_alt           = [];   // festbestellmenge der gruppe bisher
+    let fest               = [];   // festbestellmenge der gruppe aktuell
+    let fest_andere        = [];   // festbestellmenge anderer gruppen
+    let zuteilung_fest_alt = [];
+    let toleranz_alt       = [];
+    let toleranz           = [];
+    let toleranz_andere    = [];
+    let verteilmult        = [];
 
     const verticalScroll = <?php print ( isset($vertical_scroll) ? (int)$vertical_scroll : 0 ); ?>;
 
@@ -183,86 +183,103 @@ if( ! $readonly ) {
       zuteilung_berechnen( produkt, true );
     }
 
+    /**
+     * Calculate the amount of the product that is assigned to the ordering group
+     *
+     * @param {number} produkt - product id
+     * @param {boolean} init - true for initial rendering,
+     *   false means that a change in the data triggered the call
+     */
     function zuteilung_berechnen( produkt, init ) {
-      var festmenge, toleranzmenge, gebinde, bestellmenge, restmenge, zuteilung_fest, t_min;
-      var menge, quote, zuteilung_toleranz, kosten_neu, reminder, konto_rest, kontostand_neu;
-      var id;
 
-      // bestellmenge berechnen: wieviel kann insgesamt bestellt werden:
+      // assign shorthand names for improved readability and performance
+      const gebindemenge = gebindegroesse[produkt];
+      const _fest = fest[produkt];
+      const _fest_alt = fest_alt[produkt];
+      const _fest_andere = fest_andere[produkt];
+      const _toleranz = toleranz[produkt];
+      const _toleranz_alt = toleranz_alt[produkt];
+      const _toleranz_andere = toleranz_andere[produkt];
+      const _verteilmult = verteilmult[produkt];
+
+      // bestellmenge berechnen: wieviel kann insgesamt bestellt werden?
       //
-      festmenge = fest_andere[produkt] + fest[produkt];
-      toleranzmenge = toleranz_andere[produkt] + toleranz[produkt];
+      const festmenge = _fest_andere + _fest;
+      const toleranzmenge = _toleranz_andere + _toleranz;
 
+      // anzahl der zu bestellenden gebinde berechnen
       // volle fest bestellte gebinde:
       //
-      gebinde = Math.floor( festmenge / gebindegroesse[produkt] );
+      let gebinde = Math.floor( festmenge / gebindemenge );
 
       // falls angebrochenes gebinde: wenn möglich, mit toleranz auffüllen:
       //
-      if( gebinde * gebindegroesse[produkt] < festmenge )
-        if( (gebinde+1) * gebindegroesse[produkt] <= festmenge + toleranzmenge )
+      let bestellmenge = gebinde * gebindemenge;
+      if( bestellmenge < festmenge )
+        if( bestellmenge + gebindemenge <= festmenge + toleranzmenge ) {
           gebinde++;
-      bestellmenge = gebinde * gebindegroesse[produkt];
+          bestellmenge += gebindemenge;
+        }
 
-      restmenge = bestellmenge;
-      zuteilung_fest = 0;
-      if( fest[produkt] >= fest_alt[produkt] ) {
+      let restmenge = bestellmenge;
+      let zuteilung_fest = 0;
+      if( _fest >= _fest_alt ) {
 
         // falls festmenge höher oder gleichgeblieben:
         // gruppe kriegt mindestens das, was schon vorher zugeteilt worden wäre:
         //
-        menge = Math.min( zuteilung_fest_alt[produkt], restmenge );
+        let menge = Math.min( zuteilung_fest_alt[produkt], restmenge );
         zuteilung_fest += menge;
         restmenge -= menge;
 
         // ...dann werden, soweit möglich, die anderen festbestellungen erfüllt:
         //
-        menge = Math.min( fest_andere[produkt], restmenge );
+        menge = Math.min( _fest_andere, restmenge );
         restmenge -= menge;
 
         // ...dann wird die zuteilung der gruppe, soweit möglich, aufgestockt:
         //
-        menge = Math.min( fest[produkt] - zuteilung_fest, restmenge );
-        zuteilung_fest += menge; restmenge -= menge;
+        menge = Math.min( _fest - zuteilung_fest, restmenge );
+        zuteilung_fest += menge;
+        restmenge -= menge;
 
       } else {
 
         // festmenge wurde reduziert:
         // erstmal werden die anderen gruppen berücksichtigt...
         //
-        menge = Math.min( fest_andere[produkt], restmenge );
+        let menge = Math.min( _fest_andere, restmenge );
         restmenge -= menge;
 
         // ...und erst dann die gruppe, die reduziert hat:
         //
-        menge = Math.min( fest[produkt], restmenge );
-        zuteilung_fest += menge; restmenge -= menge;
+        menge = Math.min( _fest, restmenge );
+        zuteilung_fest += menge;
+        restmenge -= menge;
 
       }
 
       // falls noch toleranz berücksichtigt wird: möglichst gleichmäßig nach quote verteilen:
       //
+      let quote, zuteilung_toleranz;
       if( restmenge > 0 ) {
-        quote = restmenge / ( toleranz_andere[produkt] + toleranz[produkt] );
-        menge = Math.min( Math.ceil( toleranz[produkt] * quote ), restmenge );
-        zuteilung_toleranz = menge;
+        quote = restmenge / ( _toleranz_andere + _toleranz );
+        zuteilung_toleranz = Math.min( Math.ceil( _toleranz * quote ), restmenge );
       } else {
         zuteilung_toleranz = 0;
       }
 
       // anzeige gesamt aktualisieren:
       //
-      if( festmenge )
-        s = festmenge * verteilmult[produkt];
-      else
-        s = '0';
+      let anzeige_gesamt;
+      anzeige_gesamt = (festmenge * _verteilmult).toString();
       if( toleranzmenge > 0 )
-        s = s + ' ... ' + (festmenge + toleranzmenge) * verteilmult[produkt];
-      document.getElementById('gv_'+produkt).firstChild.nodeValue = s;
+        anzeige_gesamt += ' ... ' + ((festmenge + toleranzmenge) * _verteilmult).toString();
+      document.getElementById('gv_'+produkt).firstChild.nodeValue = anzeige_gesamt;
 
       if( gebinde > 0 ) {
         document.getElementById('g_'+produkt).className = 'highlight';
-        document.getElementById('gg_'+produkt).firstChild.nodeValue = gebinde;
+        document.getElementById('gg_'+produkt).firstChild.nodeValue = gebinde.toString();
       } else {
         document.getElementById('gg_'+produkt).firstChild.nodeValue = '0';
         if( festmenge + toleranzmenge > 0 ) {
@@ -271,10 +288,10 @@ if( ! $readonly ) {
           document.getElementById('g_'+produkt).className = '';
         }
       }
-      gwidth = document.getElementById('g_'+produkt).offsetWidth;
-      toleranzmax = Math.min( gebindegroesse[produkt] - 1, toleranzmenge );
+      const gwidth = document.getElementById('g_'+produkt).offsetWidth;
+      const toleranzmax = Math.min( gebindemenge - 1, toleranzmenge );
       if( gwidth > 40 ) {
-        nw = Math.floor( gwidth * ( ( festmenge + toleranzmax ) / gebindegroesse[produkt] - gebinde ) );
+        const nw = Math.floor( gwidth * ( ( festmenge + toleranzmax ) / gebindemenge - gebinde ) ).toString();
         document.getElementById('gi_'+produkt).style.width = ( nw + 'px' );
         document.getElementById('gi_'+produkt).style.marginRight = ((-nw) + 'px');
         document.getElementById('g_'+produkt).style.offsetWidth = gwidth;
@@ -282,41 +299,43 @@ if( ! $readonly ) {
 
       // anzeige gruppe aktualisieren:
       //
-      s = fest[produkt] * verteilmult[produkt];
-      var toleranzNode = document.getElementById('t_'+produkt);
+      let anzeige_gruppe;
+      anzeige_gruppe = _fest * _verteilmult;
+      const toleranzNode = document.getElementById('t_'+produkt);
       
       // also show when tolerance changed for marking change by color
-      if( toleranz[produkt] > 0 || toleranz_alt[produkt] != toleranz[produkt] ) {
-        s = s + ' ... ';
-        toleranzNode.firstChild.nodeValue = ( fest[produkt] + toleranz[produkt] ) * verteilmult[produkt];
+      if( _toleranz > 0 || _toleranz_alt !== _toleranz ) {
+        anzeige_gruppe += ' ... ';
+        toleranzNode.firstChild.nodeValue = (( _fest + _toleranz ) * _verteilmult).toString();
       } else {
         toleranzNode.firstChild.nodeValue = ' ';
       }
       
-      var festNode = document.getElementById('f_'+produkt);
-      festNode.firstChild.nodeValue = s;
+      const festNode = document.getElementById('f_'+produkt);
+      festNode.firstChild.nodeValue = anzeige_gruppe;
       
       // highlight changes
       if (!init) {
-        set_class(festNode, 'changed', fest[produkt] != fest_alt[produkt]);
+        set_class(festNode, 'changed', _fest !== _fest_alt);
         set_class(
             toleranzNode, 
             'changed', 
-            fest[produkt] + toleranz[produkt] != fest_alt[produkt] + toleranz_alt[produkt]);
+            _fest + _toleranz !== _fest_alt + _toleranz_alt
+        );
       }
 
       // update order form fields
-      document.getElementById('fest_'+produkt).value = fest[produkt];
-      document.getElementById('toleranz_'+produkt).value = toleranz[produkt];
+      document.getElementById('fest_'+produkt).value = _fest;
+      document.getElementById('toleranz_'+produkt).value = _toleranz;
 
       <?php if( ! hat_dienst(4) ) { ?>
-      zuteilung = zuteilung_fest + zuteilung_toleranz;
+      const zuteilung = zuteilung_fest + zuteilung_toleranz;
       if( zuteilung > 0 ) {
-        document.getElementById('z_'+produkt).firstChild.nodeValue = zuteilung * verteilmult[produkt];
+        document.getElementById('z_'+produkt).firstChild.nodeValue = (zuteilung * _verteilmult).toString();
         document.getElementById('zt_'+produkt).className = 'center highlight';
       } else {
         document.getElementById('z_'+produkt).firstChild.nodeValue = '0';
-        if( fest[produkt] + toleranz[produkt] > 0 ) {
+        if( _fest + _toleranz > 0 ) {
           document.getElementById('zt_'+produkt).className = 'center crit';
         } else {
           document.getElementById('zt_'+produkt).className = 'center';
@@ -326,10 +345,11 @@ if( ! $readonly ) {
 
       // kosten und neuen kontostand berechnen und anzeigen:
       //
-      kosten_neu = preis[produkt] * ( fest[produkt] + toleranz[produkt] );
+      const kosten_neu = preis[produkt] * ( _fest + _toleranz );
       gesamtpreis += ( kosten_neu - kosten[produkt] );
       kosten[produkt] = kosten_neu;
-      if( ( fest[produkt] + toleranz[produkt] ) > 0 ) {
+      let tag;
+      if( ( _fest + _toleranz ) > 0 ) {
         document.getElementById('k_'+produkt).firstChild.nodeValue = kosten_neu.toFixed(2);
         // document.getElementById('m_'+produkt).firstChild.nodeValue = ( fest[produkt] + toleranz[produkt] );
         if( <?php printf( hat_dienst(4) ? "gebinde" : "zuteilung" ); ?> > 0 ) {
@@ -347,8 +367,8 @@ if( ! $readonly ) {
 
       document.getElementById('gesamtpreis1').firstChild.nodeValue = gesamtpreis.toFixed(2);
       document.getElementById('gesamtpreis2').firstChild.nodeValue = gesamtpreis.toFixed(2);
-      kontostand_neu = ( kontostand - gesamtpreis ).toFixed(2);
-      konto_rest = document.getElementById('konto_rest');
+      const kontostand_neu = ( kontostand - gesamtpreis ).toFixed(2);
+      const konto_rest = document.getElementById('konto_rest');
       konto_rest.firstChild.nodeValue = kontostand_neu;
 
       if( ( gesamtpreis > 0.005 ) && ( gesamtpreis > kontostand ) ) {
@@ -362,7 +382,7 @@ if( ! $readonly ) {
         document.getElementById('submit').firstChild.nodeValue = 'Bestellung Speichern';
       }
 
-      if( ! init ) {
+      if( !init ) {
         reminder_on();
       }
 
@@ -370,8 +390,8 @@ if( ! $readonly ) {
     }
 
     function reminder_on() {
-      var reminder = document.getElementById('floating_submit_button_<?php echo $bestellform_id; ?>');
-      var footbar = document.getElementById('footbar');
+      const reminder = document.getElementById('floating_submit_button_<?php echo $bestellform_id; ?>');
+      const footbar = document.getElementById('footbar');
       while (footbar.firstChild) {
         footbar.removeChild(footbar.firstChild);
       }
@@ -380,7 +400,7 @@ if( ! $readonly ) {
       
       set_footbar(true);
       
-      id = document.getElementById('hinzufuegen');
+      const id = document.getElementById('hinzufuegen');
       while( id.firstChild ) {
         id.removeChild( id.firstChild );
       }
@@ -401,8 +421,7 @@ if( ! $readonly ) {
       zuteilung_berechnen( produkt, false );
     }
     function fest_plusplus( produkt ) {
-      var gebinde;
-      gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
+      const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       fest[produkt] = (gebinde+1) * gebindegroesse[produkt];
       zuteilung_berechnen( produkt, false );
     }
@@ -413,8 +432,7 @@ if( ! $readonly ) {
       }
     }
     function fest_minusminus( produkt ) {
-      var gebinde;
-      gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
+      const gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
       if( gebinde > 0 ) {
         fest[produkt] = gebinde * gebindegroesse[produkt];
         zuteilung_berechnen( produkt, false );
@@ -436,7 +454,7 @@ if( ! $readonly ) {
       }
     }
     function toleranz_auffuellen( produkt ) {
-      gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
+      const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       if( fest[produkt] - gebinde * gebindegroesse[produkt] > 0 ) {
         toleranz[produkt] = (gebinde+1) * gebindegroesse[produkt] - fest[produkt];
       } else {
@@ -444,7 +462,7 @@ if( ! $readonly ) {
       }
       zuteilung_berechnen( produkt, false );
     }
-    function bestellung_submit( produkt ) {
+    function bestellung_submit() {
       if( gesamtpreis > kontostand ) {
         alert( 'Kontostand nicht ausreichend!' );
       } else {
