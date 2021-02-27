@@ -2164,18 +2164,26 @@ function sql_bestellzuordnung_menge( $keys = array() ) {
 }
 
 
-// select_bestellung_produkte():
-// liefert für ein oder alle produkte einer bestellung (group by produkt):
-// - produktdaten und preise (preisdatenSetzen() sollte zusätzlich aufgerufen werden)
-// - gesamtbestellmenge
-// - festbestellmenge (gruppen _und_ basar)
-// - toleranzbestellmenge: alle toleranzebestellungen _ohne_ basar
-// - basarbestellmenge: _toleranzbestellungen_ des basars
-// - verteilmenge _ohne_ müllgruppe (nicht sinnvoll für basar: liefert nicht den basarbestand!)
-// - muellmenge: zuteilung an müll-gruppe
-// $gruppen_id = 0: summe aller gruppen
-// $gruppen_id != 0: nur für diese gruppe (muell*, basar* sind dann nicht sinnvoll)
-//
+
+/**
+ * select_bestellung_produkte
+ *
+ * Retrieves for one or several products within an order (GROUP BY produkt):
+ * - product data and price
+ * - total order amount
+ * - fixed order amount (groups _and_ bazaar)
+ * - tolerance order amount (only groups)
+ * - bazaar tolerance amount
+ * - distribution amount (without trash - also not suitable to get bazaar inventory!)
+ * - trash amount (assignment to trash bin)
+ *
+ * @param $bestell_id
+ * @param int $produkt_id
+ * @param int $gruppen_id - group id (not basar or muell)
+ *   If 0: Return sum for all groups
+ * @param string $orderby
+ * @return string
+ */
 function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
   $basar_id = sql_basar_id();
   $muell_id = sql_muell_id();
@@ -2304,15 +2312,26 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
   ";
 }
 
+
+/**
+ * sql_bestellung_produkte
+ *
+ * @param int $bestell_id
+ * @param int $produkt_id
+ * @param int $gruppen_id
+ * @param string $orderby
+ * @return array
+ */
 function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
-  $result = doSql( select_bestellung_produkte( $bestell_id, $produkt_id, $gruppen_id, $orderby ), LEVEL_KEY );
+  $result = doSql(
+      select_bestellung_produkte( $bestell_id, $produkt_id, $gruppen_id, $orderby ),
+      LEVEL_KEY
+  );
   $r = mysql2array( $result );
   foreach( $r as $key => $val )
     $r[ $key ] = preisdatenSetzen( $val );
   return $r;
 }
-
-
 
 
 /*  preisdaten setzen:
@@ -2402,16 +2421,25 @@ function preisdatenSetzen( $pr /* a row from produktpreise */ ) {
   return $pr;
 }
 
-// zuteilungen_berechnen():
-// wo benötigt, ist sql_bestellung_produkte() schon aufgerufen; zwecks effizienz übergeben wir der funktion
-// eine Ergebniszeile, um den komplexen query in sql_bestellung_produkte() nicht wiederholen zu müssen:
-//
-function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte */ ) {
-  $produkt_id = $mengen['produkt_id'];
-  $bestell_id = $mengen['gesamtbestellung_id'];
-  $gebindegroesse = $mengen['gebindegroesse'];
+/**
+ * zuteilungen_berechnen
+ *
+ * wo benötigt, ist sql_bestellung_produkte() schon aufgerufen
+ * zwecks effizienz übergeben wir der funktion eine Ergebniszeile,
+ * um den komplexen query in sql_bestellung_produkte() nicht wiederholen zu müssen
+ *
+ * @param $mengen - one row from sql_bestellung_produkte
+ * @return array
+ */
+function zuteilungen_berechnen( $mengen ) {
+  [
+    'produkt_id' => $produkt_id,
+    'gesamtbestellung_id' => $bestell_id,
+    'gebindegroesse' => $gebindegroesse,
+    'gesamtbestellmenge' => $gesamtbestellmenge,
+  ] = $mengen;
+
   $toleranzbestellmenge = $mengen['toleranzbestellmenge'] + $mengen['basarbestellmenge'];
-  $gesamtbestellmenge = $mengen['gesamtbestellmenge'];
   $festbestellmenge = $gesamtbestellmenge - $toleranzbestellmenge;
 
   $gebinde = (int)( $festbestellmenge / $gebindegroesse );
@@ -2427,21 +2455,31 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
 
   // erste zuteilungsrunde: festbestellungen in bestellreihenfolge erfüllen, dabei berechnete
   // negativ-toleranz abziehen:
-  //
-  $festbestellungen = sql_bestellzuordnungen( array( 'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG, 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id ) );
+  $festbestellungen = sql_bestellzuordnungen(
+    array(
+      'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG,
+      'bestell_id' => $bestell_id,
+      'produkt_id' => $produkt_id
+    )
+  );
+
   $festzuteilungen = array();
   $offen = array();
+
   foreach( $festbestellungen as $row ) {
+
     if( $restmenge <= 0 )
       break; // nix mehr da...
+
     $gruppe = $row['bestellgruppen_id'];
     $menge = $row['menge'];
-    if( isset( $offen[$gruppe] ) ) {
-      $offen[$gruppe] += $menge;
-    } else {
-      $offen[$gruppe] = $menge;
+
+    if( !isset( $offen[$gruppe] ) ) {
+      $offen[$gruppe] = 0;
       $festzuteilungen[$gruppe] = 0;
     }
+
+    $offen[$gruppe] += $menge;
 
     // negativ-toleranz ausrechnen und zurückbehalten (maximal ein halbes gebinde):
     //
@@ -2452,9 +2490,10 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
       $t_min = floor( $gebindegroesse / 2 );
     $menge -= $t_min;
 
-    if( $menge > $restmenge )
-      $menge = $restmenge;
+    /* we can only distribute as much as remains */
+    $menge = max($menge, $restmenge);
 
+    /* assign the calculated amount */
     $festzuteilungen[$gruppe] += $menge;
     $restmenge -= $menge;
     $offen[$gruppe] -= $menge;
@@ -2463,10 +2502,14 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
   // zweite zuteilungsrunde: ebenfalls in bestellreihenfolge noch offene festbestellungen erfüllen:
   //
   foreach( $festbestellungen as $row ) {
+
     if( $restmenge <= 0 )
       break;
+
     $gruppe = $row['bestellgruppen_id'];
+
     $menge = min( $row['menge'], $offen[$gruppe], $restmenge );
+
     $festzuteilungen[$gruppe] += $menge;
     $restmenge -= $menge;
     $offen[$gruppe] -= $menge;
@@ -2476,20 +2519,27 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
   //
   $toleranzzuteilungen = array();
   if( $toleranzbestellmenge > 0 ) {
-    $toleranzbestellungen = sql_bestellzuordnungen( array( 'art' => BESTELLZUORDNUNG_ART_TOLERANZBESTELLUNG, 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id ), '-menge' );
+    $toleranzbestellungen = sql_bestellzuordnungen(
+      array(
+        'art' => BESTELLZUORDNUNG_ART_TOLERANZBESTELLUNG,
+          'bestell_id' => $bestell_id,
+          'produkt_id' => $produkt_id
+      ),
+      '-menge'
+    );
     $quote = ( 1.0 * $restmenge ) / $toleranzbestellmenge;
     need( $quote <= 1 );
     foreach( $toleranzbestellungen as $row ) {
       if( $restmenge <= 0 )
         break;
       $gruppe = $row['bestellgruppen_id'];
+
       $menge = (int) ceil( $quote * $row['menge'] );
-      if( $menge > $restmenge )
-        $menge = $restmenge;
-      if( isset( $toleranzzuteilungen[$gruppe] ) ) // sollte nicht sein: nur _eine_ toleranzbestellung je gruppe!
+      $menge = max( $menge, $restmenge );
+
+      if( !isset( $toleranzzuteilungen[$gruppe] ) ) // sollte nicht sein: nur _eine_ toleranzbestellung je gruppe!
+        $toleranzzuteilungen[$gruppe] = 0;
         $toleranzzuteilungen[$gruppe] += $menge;
-      else
-        $toleranzzuteilungen[$gruppe] = $menge;
       $restmenge -= $menge;
     }
   }
@@ -2498,9 +2548,13 @@ function zuteilungen_berechnen( $mengen /* one row from sql_bestellung_produkte 
   //
   need( $restmenge == 0, "Fehler beim Verteilen: Rest: $restmenge bei Produkt {$mengen['produkt_name']}" );
 
-  return array( 'bestellmenge' => $bestellmenge, 'gebinde' => $gebinde, 'festzuteilungen' => $festzuteilungen, 'toleranzzuteilungen' => $toleranzzuteilungen );
+  return array(
+    'bestellmenge' => $bestellmenge,
+    'gebinde' => $gebinde,
+    'festzuteilungen' => $festzuteilungen,
+    'toleranzzuteilungen' => $toleranzzuteilungen
+  );
 }
-
 
 function select_liefermenge( $bestell_id, $produkt_id ) {
   return select_query( 'bestellvorschlaege', 'liefermenge', '', array( "gesamtbestellung_id = $bestell_id", "produkt_id = $produkt_id" ) );
@@ -2528,7 +2582,6 @@ function select_basarmenge( $bestell_id, $produkt_id ) {
          ) AS menge )";
 }
 
-
 function sql_liefermenge( $bestell_id, $produkt_id ) {
   return sql_select_single_field( select_liefermenge( $bestell_id, $produkt_id ), 'menge' );
 }
@@ -2544,8 +2597,6 @@ function sql_muellmenge( $bestell_id, $produkt_id ) {
 function sql_basarmenge( $bestell_id, $produkt_id ) {
   return sql_select_single_field( select_basarmenge( $bestell_id, $produkt_id ), 'menge' );
 }
-
-
 
 /**
  * select_basar:
@@ -2640,10 +2691,18 @@ function verteilmengenLoeschen( $bestell_id ) {
 }
 
 
+/**
+ * Assign final amounts to ordering groups
+ *
+ * @param int $bestell_id - id of gesamtbestellung
+ */
 function verteilmengenZuweisen( $bestell_id ) {
   $basar_id = sql_basar_id();
 
-  need( sql_bestellung_status($bestell_id)==STATUS_LIEFERANT , 'verteilmengenZuweisen: falscher Status der Bestellung' );
+  need(
+      sql_bestellung_status($bestell_id)==STATUS_LIEFERANT ,
+      'verteilmengenZuweisen: falscher Status der Bestellung'
+  );
 
   foreach( sql_bestellung_produkte( $bestell_id ) as $produkt ) {
     $produkt_id = $produkt['produkt_id'];

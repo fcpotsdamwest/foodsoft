@@ -80,7 +80,7 @@ switch( $action ) {
       get_http_var( "toleranz_$n", 'u', 0 );
       $toleranz = ${"toleranz_$n"};
       get_http_var( "vm_$n", 'w', 'no' );
-      $vormerken = ( ${"vm_$n"} == 'yes' ? true : false );
+      $vormerken = ( ${"vm_$n"} === 'yes' );
       $bestellungen[$n] = array( 'fest' => $fest, 'toleranz' => $toleranz, 'vormerken' => $vormerken );
       $gesamtpreis += $produkt['endpreis'] * ( $fest + $toleranz );
     }
@@ -136,7 +136,7 @@ if( hat_dienst( 4 ) ) {
     echo fc_action( 'update,class=button,text=alle aktualisieren', 'action=update_prices' );
   close_div();
   open_div( 'nodisplay', "id='preise_warnung'" );
-    echo "Warnung: bei <span id='preise_falsch'>?</span> Produkten scheinen die Preise falsch --- bitte pruefen!";
+    echo "Warnung: bei <span id='preise_falsch'>?</span> Produkten scheinen die Preise falsch --- bitte prüfen!";
   close_div();
   smallskip();
 }
