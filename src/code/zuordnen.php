@@ -2453,8 +2453,7 @@ function zuteilungen_berechnen( $mengen ) {
 
   $restmenge = $bestellmenge;
 
-  // erste zuteilungsrunde: festbestellungen in bestellreihenfolge erfüllen, dabei berechnete
-  // negativ-toleranz abziehen:
+  // erste zuteilungsrunde: festbestellungen in bestellreihenfolge erfüllen
   $festbestellungen = sql_bestellzuordnungen(
     array(
       'art' => BESTELLZUORDNUNG_ART_FESTBESTELLUNG,
@@ -2481,14 +2480,6 @@ function zuteilungen_berechnen( $mengen ) {
 
     $offen[$gruppe] += $menge;
 
-    // negativ-toleranz ausrechnen und zurückbehalten (maximal ein halbes gebinde):
-    //
-    $t_min = floor( ( $menge - $gebindegroesse / 2 ) / 2 );
-    if( $t_min < 0 )
-      $t_min = 0;
-    if( $t_min > $gebindegroesse / 2 )
-      $t_min = floor( $gebindegroesse / 2 );
-    $menge -= $t_min;
 
     /* we can only distribute as much as remains */
     $menge = max($menge, $restmenge);
@@ -2539,7 +2530,7 @@ function zuteilungen_berechnen( $mengen ) {
 
       if( !isset( $toleranzzuteilungen[$gruppe] ) ) // sollte nicht sein: nur _eine_ toleranzbestellung je gruppe!
         $toleranzzuteilungen[$gruppe] = 0;
-        $toleranzzuteilungen[$gruppe] += $menge;
+      $toleranzzuteilungen[$gruppe] += $menge;
       $restmenge -= $menge;
     }
   }
@@ -2807,6 +2798,28 @@ function nichtGeliefert( $bestell_id, $produkt_id ) {
   sql_change_liefermenge( $bestell_id, $produkt_id, 0 );
 }
 
+/**
+ * change_bestellmengen
+ *
+ * This is called on each update of the ordered product amount during the ordering phase.
+ *
+ * The amounts in ordered/tolerance columns are persisted.
+ * If the pre-order checkbox was checked, the values are also replacing the existing
+ * pre-order amounts.
+ *
+ * Updates are done by combining DELETE/INSERT in order to record chronological order
+ * of ordering events.
+ * The total amount ordered by one group may thus be split into several db rows if the
+ * amount was increased one or more times.
+ * This is part of the Foodsoft way of implementing the "first come, first serve" principle.
+ *
+ * @param int $gruppen_id
+ * @param int $bestell_id
+ * @param int $produkt_id
+ * @param int $festmenge
+ * @param int $toleranzmenge
+ * @param false $vormerken
+ */
 function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge = -1, $toleranzmenge = -1, $vormerken = false ) {
   need( sql_bestellung_status( $bestell_id ) == STATUS_BESTELLEN, "Bestellen bei dieser Bestellung nicht mehr möglich" );
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
