@@ -21,6 +21,7 @@ services:
       - "8008:80"
     volumes:
       - ../src:/src:ro
+      - ../tests:/tests:ro
       - ./web/assets/foodsoft.conf:/etc/apache2/sites-available/foodsoft.conf
     container_name: foodsoft-php8
     command: /opt/bin/start-web.sh
@@ -43,6 +44,7 @@ services:
       - "8007:80"
     volumes:
       - ../src:/src:ro
+      - ../tests:/tests:ro
       - ./web/assets/foodsoft.conf:/etc/apache2/sites-available/foodsoft.conf
     container_name: foodsoft-php7
     command: /opt/bin/start-web.sh

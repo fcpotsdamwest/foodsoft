@@ -37,6 +37,10 @@ RUN set -ex \
         session \
         xml \
     && \
+    # Add PHPUnit
+    curl -L -o /usr/bin/phpunit https://phar.phpunit.de/phpunit-9.phar && \
+    chmod +x /usr/bin/phpunit && \
+    phpunit --version && \
     # Enable mod_rewrite
     a2enmod rewrite
 

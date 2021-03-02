@@ -26,6 +26,7 @@ chmod 644 apache.sample.conf
 chmod 644 db/mwst.sql
 chmod 755 deploy.sh
 chmod 644 dev/.env.sample
+chmod 644 dev/Makefile
 chmod 644 dev/db/config/foodsoft.cnf
 chmod 644 dev/docker-compose.yml
 chmod 644 dev/web/Containerfile.php7
@@ -130,4 +131,5 @@ chmod 644 src/windows/produkte.php
 chmod 644 src/windows/produktpreise.php
 chmod 644 src/windows/produktverteilung.php
 chmod 644 src/windows/verluste.php
+chmod 644 tests/FirstTest.php
 chmod 700 .git
