@@ -48,7 +48,16 @@ switch( $action ) {
     sql_update( 'produkte', $produkt_id, array( 'artikelnummer' => $anummer ) );
     break;
   case 'neuer_preiseintrag':
-    action_form_produktpreis();
+    $new_price_id = action_form_produktpreis();
+    if( $new_price_id && $bestell_id && sql_bestellung_status( $bestell_id ) < STATUS_ABGERECHNET )
+    {
+      /* automagically activate new price entry */
+      sql_update(
+        'bestellvorschlaege',
+        [ 'gesamtbestellung_id' => $bestell_id, 'produkt_id' => $produkt_id ],
+        [ 'produktpreise_id' => $new_price_id ],
+      );
+    }
     break;
   case 'delete_price':
     need_http_var('preis_id','u');
@@ -181,4 +190,3 @@ if( $editable ) {
 }
 
 ?>
-
