@@ -176,6 +176,7 @@ function upload_bnn( $katalogformat ) {
   $klines = file( $_FILES['katalog']['tmp_name'] );
 
   $fuehrungssatz = $klines[0];
+  $fuehrungssatz = iconv( 'CP850', 'UTF-8', $fuehrungssatz );
   unset( $klines[0] );
 
   need( preg_match( '/^BNN;3;/', $fuehrungssatz ), 'kein oder falsches BNN format' );
@@ -183,8 +184,8 @@ function upload_bnn( $katalogformat ) {
   $tag = 'Tr'; // Bode, Grell: nur ein Katalog, entspricht "Trocken" bei Terra
 
   if( preg_match( '/;"?Terra Naturkost /', $fuehrungssatz ) ) {
-    // Terra: unterscheidet 4 Kataloge:
-    if( preg_match( '/;"?[^"]*(Obst|O&G)/', $fuehrungssatz ) )
+    // Terra: tell apart several types of catalogues
+    if( preg_match( '/;[^;]*(Obst|O&G)/', $fuehrungssatz ) )
       $tag = 'OG';
     else if( preg_match( '/;"?(Naturdrog|Drog)/', $fuehrungssatz ) )
       $tag = 'drog';
@@ -192,6 +193,8 @@ function upload_bnn( $katalogformat ) {
       $tag = 'Tr';
     else if( preg_match( '/;"?Frisch/', $fuehrungssatz ) )
       $tag = 'Fr';
+    else if( preg_match( '/;"?Gastronomie/', $fuehrungssatz) )
+      $tag = 'Gastro';
     else
       error( 'Terra: Katalogformat nicht erkannt' );
     open_div( 'ok', '', "Terra: detektierter Teilkatalog: $tag" );
