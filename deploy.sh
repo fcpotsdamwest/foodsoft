@@ -56,6 +56,7 @@ chmod 644 src/css/foodsoft.css
 chmod 644 src/css/modified.gif
 chmod 644 src/css/readonly.gif
 chmod 644 src/dump.php
+chmod 644 src/favicon.ico
 chmod 644 src/fcck.php
 chmod 644 src/foodsoft.class.php
 chmod 644 src/head.php
