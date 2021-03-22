@@ -131,5 +131,5 @@ chmod 644 src/windows/produkte.php
 chmod 644 src/windows/produktpreise.php
 chmod 644 src/windows/produktverteilung.php
 chmod 644 src/windows/verluste.php
-chmod 644 tests/FirstTest.php
+chmod 644 tests/code/ZuordnenTest.php
 chmod 700 .git
