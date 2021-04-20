@@ -2463,6 +2463,8 @@ function zuteilungen_berechnen( $mengen ) {
     )
   );
 
+  highlight_string("<?php\n\$festbestellungen =\n" . var_export($festbestellungen, true) . ";\n?>");
+
   $festzuteilungen = array();
   $offen = array();
 
@@ -2518,6 +2520,9 @@ function zuteilungen_berechnen( $mengen ) {
       ),
       '-menge'
     );
+
+    highlight_string("<?php\n\$toleranzbestellungen =\n" . var_export($toleranzbestellungen, true) . ";\n?>");
+
     $quote = ( 1.0 * $restmenge ) / $toleranzbestellmenge;
     need( $quote <= 1 );
     foreach( $toleranzbestellungen as $row ) {
@@ -2539,12 +2544,16 @@ function zuteilungen_berechnen( $mengen ) {
   //
   need( $restmenge == 0, "Fehler beim Verteilen: Rest: $restmenge bei Produkt {$mengen['produkt_name']}" );
 
-  return array(
+  $result = array(
     'bestellmenge' => $bestellmenge,
     'gebinde' => $gebinde,
     'festzuteilungen' => $festzuteilungen,
     'toleranzzuteilungen' => $toleranzzuteilungen
   );
+
+  highlight_string("<?php\n\$result =\n" . var_export($result, true) . ";\n?>");
+
+  return $result;
 }
 
 function select_liefermenge( $bestell_id, $produkt_id ) {

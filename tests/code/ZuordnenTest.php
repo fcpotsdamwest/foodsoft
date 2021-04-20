@@ -66,4 +66,240 @@ final class ZuordnenZuteilungenBerechnenTest extends TestCase
 
         $this->assertEquals(BESTELLZUORDNUNG_ART_VORMERKUNG_FEST, 10);
     }
+
+    function zuteilungenBerechnenProvider()
+    {
+        $examples = [
+            [
+                'example_id' => 1,
+                'product_id' => 1774,
+                'festbestellungen' => [
+                    0 => [
+                        'produkt_id' => '1774',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-03-20 23:53:45',
+                        'bestellzuordnung_id' => '843946',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 1,
+                    ],
+                ],
+                'result' => [
+                    'bestellmenge' => 1,
+                    'gebinde' => 1,
+                    'festzuteilungen' => [ 44 => 1.0 ],
+                    'toleranzzuteilungen' => [],
+                ],
+            ],
+            [
+                'example_id' => 2,
+                'product_id' => 1747,
+                'festbestellungen' => [
+                    0 => [
+                        'produkt_id' => '1747',
+                        'menge' => '4.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 22:30:19',
+                        'bestellzuordnung_id' => '843897',
+                        'bestellgruppen_id' => '45',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 1,
+                    ],
+                    1 => [
+                        'produkt_id' => '1747',
+                        'menge' => '12.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 22:30:42',
+                        'bestellzuordnung_id' => '843898',
+                        'bestellgruppen_id' => '2032',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 2,
+                    ],
+                    2 => [
+                        'produkt_id' => '1747',
+                        'menge' => '4.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 22:31:04',
+                        'bestellzuordnung_id' => '843908',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 3,
+                    ],
+                    3 => [
+                        'produkt_id' => '1747',
+                        'menge' => '2.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 23:24:03',
+                        'bestellzuordnung_id' => '843909',
+                        'bestellgruppen_id' => '2032',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 4,
+                    ],
+                    4 => [
+                        'produkt_id' => '1747',
+                        'menge' => '2.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 23:24:08',
+                        'bestellzuordnung_id' => '843919',
+                        'bestellgruppen_id' => '2032',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 5,
+                    ],
+                ],
+                'result' => [
+                    'bestellmenge' => 16,
+                    'gebinde' => 1,
+                    'festzuteilungen' => [
+                        45 => 16,
+                    ],
+                    'toleranzzuteilungen' => [],
+                ],
+            ],
+            [
+                'example_id' => 3,
+                'product_id' => 3863,
+                'festbestellungen' => [
+                    0 => [
+                        'produkt_id' => '3863',
+                        'menge' => '6.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-27 23:18:07',
+                        'bestellzuordnung_id' => '843935',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 1,
+                    ],
+                    1 => [
+                        'produkt_id' => '3863',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-27 23:18:54',
+                        'bestellzuordnung_id' => '843936',
+                        'bestellgruppen_id' => '2032',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 2,
+                    ],
+                ],
+                'result' => [
+                    'bestellmenge' => 6,
+                    'gebinde' => 1,
+                    'festzuteilungen' => [
+                        44 => 6,
+                    ],
+                    'toleranzzuteilungen' => [],
+                ]
+            ],
+            [
+                'example_id' => 4,
+                'product_id' => 4188,
+                'festbestellungen' => [
+                    0 => [
+                        'produkt_id' => '4188',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:38:29',
+                        'bestellzuordnung_id' => '843929',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 1,
+                    ],
+                    1 => [
+                        'produkt_id' => '4188',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:38:34',
+                        'bestellzuordnung_id' => '843930',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 2,
+                    ],
+                    2 => [
+                        'produkt_id' => '4188',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:38:40',
+                        'bestellzuordnung_id' => '843931',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 3,
+                    ],
+                    3 => [
+                        'produkt_id' => '4188',
+                        'menge' => '2.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:38:49',
+                        'bestellzuordnung_id' => '843932',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 4,
+                    ],
+                    4 => [
+                        'produkt_id' => '4188',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:38:57',
+                        'bestellzuordnung_id' => '843933',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 5,
+                    ],
+                    5 => [
+                        'produkt_id' => '4188',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-22 22:39:29',
+                        'bestellzuordnung_id' => '843934',
+                        'bestellgruppen_id' => '45',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 6,
+                    ],    
+                ],
+                'result' => [
+                    'bestellmenge' => 6,
+                    'gebinde' => 1,
+                    'festzuteilungen' => [ 44 => 6 ],
+                    'toleranzzuteilungen' => [],
+                ],
+            ],
+            [
+                'example_id' => 5,
+                'description' => 'One group orders a full bunch, and another one later claims a small amount',
+                'product_id' => 3865,
+                'festbestellungen' => [
+                    0 => 
+                    [
+                        'produkt_id' => '3865',
+                        'menge' => '6.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 00:43:40',
+                        'bestellzuordnung_id' => '843743',
+                        'bestellgruppen_id' => '2032',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 1,
+                    ],
+                    1 => [
+                        'produkt_id' => '3865',
+                        'menge' => '1.000',
+                        'art' => '20',
+                        'zeitpunkt' => '2021-02-15 01:24:36',
+                        'bestellzuordnung_id' => '843757',
+                        'bestellgruppen_id' => '44',
+                        'gesamtbestellung_id' => '1139',
+                        'nr' => 2,
+                    ],
+                ],
+                'result' => [
+                    'bestellmenge' => 6,
+                    'gebinde' => 1,
+                    'festzuteilungen' => [ 2032 => 6 ],
+                    'toleranzzuteilungen' => [],
+                ],
+            ],
+        ];
+
+        $testcases = null;
+
+        return $testcases;
+    }
 }
