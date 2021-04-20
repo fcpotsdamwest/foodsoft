@@ -226,12 +226,19 @@ if( ! $readonly ) {
       zuteilung_berechnen( produkt, true );
     }
 
-    /**
+    /** zuteilung_berechnen
      * Calculate the amount of the product that is assigned to the ordering group
      *
      * @param {number} produkt - product id
      * @param {boolean} init - true for initial rendering,
      *   false means that a change in the data triggered the call
+     *
+     * This function is ONLY relevant for the live display of order amounts and allocations
+     * in the client UI of the specific ordering group.
+     *
+     * WARNING:
+     * The actual allocation (as it will appear on the distribution lists) is calculated
+     * by the PHP zuteilungen_berechnen function which might yield a different result!
      */
     function zuteilung_berechnen( produkt, init ) {
 
@@ -642,6 +649,7 @@ foreach( $produkte as $produkt ) {
   $festmenge_gesamt = $produkt['gesamtbestellmenge'] - $toleranzmenge_gesamt;
   $festmenge_andere = $festmenge_gesamt - $festmenge;
 
+  /* this call is relevant for the actual distribution of the total amount ordered among the groups */
   $zuteilungen = zuteilungen_berechnen( $produkt );
   $zuteilung_fest = adefault( $zuteilungen['festzuteilungen'], $gruppen_id, 0 );
   $zuteilung_toleranz = adefault( $zuteilungen['toleranzzuteilungen'], $gruppen_id, 0 );

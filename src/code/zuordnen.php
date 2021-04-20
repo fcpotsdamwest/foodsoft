@@ -2850,6 +2850,22 @@ function nichtGeliefert( $bestell_id, $produkt_id ) {
   sql_change_liefermenge( $bestell_id, $produkt_id, 0 );
 }
 
+/**
+ * change_bestellmengen
+ *
+ * Update the order [and prebook] amount(s) for the given (order,group,product) tuple.
+ *
+ * To skip updating one of festmenge or toleranzmenge, a dummy value <0 can be used.
+ * Example: To update festmenge only, we set the toleranzmenge -1 param to -1
+ * change_bestellmengen($group, $order, $product, $fest, -1, $prebook)
+ *
+ * @param $gruppen_id
+ * @param $bestell_id
+ * @param $produkt_id
+ * @param int $festmenge
+ * @param int $toleranzmenge
+ * @param false $vormerken
+ */
 function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge = -1, $toleranzmenge = -1, $vormerken = false ) {
   need( sql_bestellung_status( $bestell_id ) == STATUS_BESTELLEN, "Bestellen bei dieser Bestellung nicht mehr möglich" );
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
