@@ -828,10 +828,7 @@ if( ! $readonly ) {
             open_td('', '', '');
             open_td('', 'id="productLink"', '');
             open_td('right');
-              submission_button( 'Produkt hinzufügen', true
-                , "Produkt zur Bestellvorlage hinzufügen: bist du überzeugt, dass das Gebinde noch voll werden wird, "
-                  ."und dass du dich nicht lieber an der Bestellung eines schon teilweise gefüllten Gebindes beteiligen möchtest?"
-              );
+              submission_button( 'Produkt hinzufügen', true );
         close_table();
       close_form();
     

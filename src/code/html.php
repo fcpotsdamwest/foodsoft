@@ -415,14 +415,10 @@ function html_button( $text, $js = '', $attrib = '' ) {
   echo "<a href='javascript:$js' class='button' $attrib title='$text'>$text</a>";
 }
 
-function submission_button( $text = '', $active = true, $confirm = '' ) {
+function submission_button( $text = 'Speichern', $active = true ) {
   global $form_id;
-  $text or $text = 'Speichern';
   $class = ( $active ? 'button' : 'button inactive' );
-  // open_span( 'qquad', '', "<a href='javascript:return true;' class='$class' id='submit_button_$form_id' title='$text' onClick=\"submit_form( $form_id );\">$text</a>" );
-  if( $confirm )
-    $confirm = "if( confirm( '$confirm' ) ) ";
-  open_span( 'qquad', '', "<a href=\"javascript:$confirm submit_form( $form_id );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>" );
+  open_span( 'qquad', '', "<a href=\"javascript:submit_form( $form_id );\" class='$class' id='submit_button_$form_id' title='$text' >$text</a>" );
 }
 
 function reset_button( $text = 'Zurücksetzen' ) {
