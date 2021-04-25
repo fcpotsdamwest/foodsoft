@@ -228,7 +228,7 @@ if( ! $readonly ) {
         // falls festmenge höher oder gleichgeblieben:
         // gruppe kriegt mindestens das, was schon vorher zugeteilt worden wäre:
         //
-        let menge = Math.min( zuteilung_fest_alt[produkt], restmenge );
+        let menge = Math.min( _fest_alt, restmenge );
         zuteilung_fest += menge;
         restmenge -= menge;
 
