@@ -35,7 +35,7 @@ open_table( 'layout hfill' );
     if( $action == 'edit' ) {
       open_form( '', 'action=save' );
         open_div( 'board' );
-          ?><textarea id='news' wrap='hard' name='bulletinboard' class='board' cols='38' rows='8'><?php echo $bulletinboard; ?></textarea><?php
+          ?><textarea id='news' wrap='hard' name='bulletinboard' class='board' cols='80' rows='12'><?php echo $bulletinboard; ?></textarea><?php
           open_div( 'chalk' );
             submission_button();
           close_div();
@@ -45,7 +45,7 @@ open_table( 'layout hfill' );
     } else {
       $form_id = open_form( '', 'action=edit' );
         open_div( 'board' );
-          ?><textarea class='board' name='news' readonly cols='38' rows='8'><?php echo $bulletinboard; ?></textarea><?php
+          ?><textarea class='board' name='news' readonly cols='80' rows='12'><?php echo $bulletinboard; ?></textarea><?php
           open_div( 'chalk' );
             ?><a href='#' onclick="document.forms.form_<?php echo $form_id; ?>.submit();"
                 title='Tafel beschreiben...'><img src='img/chalk_trans.gif' alt='Kreide'></a><?php
