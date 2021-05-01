@@ -201,6 +201,7 @@ if( ! $readonly ) {
       const _toleranz_alt = toleranz_alt[produkt];
       const _toleranz_andere = toleranz_andere[produkt];
       const _verteilmult = verteilmult[produkt];
+      const _zuteilung_fest_alt = zuteilung_fest_alt[produkt];
 
       // bestellmenge berechnen: wieviel kann insgesamt bestellt werden?
       //
@@ -221,14 +222,16 @@ if( ! $readonly ) {
           bestellmenge += gebindemenge;
         }
 
-      let restmenge = bestellmenge;
       let zuteilung_fest = 0;
+      let zuteilung_toleranz = 0;
+      
+      let restmenge = bestellmenge;
       if( _fest >= _fest_alt ) {
 
         // falls festmenge höher oder gleichgeblieben:
         // gruppe kriegt mindestens das, was schon vorher zugeteilt worden wäre:
         //
-        let menge = Math.min( _fest_alt, restmenge );
+        let menge = Math.min( _zuteilung_fest_alt, restmenge );
         zuteilung_fest += menge;
         restmenge -= menge;
 
@@ -259,14 +262,13 @@ if( ! $readonly ) {
 
       }
 
-      // falls noch toleranz berücksichtigt wird: möglichst gleichmäßig nach quote verteilen:
-      //
-      let quote, zuteilung_toleranz;
-      if( restmenge > 0 ) {
-        quote = restmenge / ( _toleranz_andere + _toleranz );
+      let _toleranz_gesamt = _toleranz_andere + _toleranz;
+
+      if( restmenge > 0 && _toleranz_gesamt > 0 ) {
+        // falls noch toleranz berücksichtigt wird:
+        // möglichst gleichmäßig nach quote verteilen
+        const quote = restmenge / ( _toleranz_gesamt );
         zuteilung_toleranz = Math.min( Math.ceil( _toleranz * quote ), restmenge );
-      } else {
-        zuteilung_toleranz = 0;
       }
 
       // anzeige gesamt aktualisieren:
