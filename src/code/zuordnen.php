@@ -2481,15 +2481,6 @@ function zuteilungen_berechnen( $mengen ) {
 
     $offen[$gruppe] += $menge;
 
-    // negativ-toleranz ausrechnen und zurückbehalten (maximal ein halbes gebinde):
-    //
-    $t_min = floor( ( $menge - $gebindegroesse / 2 ) / 2 );
-    if( $t_min < 0 )
-      $t_min = 0;
-    if( $t_min > $gebindegroesse / 2 )
-      $t_min = floor( $gebindegroesse / 2 );
-    $menge -= $t_min;
-
     /* we can only distribute as much as remains */
     $menge = min($menge, $restmenge);
 
