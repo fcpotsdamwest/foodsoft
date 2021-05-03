@@ -2491,7 +2491,7 @@ function zuteilungen_berechnen( $mengen ) {
     $menge -= $t_min;
 
     /* we can only distribute as much as remains */
-    $menge = max($menge, $restmenge);
+    $menge = min($menge, $restmenge);
 
     /* assign the calculated amount */
     $festzuteilungen[$gruppe] += $menge;
@@ -2535,7 +2535,7 @@ function zuteilungen_berechnen( $mengen ) {
       $gruppe = $row['bestellgruppen_id'];
 
       $menge = (int) ceil( $quote * $row['menge'] );
-      $menge = max( $menge, $restmenge );
+      $menge =min( $menge, $restmenge );
 
       if( !isset( $toleranzzuteilungen[$gruppe] ) ) // sollte nicht sein: nur _eine_ toleranzbestellung je gruppe!
         $toleranzzuteilungen[$gruppe] = 0;
