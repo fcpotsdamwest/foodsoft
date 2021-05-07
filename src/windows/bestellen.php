@@ -271,8 +271,7 @@ if( ! $readonly ) {
         zuteilung_toleranz = Math.min( Math.ceil( _toleranz * quote ), restmenge );
       }
 
-      // anzeige gesamt aktualisieren:
-      //
+      // anzeige gesamt aktualisieren (Gesamtmengen, Spalte "Gesamtbestellung")
       let anzeige_gesamt;
       anzeige_gesamt = (festmenge * _verteilmult).toString();
       if( toleranzmenge > 0 )
@@ -299,8 +298,7 @@ if( ! $readonly ) {
         document.getElementById('g_'+produkt).style.offsetWidth = gwidth;
       }
 
-      // anzeige gruppe aktualisieren:
-      //
+      // anzeige für gruppe aktualisieren (effektive Zuteilung, Spalte "Zuteilung")
       let anzeige_gruppe;
       anzeige_gruppe = _fest * _verteilmult;
       const toleranzNode = document.getElementById('t_'+produkt);
@@ -345,8 +343,7 @@ if( ! $readonly ) {
       }
       <?php } ?>
 
-      // kosten und neuen kontostand berechnen und anzeigen:
-      //
+      // kosten und neuen kontostand berechnen und anzeigen
       const kosten_neu = preis[produkt] * ( _fest + _toleranz );
       gesamtpreis += ( kosten_neu - kosten[produkt] );
       kosten[produkt] = kosten_neu;
@@ -422,17 +419,20 @@ if( ! $readonly ) {
       }
       zuteilung_berechnen( produkt, false );
     }
+
     function fest_plusplus( produkt ) {
       const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       fest[produkt] = (gebinde+1) * gebindegroesse[produkt];
       zuteilung_berechnen( produkt, false );
     }
+
     function fest_minus( produkt ) {
       if( fest[produkt] > 0 ) {
         fest[produkt]--;
         zuteilung_berechnen( produkt, false );
       }
     }
+
     function fest_minusminus( produkt ) {
       const gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
       if( gebinde > 0 ) {
@@ -443,18 +443,21 @@ if( ! $readonly ) {
         zuteilung_berechnen( produkt, false );
       }
     }
+
     function toleranz_plus( produkt ) {
       if( toleranz[produkt] < gebindegroesse[produkt]-1 ) {
         toleranz[produkt]++;
         zuteilung_berechnen( produkt, false );
       }
     }
+
     function toleranz_minus( produkt ) {
       if( toleranz[produkt] > 0 ) {
         toleranz[produkt]--;
         zuteilung_berechnen( produkt, false );
       }
     }
+
     function toleranz_auffuellen( produkt ) {
       const gebinde = Math.floor( fest[produkt] / gebindegroesse[produkt] );
       if( fest[produkt] - gebinde * gebindegroesse[produkt] > 0 ) {
@@ -464,6 +467,7 @@ if( ! $readonly ) {
       }
       zuteilung_berechnen( produkt, false );
     }
+
     function bestellung_submit() {
       if( gesamtpreis > kontostand ) {
         alert( 'Kontostand nicht ausreichend!' );
@@ -561,7 +565,7 @@ open_table( 'list hfill' );  // bestelltabelle
     open_th( '', "colspan='1' title='Toleranz-Menge: wieviel du auch mehr nehmen würdest'", 'Toleranz' );
     open_th( '', '', '' );
     open_th( 'small tight', '', '(maximal)' );
-    open_th( '', "colspan='1' title='insgesamt gefuellte Gebinde'", 'volle Gebinde' );
+    open_th( '', "colspan='1' title='insgesamt gefüllte Gebinde'", 'volle Gebinde' );
     if( hat_dienst(4) )
       open_th( 'small tight', '', '' );
     else

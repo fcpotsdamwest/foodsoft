@@ -95,7 +95,7 @@ global
   $login_gruppen_name,
   $session_id;
 
-  $angemeldet = false;
+$angemeldet = false;
 
 require_once('structure.php');
 require_once('code/views.php');

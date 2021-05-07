@@ -4380,7 +4380,7 @@ function sanitize_http_input() {
       need( checkvalue( $val, $foodsoft_get_vars[$key] ) !== false , "unerwarteter Wert für Variable $key in URL" );
     }
     if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
+      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular übergeben' );
       sscanf( $_POST['itan'], "%u_%s", $t_id, $itan );
       need( $t_id, 'fehlerhaftes Formular übergeben' );
       $row = sql_select_single_row( "SELECT * FROM transactions WHERE id=$t_id", true );
