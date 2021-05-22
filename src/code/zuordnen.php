@@ -421,7 +421,7 @@ function select_dienste( $filter = 'true' ) {
   ";
 }
 
-function sql_dienste( $filter = 'true', $orderby = 'lieferdatum ASC, dienst' ) {
+function sql_dienste( $filter = 'true', $orderby = 'lieferdatum ASC, dienst DESC' ) {
   return mysql2array( doSql(
     select_dienste( $filter ) . " ORDER BY $orderby "
   , LEVEL_ALL, "error while reading from dienste"

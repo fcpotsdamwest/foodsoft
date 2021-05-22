@@ -4,6 +4,7 @@
     $coopie_name,
     $foodsoftdir,
     $login_dienst,
+    $login_dienstname,
     $login_gruppen_name,
     $readonly;
 
@@ -38,9 +39,9 @@ open_div( $headclass, "id='header'" );
     open_td( '', "style='padding-top:1em;'" );
       if( $angemeldet ) {
         if( $login_dienst > 0 ) {
-          echo "Hallo $coopie_name ($login_gruppen_name) vom Dienst $login_dienst!";
+          echo "Hallo Dienst \"$login_dienstname\" | $coopie_name von $login_gruppen_name";
         } else {
-          echo "Hallo Gruppe $login_gruppen_name!";
+          echo "Hallo Gruppe $login_gruppen_name";
         }
       }
     open_td( '', "style='text-align:right;padding-top:1em;'" );

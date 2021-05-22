@@ -167,9 +167,9 @@ if( hat_dienst(5) ) {
           echo "Eingeteilt werden für Dienst...";
         open_tr();
           open_td( 'qquad' );
-            open_span( 'qquad', '', "1/2: " . int_view( $personen_1, "personen_1", 1 ) );
-            open_span( 'qquad', '', "3: " . int_view( $personen_3, "personen_3", 1 ) );
-            open_span( 'qquad', '', "4: " . int_view( $personen_4, "personen_4", 1 ) . " Personen" );
+            open_span( 'medskip', '', "{$dienstinfos[4]['label']}: " . int_view( $personen_4, "personen_4", 1 ) . " Personen<br>" );
+            open_span( 'medskip', '', "{$dienstinfos[3]['label']}: " . int_view( $personen_3, "personen_3", 1 ) . " Personen<br>" );
+            open_span( 'medskip', '', "{$dienstinfos[1]['label']}: " . int_view( $personen_1, "personen_1", 1 ) . " Personen<br>" );
         open_tr();
           open_td( 'right', '' );
             smallskip();
@@ -225,13 +225,13 @@ open_table( 'menu', "id='option_menu_table'" );
 close_table();
 medskip();
 
-$dienstnamen = array( '1/2', '3', '4' );
+$dienstnamen = array( '4', '3', '1/2' );
 
 open_table( 'list' );
   open_th( '', '', 'Datum' );
-  open_th( '', '', 'Dienst 1/2' );
-  open_th( '', '', 'Dienst 3' );
-  open_th( '', '', 'Dienst 4' );
+  open_th( '', "title='{$dienstinfos[4]['description']}'", $dienstinfos[4]['label'] );
+  open_th( '', "title='{$dienstinfos[3]['description']}'", $dienstinfos[3]['label'] );
+  open_th( '', "title='{$dienstinfos[1]['description']}'", $dienstinfos[1]['label'] );
 
   $dienste = sql_dienste();
 
