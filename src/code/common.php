@@ -94,7 +94,8 @@ global
   $login_dienstname,
   $login_gruppen_id,
   $login_gruppen_name,
-  $session_id;
+  $session_id,
+  $theme;
 
 $angemeldet = false;
 

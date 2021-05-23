@@ -76,7 +76,8 @@ function init_login() {
     $login_gruppen_id,
     $login_gruppen_name,
     $reconfirmation_muted,
-    $session_id;
+    $session_id,
+    $theme;
 
   $angemeldet=FALSE;
   $session_id = 0;
@@ -87,6 +88,7 @@ function init_login() {
   $dienstkontrollblatt_id = FALSE;
   $coopie_name= FALSE;
   $reconfirmation_muted = FALSE;
+  $theme = 'normal';
 }
 
 function logout() {
@@ -217,8 +219,12 @@ switch( $login ) {
     break;
 }
 
-if( $angemeldet )
+if( $angemeldet ) {
+  if ($login_dienst > 0) {
+    $theme = 'dienst';
+  }
   return;
+}
 
 // ab hier: benutzer ist nicht eingeloggt; wir setzen alles zurück und zeigen das anmeldeformular:
 
@@ -326,6 +332,10 @@ open_javascript( "
       : { dienst: 'none' , nodienst: 'block' };
     \$('dienstform').style.display = display.dienst;
     \$('nodienstform').style.display = display.nodienst;
+    const theme = selected != 0
+      ? 'dienst'
+      : 'normal';
+    document.documentElement.setAttribute('data-theme', theme);
   }
   \$('$login_form_id').onsubmit = pick_login_text;
   document.observe('dom:loaded', pick_login_text);
