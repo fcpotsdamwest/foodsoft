@@ -1713,7 +1713,10 @@ function select_produkte_anzahl( $keys = array(), $using = array() ) {
   return query_produkte( 'COUNT', $keys, $using );
 }
 
-function sql_produkte( $keys = array(), $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name' ) {
+function sql_produkte(
+  $keys = array(),
+  $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name'
+) {
   $r = mysql2array( doSql( select_produkte( $keys, array(), $orderby ) ) );
   foreach( $r as & $p ) {
     if( isset( $p['preis_id'] ) ) {

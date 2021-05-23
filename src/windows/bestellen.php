@@ -677,8 +677,15 @@ foreach( $produkte as $produkt ) {
     open_table( "layout $class" );
       open_tr();
         open_td( "mult $class" );
-        echo fc_link( 'produktdetails', array( 'produkt_id' => $n, 'bestell_id' => $bestell_id
-                                          , 'text' => sprintf( '%.2lf', $preis ), 'class' => 'href' ) );
+        echo fc_link(
+          'produktdetails',
+          [
+            'text'       => sprintf( '%.2lf', $preis ),
+            'produkt_id' => $n,
+            'bestell_id' => $bestell_id,
+            'class'      => 'href',
+          ]
+        );
         open_td( "unit $class", '', "/ {$produkt['verteileinheit']}" );
 
       open_tr();
@@ -772,9 +779,18 @@ foreach( $produkte as $produkt ) {
   if( hat_dienst(4) ) {
     open_td();
       echo fc_link( 'edit_produkt', "produkt_id=$produkt_id" );
-      echo fc_action( array( 'class' => 'drop', 'text' => '', 'title' => 'Bestellvorschlag löschen'
-                           , 'confirm' => 'Bestellvorschlag wirklich löschen?' )
-                    , array( 'action' => 'delete', 'produkt_id' => $produkt_id ) );
+      echo fc_action(
+        [
+          'text'       => '',
+          'title'      => 'Bestellvorschlag löschen',
+          'confirm'    => 'Bestellvorschlag wirklich löschen?',
+          'class'      => 'drop', 
+        ],
+        [
+          'action'     => 'delete',
+          'produkt_id' => $produkt_id,
+        ]
+      );
     close_td();
   } else {
     open_td( '', "id='zt_$n'" );
@@ -848,11 +864,12 @@ if( ! $readonly ) {
     close_fieldset();
   close_div();
   
-  $unlisted_products = sql_produkte( array(
-      (hat_dienst( 4 ) ? 'price_on_date_or_null' : 'price_on_date') 
-          => $gesamtbestellung['lieferung']
-    , 'not_in_order' => $gesamtbestellung['id']
-    , 'lieferanten_id' => $lieferanten_id  ));
+  $price_key = hat_dienst( 4 ) ? 'price_on_date_or_null' : 'price_on_date';
+  $unlisted_products = sql_produkte([
+        $price_key       => $gesamtbestellung['lieferung'],
+        'not_in_order'   => $gesamtbestellung['id'],
+        'lieferanten_id' => $lieferanten_id
+      ]);
     
   foreach ($unlisted_products as $p) {
     $json = array();
@@ -864,10 +881,14 @@ if( ! $readonly ) {
     $json['price'] = $price;
     $json['unit'] = $p['verteileinheit_anzeige'];
     $json['group'] = $p['produktgruppen_name'];
-    $json['link'] = fc_link('produktdetails', array( 
-          'produkt_id' => $p['produkt_id']
-        , 'text' => 'Produktdetails'
-        , 'class' => 'button noleftmargin'));
+    $json['link'] = fc_link(
+      'produktdetails',
+      [
+        'produkt_id' => $p['produkt_id'],
+        'text'       => 'Produktdetails',
+        'class'      => 'button noleftmargin'
+      ]
+    );
     $json_list[] = $json;
   }
   

@@ -1,6 +1,11 @@
 <?php
-  global $angemeldet, $login_gruppen_name, $coopie_name, $login_dienst
-       , $readonly, $foodsoftdir;
+  global
+    $angemeldet,
+    $coopie_name,
+    $foodsoftdir,
+    $login_dienst,
+    $login_gruppen_name,
+    $readonly;
 
 $headclass='head';
 $payloadclass='';

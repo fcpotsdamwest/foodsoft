@@ -20,9 +20,16 @@
 //  - $dienstkontrollblatt_id
 
 function init_login() {
-  global $angemeldet, $session_id, $login_gruppen_id, $login_gruppen_name
-       , $login_dienst, $dienstkontrollblatt_id, $coopie_name
-       , $reconfirmation_muted;
+  global
+    $angemeldet,
+    $coopie_name,
+    $dienstkontrollblatt_id,
+    $login_dienst,
+    $login_gruppen_id,
+    $login_gruppen_name,
+    $reconfirmation_muted,
+    $session_id;
+
   $angemeldet=FALSE;
   $session_id = 0;
   $login_gruppen_id = FALSE;
@@ -127,12 +134,15 @@ switch( $login ) {
     if( ! $problems ) {
       // alles ok: neue session erzeugen:
       $cookie = random_hex_string( 5 );
-      $session_id = sql_insert( 'sessions', array( 
-        'cookie' => $cookie
-      , 'login_gruppen_id' => $login_gruppen_id
-      , 'dienst' => $login_dienst
-      , 'dienstkontrollblatt_id' => $dienstkontrollblatt_id
-      ) );
+      $session_id = sql_insert(
+        'sessions',
+        [
+          'cookie'                 => $cookie,
+          'login_gruppen_id'       => $login_gruppen_id,
+          'dienst'                 => $login_dienst,
+          'dienstkontrollblatt_id' => $dienstkontrollblatt_id
+        ]
+      );
       $keks = $session_id.'_'.$cookie;
       need( setcookie( 'foodsoftkeks', $keks, 0, '/' ), "setcookie() fehlgeschlagen" );
       $angemeldet = TRUE;
