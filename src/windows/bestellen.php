@@ -147,7 +147,7 @@ if( ! $readonly ) {
   $bestellform_id = open_form( '', 'action=bestellen' );
 
   ?>
-  <script type="text/javascript">
+  <script>
     const anzahl_produkte = <?php echo count( $produkte ); ?>;
     let kontostand = <?php printf( "%.2lf", $kontostand ); ?>;
     let gesamtpreis = 0.00;

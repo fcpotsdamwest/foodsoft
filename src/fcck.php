@@ -15,7 +15,7 @@ global $db_handle;
 
 
   echo "
-    <script type='text/javascript'>
+    <script>
       function neuesfenster(url,name) {
         f=window.open(url,name);
         f.focus();
