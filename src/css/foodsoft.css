@@ -985,6 +985,17 @@ img.button:hover {
   background-color: #ffffd0;
 }
 
+a.bulb {
+  padding: 2px 1ex 2px 2em;
+  background-image: url(../img/gluehbirne_15x16.png);
+  background-repeat: no-repeat;
+  background-position: 5px;
+}
+
+a.bulb:hover {
+  background-image: url(../img/birne_rot.png);
+}
+
 a.wikilink,
 ul#menu li a.wikilink {
   padding: 2px 1ex 2px 2em;
@@ -1001,7 +1012,6 @@ ul#menu li a.wikilink:hover {
   background-image: url(../img/birne_rot.png);
   text-decoration: underline;
 }
-
 
 span.radiooption {
   padding-right: 1em;

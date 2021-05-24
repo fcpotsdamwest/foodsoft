@@ -229,9 +229,15 @@ $dienstnamen = array( '4', '3', '1/2' );
 
 open_table( 'list' );
   open_th( '', '', 'Datum' );
-  open_th( '', "title='{$dienstinfos[4]['description']}'", $dienstinfos[4]['label'] );
-  open_th( '', "title='{$dienstinfos[3]['description']}'", $dienstinfos[3]['label'] );
-  open_th( '', "title='{$dienstinfos[1]['description']}'", $dienstinfos[1]['label'] );
+  foreach( [4, 3, 1] as $dienst){
+    [
+      'label' => $label,
+      'description' => $desc,
+      'wiki' => $wiki_topic,
+    ] = $dienstinfos[$dienst];
+    $content = "<a class='bulb' style='color:#000' href=\"" . wikiHref( $wiki_topic ) . "\">$label</span>";
+    open_th( '', "title='{$desc}'", $content );
+  }
 
   $dienste = sql_dienste();
 
