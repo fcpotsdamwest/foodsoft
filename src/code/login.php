@@ -265,63 +265,41 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
       echo "<div class='ok'>$msg</div>";
     }
 
-    open_div( 'kommentar', "style='padding:1em;'", 'Anmeldung für die Foodsoft und fürs Doku-Wiki der Foodsoft:' );
     open_div( 'newfield', '', "
-      <label> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>
-      <input type='text' size='4' name='login_gruppen_id_text' id='login_gruppen_id_text' value='' 
+      <p>
+        <label class='login'> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>
+        <input type='text' size='12' name='login_gruppen_id_text' id='login_gruppen_id_text' value='' 
           onkeyup='pick_login_text();'>
-      <select size='1' name='login_gruppen_id' id='login_gruppen_id' 
+        <select size='1' name='login_gruppen_id' id='login_gruppen_id' 
           onchange='pick_login_dropdown();'>
         ". optionen_gruppen() ."
-      </select>
-      <label style='padding-left:4em;'>Passwort:</label>
-        <input type='password' size='8' name='passwort' value=''>
+        </select>
+      </p>
+      <p>
+        <label class='login'>Passwort:</label>
+        <input type='password' size='12' name='passwort' value=''>
+      </p>
+        <div class='kommentar' id='nodienstform'>
+          Um zu bestellen oder dein Gruppenkonto einzusehen, brauchst Du hier keinen Dienst auszuwählen.
+        </div>
+      <p>
+        <label class='login'>Dienst:</label>
+        <select size='1' name='dienst' id='dienst' 
+          onchange='set_dienstform();'>
+        ". optionen_dienste() . "  
+        </select>
+      </p>
     " );
-    open_div( 'newfield', '', 'Ich mache gerade...' );
-    open_table();
-      open_tr();
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='0'
-                 onclick='dienstform_off();' ";
-          echo ( $login_dienst ? '>' : 'checked>' );
-          echo ( $FC_acronym == 'LS' ? '<label>keine Aktion</label>' : '<label>'. $dienstinfos[DIENST_KEIN]['label'] . '</label>' );
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='4'
-                  onclick='dienstform_on();' ";
-          echo ( $login_dienst == 4 ) ? ' checked>' : '>';
-          echo "<label title='{$dienstinfos[DIENST_VORBEREITEN_ABRECHNEN]['description']}'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " " . $dienstinfos[DIENST_VORBEREITEN_ABRECHNEN]['label'] . "</label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='3'
-                  onclick='dienstform_on();' ";
-          echo ( $login_dienst == 3 ) ? ' checked>' : '>';
-          echo "<label title='{$dienstinfos[DIENST_ANNEHMEN]['description']}'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " " . $dienstinfos[DIENST_ANNEHMEN]['label'] . "</label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='1'
-                 onclick='dienstform_on();' ";
-          echo ( $login_dienst == 1 ) ? ' checked>' : '>';
-          echo "<label title='{$dienstinfos[DIENST_VERTEILEN]['description']}'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " " . $dienstinfos[DIENST_VERTEILEN]['label'] . "</label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='5'
-              onclick='dienstform_on();' ";
-          echo ( $login_dienst == 5 ) ? ' checked>' : '>';
-          echo "<label title='{$dienstinfos[DIENST_MITGLIEDERN]['description']}'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " " . $dienstinfos[DIENST_MITGLIEDERN]['label'] . "</label>";
-    close_table();
-    open_div( 'kommentar', "id='nodienstform' style='display:" . ( $login_dienst ? 'none' : 'block' ) .";'" );
-      if( $FC_acronym == 'LS' ) {
-        echo "Wenn du nur bestellen oder dein Konto einsehen möchtest, brauchst Du hier keine Aktion auszuwählen.";
-      } else {
-        echo "Wenn du nur bestellen oder dein Gruppenkonto einsehen möchtest, brauchst Du hier keinen Dienst auszuwählen.";
-      }
-    close_div();
     open_div( '', "id='dienstform' style='display:" . ( $login_dienst ? 'block' : 'none' ) .";'" );
       open_div( 'kommentar', '', "
         Wenn Du Dich " . ( $FC_acronym == 'LS' ? 'für eine Aktion' : 'als diensthabend' ) . " anmeldest,
-        kannst Du zusätzliche Funktionen der Foodsoft nutzen; außerdem wirst Du 
-        automatisch ins " . ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) . " eingetragen:
-      " );
+        kannst Du zusätzliche Funktionen der Foodsoft nutzen." ."<br>" .
+        "Außerdem wirst Du automatisch ins " . ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) .
+        " eingetragen:" );
       open_fieldset( 'small_form', '', ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) );
         open_div( 'newfield' );
-          ?> <label>Dein Name:</label>
+          ?> 
+             <label>Dein Name:</label>
              <input type='text' size='20' name='coopie_name' value='<?php echo $coopie_name; ?>'>
              <label style='padding-left:4em;'>Telefon:</label>
              <input type='text' size='20' name='telefon' value='<?php $telefon; ?>'> <?php
@@ -341,17 +319,36 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
 close_form();
 
 open_javascript( "
-  function dienstform_on() {
-    document.getElementById('dienstform').style.display = 'block';
-    document.getElementById('nodienstform').style.display = 'none';
-  }
-  function dienstform_off() {
-    document.getElementById('dienstform').style.display = 'none';
-    document.getElementById('nodienstform').style.display = 'block';
+  function set_dienstform() {
+    const selected = \$('dienst').value;
+    const display = selected != 0
+      ? { dienst: 'block', nodienst: 'none'  }
+      : { dienst: 'none' , nodienst: 'block' };
+    \$('dienstform').style.display = display.dienst;
+    \$('nodienstform').style.display = display.nodienst;
   }
   \$('$login_form_id').onsubmit = pick_login_text;
   document.observe('dom:loaded', pick_login_text);
 " );
+
+function optionen_dienste() {
+  global $dienstinfos, $login_dienst;
+  $optionen = "";
+  $dienste_ordered = [
+    DIENST_KEIN,
+    DIENST_VORBEREITEN_ABRECHNEN,
+    DIENST_ANNEHMEN,
+    DIENST_VERTEILEN,
+    DIENST_MITGLIEDER_DIENSTE
+  ];
+  foreach($dienste_ordered as $dienst) {
+    $selected = $login_dienst == $dienst ? 'selected' : '';
+    $label = $dienstinfos[$dienst]['label'];
+    $description = $dienstinfos[$dienst]['description'];
+    $optionen .= "<option value='$dienst' title='$description' $selected>$label</option>";
+  }
+  return $optionen;
+}
 
 function nur_fuer_dienst(...$dienste) {
   global $login_dienst;
@@ -361,6 +358,7 @@ function nur_fuer_dienst(...$dienste) {
   div_msg( 'warn', 'Keine Berechtigung' );
   exit();
 }
+
 function hat_dienst(...$dienste) {
   global $login_dienst;
   return in_array($login_dienst, $dienste);

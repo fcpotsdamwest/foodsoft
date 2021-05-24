@@ -709,6 +709,11 @@ label {
   margin-right: 1em;
 }
 
+label.login {
+  display: inline-block;
+  width: 80px;
+}
+
 .kommentar {
   padding-top: 1em;
   padding-bottom: 1em;
