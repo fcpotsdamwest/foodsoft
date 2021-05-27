@@ -1,6 +1,11 @@
 <?php
-  global $angemeldet, $login_gruppen_name, $coopie_name, $login_dienst
-       , $readonly, $foodsoftdir;
+  global
+    $angemeldet,
+    $coopie_name,
+    $foodsoftdir,
+    $login_dienst,
+    $login_gruppen_name,
+    $readonly;
 
 $headclass='head';
 $payloadclass='';
@@ -18,8 +23,8 @@ open_tag( 'head' );
   <title>Food Coop <?php echo $foodcoop_name; ?>  - Foodsoft</title>
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' >
   <link rel='stylesheet' type='text/css' href='<?php echo $foodsoftbase; ?>/css/foodsoft.css'>
-  <script type='text/javascript' src='<?php echo $foodsoftdir; ?>/js/lib/prototype.js' language='javascript'></script>        
-  <script type='text/javascript' src='<?php echo $foodsoftdir; ?>/js/foodsoft.js' language='javascript'></script>	 
+  <script src="<?php echo $foodsoftdir; ?>/js/lib/prototype.js"></script>
+  <script src="<?php echo $foodsoftdir; ?>/js/foodsoft.js"></script>	 
 <?php
 close_tag( 'head' );
 open_tag( 'body' );

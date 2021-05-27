@@ -3,7 +3,7 @@
 // login.php
 //
 // anmeldescript:
-//  - prueft, ob benutzer schon angemeldet (per cookie)
+//  - prüft, ob benutzer schon angemeldet (per cookie)
 //  - verarbeitet neuanmeldungen
 //  - per "login=logout" wird ein logout (löschen des cookie) erzwungen
 //  - falls nicht angemeldet: anmeldeformular wird ausgegeben
@@ -20,9 +20,16 @@
 //  - $dienstkontrollblatt_id
 
 function init_login() {
-  global $angemeldet, $session_id, $login_gruppen_id, $login_gruppen_name
-       , $login_dienst, $dienstkontrollblatt_id, $coopie_name
-       , $reconfirmation_muted;
+  global
+    $angemeldet,
+    $coopie_name,
+    $dienstkontrollblatt_id,
+    $login_dienst,
+    $login_gruppen_id,
+    $login_gruppen_name,
+    $reconfirmation_muted,
+    $session_id;
+
   $angemeldet=FALSE;
   $session_id = 0;
   $login_gruppen_id = FALSE;
@@ -40,7 +47,8 @@ function logout() {
 }
 
 init_login();
-$problems = '';
+$errors = [];
+$messages = [];
 
 $telefon ='';
 $name ='';
@@ -52,11 +60,11 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
   sscanf( $_COOKIE['foodsoftkeks'], "%u_%s", $session_id, $cookie );
   $row = sql_select_single_row( "SELECT *, TIMESTAMPDIFF(MINUTE, muteReconfirmation_timestamp, NOW()) AS muteReconfirmation_elapsed FROM sessions WHERE id=$session_id", true );
   if( ! $row ) {
-    $problems .= "<div class='warn'>nicht angemeldet</div>";
+    $errors[] = "nicht angemeldet";
   } elseif( $cookie != $row['cookie'] ) {
-    $problems .= "<div class='warn'>Fehler im Keks: nicht angemeldet</div>";
+    $errors[] = "(im Keks) nicht angemeldet";
   } else {
-    // anmeldung ist gueltig:
+    // anmeldung ist gültig:
     $login_gruppen_id = $row['login_gruppen_id'];
     $login_dienst = $row['dienst'];
     $dienstkontrollblatt_id = $row['dienstkontrollblatt_id'];
@@ -64,58 +72,58 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
     if (! is_null($row['muteReconfirmation_elapsed']) && $row['muteReconfirmation_elapsed'] < 60 )
         $reconfirmation_muted = TRUE;
   }
-  if( ! in_array( $login_dienst, array( 0, 1, 3, 4, 5 ) ) )
-    $problems = $problems .  "<div class='warn'>interner fehler: ungueltiger dienst</div>";
+  if( ! array_key_exists( $login_dienst, $dienstinfos ) )
+    $errors[] = "(intern) ungültiger dienst";
   if( $login_dienst > 0 ) {
     if( $dienstkontrollblatt_id > 0 ) {
       ( $row =  current( sql_dienstkontrollblatt( $dienstkontrollblatt_id ) ) )
-        or $problems = $problems .  "<div class='warn'>Dienstkontrollblatt-Eintrag nicht gefunden</div>";
+        or $errors[] = "Dienstkontrollblatt-Eintrag nicht gefunden";
       $coopie_name = $row['name'];
     } else {
-      $problems = $problems .  "<div class='warn'>interner fehler: ungueltige dienstkontrollblatt_id</div>";
+      $errors[] = "(intern) ungültige dienstkontrollblatt_id";
     }
   }
-  if( ! $problems ) {  // login ok, weitermachen...
+  if( ! $errors ) {  // login ok, weitermachen...
     $angemeldet = TRUE;
-  } else {  // irgendwas war falsch... zurueck auf los:
+  } else {  // irgendwas war falsch... zurück auf los:
     logout();
   }
 }
 
-// pruefen, ob neue login daten uebergeben werden:
+// prüfen, ob neue login daten übergeben werden:
 //
 get_http_var( 'login', 'w', '' );
 switch( $login ) {
   case 'login': 
     get_http_var( 'login_gruppen_id', 'u' )
-      or $problems .= "<div class='warn'>FEHLER: keine Gruppe ausgewählt</div>";
+      or $errors[] = "keine Gruppe ausgewählt";
     get_http_var( 'passwort','R' )
-      or $problems .= "<div class='warn'>FEHLER: kein Passwort angegeben</div>";
+      or $errors[] = "kein Passwort angegeben";
     get_http_var( 'dienst', 'u' )
-      or $problems .= "<div class='warn'>FEHLER: kein Dienst ausgewählt</div>";
+      or $errors[] = "kein Dienst ausgewählt";
 
-    if( ! in_array( $dienst, array( 0, 1, 3, 4, 5 ) ) ) {
-      $problems .= "<div class='warn'>FEHLER: kein gültiger Dienst angegeben</div>";
+    if( ! array_key_exists( $dienst, $dienstinfos ) ) {
+      $errors[] = "kein gültiger Dienst angegeben";
     }
 
     if( $dienst != 0 ) {
       get_http_var( 'coopie_name', 'H', '' );
       if( ! $coopie_name || ( strlen( $coopie_name ) < 2 ) ) {
-        $problems = $problems . "<div class='warn'>FEHLER: kein Name angegeben</div>";
+        $errors[] = "kein Name angegeben";
       }
       get_http_var( 'telefon', 'H', '' );
       get_http_var( 'notiz', 'H', '' );
     }
 
-    if( ! $problems ) {
+    if( ! $errors ) {
       if( $gruppe = check_password( $login_gruppen_id, $passwort ) ) {
         $login_gruppen_name = $gruppe['name'];
       } else {
-        $problems .= "<div class='warn'>FEHLER: Passwort leider falsch</div>";
+        $errors[] = "Passwort leider falsch";
       }
     }
 
-    if ( ( ! $problems ) && ( $dienst > 0 ) ) {
+    if ( ( ! $errors ) && ( $dienst > 0 ) ) {
       $login_dienst = $dienst;
       $dienstkontrollblatt_id = dienstkontrollblatt_eintrag(
         false, $login_gruppen_id, $login_dienst, $coopie_name, $telefon, $notiz 
@@ -124,15 +132,18 @@ switch( $login ) {
       $dienstkontrollblatt_id = 0;
     }
 
-    if( ! $problems ) {
+    if( ! $errors ) {
       // alles ok: neue session erzeugen:
       $cookie = random_hex_string( 5 );
-      $session_id = sql_insert( 'sessions', array( 
-        'cookie' => $cookie
-      , 'login_gruppen_id' => $login_gruppen_id
-      , 'dienst' => $login_dienst
-      , 'dienstkontrollblatt_id' => $dienstkontrollblatt_id
-      ) );
+      $session_id = sql_insert(
+        'sessions',
+        [
+          'cookie'                 => $cookie,
+          'login_gruppen_id'       => $login_gruppen_id,
+          'dienst'                 => $login_dienst,
+          'dienstkontrollblatt_id' => $dienstkontrollblatt_id
+        ]
+      );
       $keks = $session_id.'_'.$cookie;
       need( setcookie( 'foodsoftkeks', $keks, 0, '/' ), "setcookie() fehlgeschlagen" );
       $angemeldet = TRUE;
@@ -140,7 +151,7 @@ switch( $login ) {
     }
     break;
   case 'logout':
-    $problems .= "<div class='ok'>Abgemeldet!</div>";
+    $messages[] = "Abgemeldet!";
   case 'silentlogout':
     // ggf. noch  dienstkontrollblatt-Eintrag aktualisieren:
     if( $login_dienst > 0 and $dienstkontrollblatt_id > 0 ) {
@@ -158,9 +169,9 @@ switch( $login ) {
 if( $angemeldet )
   return;
 
-// ab hier: benutzer ist nicht eingeloggt; wir setzen alles zurueck und zeigen das anmeldeformular:
+// ab hier: benutzer ist nicht eingeloggt; wir setzen alles zurück und zeigen das anmeldeformular:
 
-logout();  // nicht korrekt angemeldet: alles zuruecksetzen...
+logout();  // nicht korrekt angemeldet: alles zurücksetzen...
 require_once("head.php");
 setWikiHelpTopic( ':' );
 
@@ -195,9 +206,14 @@ close_javascript();
 // we need $foodsoftdir in form action to allow login from DokuWiki:
 //
 open_form( "url=$foodsoftdir/index.php", 'login=login' );
-  open_fieldset( 'small_form', "style='padding:2em;width:800px;'", 'Anmelden' );
-    if( "$problems" )
-      echo "$problems";
+  open_fieldset( 'small_form', "style='padding:2em;width:max-content;'", 'Anmelden' );
+    foreach( $errors as $error ) {
+      echo "<div class='warn'>FEHLER: $error</div>";
+    }
+    foreach( $messages as $msg ) {
+      echo "<div class='ok'>$msg</div>";
+    }
+
     open_div( 'kommentar', "style='padding:1em;'", 'Anmeldung für die Foodsoft und fürs Doku-Wiki der Foodsoft:' );
     open_div( 'newfield', '', "
       <label> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>

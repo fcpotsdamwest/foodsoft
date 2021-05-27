@@ -1713,7 +1713,10 @@ function select_produkte_anzahl( $keys = array(), $using = array() ) {
   return query_produkte( 'COUNT', $keys, $using );
 }
 
-function sql_produkte( $keys = array(), $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name' ) {
+function sql_produkte(
+  $keys = array(),
+  $orderby = 'produktgruppen.name, produktgruppen.id, produkte.name'
+) {
   $r = mysql2array( doSql( select_produkte( $keys, array(), $orderby ) ) );
   foreach( $r as & $p ) {
     if( isset( $p['preis_id'] ) ) {
@@ -4377,7 +4380,7 @@ function sanitize_http_input() {
       need( checkvalue( $val, $foodsoft_get_vars[$key] ) !== false , "unerwarteter Wert für Variable $key in URL" );
     }
     if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
-      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular uebergeben' );
+      need( isset( $_POST['itan'] ), 'foodsoft: fehlerhaftes Formular übergeben' );
       sscanf( $_POST['itan'], "%u_%s", $t_id, $itan );
       need( $t_id, 'fehlerhaftes Formular übergeben' );
       $row = sql_select_single_row( "SELECT * FROM transactions WHERE id=$t_id", true );

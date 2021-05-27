@@ -248,9 +248,22 @@ open_table( 'list' );
       open_th( 'top' );
         open_div( '', '', $currentDate );
         if( hat_dienst(5) && ! $readonly ) {
-          open_div( 'bigskip center', ''
-            , fc_action( "update,title=Dienste für ganzen Liefertag löschen,class=drop,text=,confirm=Alle Dienste dieses Tages wirklich löschen?"
-                       , "action=diensteTagLoeschen,message={$dienst['id']}" )
+          open_div(
+            'bigskip center',
+            '',
+            fc_action(
+              [
+                'update'  => 1,
+                'title'   => 'Dienste für ganzen Liefertag löschen',
+                'class'   => 'drop',
+                'text'    => '',
+                'confirm' => 'Alle Dienste dieses Tages wirklich löschen?'
+              ],
+              [
+                'action'  => 'diensteTagLoeschen',
+                'message' => $dienst['id'],
+              ]
+            )
           );
         }
     }
@@ -268,8 +281,19 @@ open_table( 'list' );
           if( hat_dienst(5) && ! $readonly && ! $dienst['historic'] ) {
             open_tr();
             open_td( 'smallskip center', '',
-              fc_action( "update,title=Dienst hinzufuegen,class=button,text= + "
-                       , "action=dienstEinfuegen,message={$currentDate}_$d" ) );
+              fc_action(
+                [
+                  'update' => 1,
+                  'title'  => 'Dienst hinzufügen',
+                  'class'  => 'button',
+                  'text'   => ' + ',
+                ],
+                [
+                  'action'  => 'dienstEinfuegen',
+                  'message' => "{$currentDate}_$d"
+                ]
+              )
+            );
           }
         close_table();
     }

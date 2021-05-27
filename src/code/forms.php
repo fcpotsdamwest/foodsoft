@@ -915,7 +915,7 @@ function formular_produktpreis( $produkt_id, $vorschlag = array() ) {
   close_form();
 
   ?>
-  <script type="text/javascript">
+  <script>
 
     var mwst, pfand, verteilmult, verteileinheit, preis, gebindegroesse_in_liefereinheiten,
       liefermult, liefereinheit, lieferpreis, lv_faktor;

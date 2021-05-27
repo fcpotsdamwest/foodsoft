@@ -1021,7 +1021,7 @@ if( count( $changes ) == 0 ) {
 ?>
 
 </form>
-<script type='text/javascript'>
+<script>
   <?php echo $js; ?>
 </script>
 </body>

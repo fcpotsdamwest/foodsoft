@@ -2325,7 +2325,7 @@ function catalogue_acronym_view( $editable ) {
     /* ?><textarea name='changes' id='changes' rows=10 cols=80></textarea> <?php */
   close_form();
   
-  ?><script type='text/javascript' src='<?php echo $foodsoftdir; ?>/js/Acronyms.js' language='javascript'></script><?php
+  ?><script src='<?php echo $foodsoftdir; ?>/js/Acronyms.js'></script><?php
   open_javascript();
   ?>
 
