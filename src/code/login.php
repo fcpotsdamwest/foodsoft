@@ -286,7 +286,8 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
         <input type='password' size='12' name='passwort' value=''>
       </p>
         <div class='kommentar' id='nodienstform'>
-          Um zu bestellen oder dein Gruppenkonto einzusehen, brauchst Du hier keinen Dienst auszuwählen.
+          Um zu bestellen oder dein Gruppenkonto einzusehen,<br>
+          brauchst Du hier keinen Dienst auszuwählen.
         </div>
       <p>
         <label class='login'>Dienst:</label>
