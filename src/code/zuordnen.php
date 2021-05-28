@@ -421,7 +421,7 @@ function select_dienste( $filter = 'true' ) {
   ";
 }
 
-function sql_dienste( $filter = 'true', $orderby = 'lieferdatum ASC, dienst' ) {
+function sql_dienste( $filter = 'true', $orderby = 'lieferdatum ASC, dienst DESC' ) {
   return mysql2array( doSql(
     select_dienste( $filter ) . " ORDER BY $orderby "
   , LEVEL_ALL, "error while reading from dienste"
@@ -5022,14 +5022,24 @@ function update_database( $version ) {
 	}
 }
 
-function wikiLink( $topic, $text, $head = false ) {
+function wikiHref( $topic ) {
   global $wikibase;
   isset($wikibase) || $wikibase = getenv('wikibase');
-  if( isset( $wikibase ) ) {
+  if ( isset( $wikibase ) ) {
+    $url = "$wikibase/doku.php?id=$topic";
+    return "javascript:neuesfenster('$url','wiki');";
+  } else {
+    return null;
+  }
+}
+
+function wikiLink( $topic, $text, $head = false ) {
+  $url = wikiHref( $topic );
+  if( !is_null( $url ) ) {
     echo "
       <a class='wikilink' " . ( $head ? "id='wikilink_head' " : "" ) . "
         title='zur Wiki-Seite $topic'
-        href=\"javascript:neuesfenster('$wikibase/doku.php?id=$topic','wiki');\"
+        href=\"". wikiHref( $topic ) . "\"
       >$text</a>
     ";
   }

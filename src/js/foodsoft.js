@@ -1,7 +1,14 @@
 //  das  javascript der foodsoft  
 // copyright Fc Schinke09 2006 
 
-
+function setTheme(value) {
+  if (value == 'dienst') {
+    theme = 'dienst';
+  } else {
+    theme = 'normal';
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+}
 
 function checkAll( form_id ) {
   var o = document.forms[ 'form_'+form_id ].elements;

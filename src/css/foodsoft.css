@@ -4,6 +4,14 @@
  *
 */
 
+:root {
+  --main-color: #a01111;
+}
+
+[data-theme="dienst"] {
+  --main-color: #17038d;
+}
+
 html,
 body {
   height: 100%;
@@ -337,7 +345,7 @@ div#header table tr td {
 div#header.head,
 div#header.head table,
 div#header.head table tr td {
-  background-color: #e01010;
+  background-color: var(--main-color);
 }
 
 div#header.headro,
@@ -364,12 +372,12 @@ a.logo:link {
 span.logo,
 span.logo a {
   color: #ffffff;
-  background-color: #e01010;
+  background-color: var(--main-color);
 }
 
 span.logoinvers,
 span.logoinvers a {
-  color: #e01010;
+  color: var(--main-color);
   background-color: #ffffff;
 }
 
@@ -380,7 +388,7 @@ span.logo a:hover {
 /* das menu mit hover funktion  */
 
 div#header ul#menu {
-  background: #e01010;
+  background: var(--main-color);
   display: inline;
   margin: 0pt;
   padding: 2px 5px 0px 5px;
@@ -412,13 +420,13 @@ ul#menu li span {
 }
 
 ul#menu li span.inactive {
-  background: #e01010;
+  background: var(--main-color);
   color: #cccccc;
 }
 
 ul#menu li a:hover {
   background: white;
-  color: #e01010;
+  color: var(--main-color);
 }
 
 ul#menu li a.wikilink {
@@ -709,6 +717,11 @@ label {
   margin-right: 1em;
 }
 
+label.login {
+  display: inline-block;
+  width: 80px;
+}
+
 .kommentar {
   padding-top: 1em;
   padding-bottom: 1em;
@@ -787,7 +800,7 @@ a,
 a:visited,
 .href,
 .href:visited {
-  color: #d01010;
+  color: var(--main-color);
   text-decoration: none;
 }
 
@@ -980,11 +993,22 @@ img.button:hover {
   background-color: #ffffd0;
 }
 
+a.bulb {
+  padding: 2px 1ex 2px 2em;
+  background-image: url(../img/gluehbirne_15x16.png);
+  background-repeat: no-repeat;
+  background-position: 5px;
+}
+
+a.bulb:hover {
+  background-image: url(../img/birne_rot.png);
+}
+
 a.wikilink,
 ul#menu li a.wikilink {
   padding: 2px 1ex 2px 2em;
   background-color: white;
-  color: #e01010;
+  color: var(--main-color);
   background-image: url(../img/gluehbirne_15x16.png);
   background-repeat: no-repeat;
   background-position: 5px;
@@ -996,7 +1020,6 @@ ul#menu li a.wikilink:hover {
   background-image: url(../img/birne_rot.png);
   text-decoration: underline;
 }
-
 
 span.radiooption {
   padding-right: 1em;

@@ -4,8 +4,10 @@
     $coopie_name,
     $foodsoftdir,
     $login_dienst,
+    $login_dienstname,
     $login_gruppen_name,
-    $readonly;
+    $readonly,
+    $theme;
 
 $headclass='head';
 $payloadclass='';
@@ -24,7 +26,8 @@ open_tag( 'head' );
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8' >
   <link rel='stylesheet' type='text/css' href='<?php echo $foodsoftbase; ?>/css/foodsoft.css'>
   <script src="<?php echo $foodsoftdir; ?>/js/lib/prototype.js"></script>
-  <script src="<?php echo $foodsoftdir; ?>/js/foodsoft.js"></script>	 
+  <script src="<?php echo $foodsoftdir; ?>/js/foodsoft.js"></script>
+  <script>setTheme('<?php echo $theme; ?>');</script>
 <?php
 close_tag( 'head' );
 open_tag( 'body' );
@@ -38,9 +41,9 @@ open_div( $headclass, "id='header'" );
     open_td( '', "style='padding-top:1em;'" );
       if( $angemeldet ) {
         if( $login_dienst > 0 ) {
-          echo "Hallo $coopie_name ($login_gruppen_name) vom Dienst $login_dienst!";
+          echo "Hallo Dienst \"$login_dienstname\" | $coopie_name von $login_gruppen_name";
         } else {
-          echo "Hallo Gruppe $login_gruppen_name!";
+          echo "Hallo Gruppe $login_gruppen_name";
         }
       }
     open_td( '', "style='text-align:right;padding-top:1em;'" );

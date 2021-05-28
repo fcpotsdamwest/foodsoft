@@ -15,9 +15,56 @@
 //  - $login_gruppen_name
 //  - $session_id
 //  - $login_dienst (0, 1, 3, 4 oder 5)
+//  - $login_dienstname (lesbare Dienstbezeichnung)
 // falls $login_dienst > 0 außerdem:
 //  - $coopie_name
 //  - $dienstkontrollblatt_id
+
+define('DIENST_KEIN',                    0);
+define('DIENST_VERTEILEN',               1);
+define('DIENST_AUCH_VERTEILEN',          2);
+define('DIENST_ANNEHMEN',                3);
+define('DIENST_VORBEREITEN_ABRECHNEN',   4);
+define('DIENST_MITGLIEDER_DIENSTE',      5);
+
+$dienstinfos = [
+  DIENST_KEIN => [
+    'label'       => '(kein Dienst)',
+    'description' => 'Bestellen, Gruppenkonto einsehen',
+    'wiki'        => null,
+    'comment'     =>  'This is the default (no special task)'
+  ],
+  DIENST_VERTEILEN => [
+    'label'       => 'Verteilen',
+    'description' => 'Verteilung Terra',
+    'wiki'        => 'fc:dienst_1-2',
+    'comment'     => 'This is the former `Dienst 1`'
+  ],
+  DIENST_AUCH_VERTEILEN => [  // does not occur in the wild
+    'label'       => '(auch Verteilen)',
+    'description' => '(auch: Verteilung Terra)',
+    'wiki'        => 'fc:dienst_1-2',
+    'comment'     => 'This is the former `Dienst 2`'
+  ],
+  DIENST_ANNEHMEN => [
+    'label'       => 'Annehmen',
+    'description' => 'Pfand, Annahme Terra, Verteilung Landbrot',
+    'wiki'        => 'fc:dienst_3',
+    'comment'     => 'This is the former `Dienst 3`'
+  ],
+  DIENST_VORBEREITEN_ABRECHNEN => [
+    'label'       => 'Vorbereiten/Abrechnen',
+    'description' => 'Katalogpflege, Bestellformulare, Abrechnung',
+    'wiki'        => 'fc:dienst_4',
+    'comment'     => 'This is the former `Dienst 4`'
+  ],
+  DIENST_MITGLIEDER_DIENSTE => [
+    'label'       => 'Mitglieder/Dienste',
+    'description' => 'Mitgliederverwaltung, Dienstplanerstellung',
+    'wiki'        => 'fc:dienst_5',
+    'comment'     => 'This is the former `Dienst 5`'
+  ],
+];
 
 function init_login() {
   global
@@ -25,19 +72,23 @@ function init_login() {
     $coopie_name,
     $dienstkontrollblatt_id,
     $login_dienst,
+    $login_dienstname,
     $login_gruppen_id,
     $login_gruppen_name,
     $reconfirmation_muted,
-    $session_id;
+    $session_id,
+    $theme;
 
   $angemeldet=FALSE;
   $session_id = 0;
   $login_gruppen_id = FALSE;
   $login_gruppen_name = FALSE;
   $login_dienst = 0;
+  $login_dienstname = FALSE;
   $dienstkontrollblatt_id = FALSE;
   $coopie_name= FALSE;
   $reconfirmation_muted = FALSE;
+  $theme = 'normal';
 }
 
 function logout() {
@@ -67,6 +118,7 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
     // anmeldung ist gültig:
     $login_gruppen_id = $row['login_gruppen_id'];
     $login_dienst = $row['dienst'];
+    $login_dienstname = $dienstinfos[$login_dienst]['label'];
     $dienstkontrollblatt_id = $row['dienstkontrollblatt_id'];
     $login_gruppen_name = sql_gruppenname( $login_gruppen_id );
     if (! is_null($row['muteReconfirmation_elapsed']) && $row['muteReconfirmation_elapsed'] < 60 )
@@ -125,6 +177,7 @@ switch( $login ) {
 
     if ( ( ! $errors ) && ( $dienst > 0 ) ) {
       $login_dienst = $dienst;
+      $login_dienstname = $dienstinfos[$login_dienst]['label'];
       $dienstkontrollblatt_id = dienstkontrollblatt_eintrag(
         false, $login_gruppen_id, $login_dienst, $coopie_name, $telefon, $notiz 
       );
@@ -166,8 +219,12 @@ switch( $login ) {
     break;
 }
 
-if( $angemeldet )
+if( $angemeldet ) {
+  if ($login_dienst > 0) {
+    $theme = 'dienst';
+  }
   return;
+}
 
 // ab hier: benutzer ist nicht eingeloggt; wir setzen alles zurück und zeigen das anmeldeformular:
 
@@ -214,63 +271,41 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
       echo "<div class='ok'>$msg</div>";
     }
 
-    open_div( 'kommentar', "style='padding:1em;'", 'Anmeldung für die Foodsoft und fürs Doku-Wiki der Foodsoft:' );
     open_div( 'newfield', '', "
-      <label> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>
-      <input type='text' size='4' name='login_gruppen_id_text' id='login_gruppen_id_text' value='' 
+      <p>
+        <label class='login'> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>
+        <input type='text' size='12' name='login_gruppen_id_text' id='login_gruppen_id_text' value='' 
           onkeyup='pick_login_text();'>
-      <select size='1' name='login_gruppen_id' id='login_gruppen_id' 
+        <select size='1' name='login_gruppen_id' id='login_gruppen_id' 
           onchange='pick_login_dropdown();'>
         ". optionen_gruppen() ."
-      </select>
-      <label style='padding-left:4em;'>Passwort:</label>
-        <input type='password' size='8' name='passwort' value=''>
+        </select>
+      </p>
+      <p>
+        <label class='login'>Passwort:</label>
+        <input type='password' size='12' name='passwort' value=''>
+      </p>
+        <div class='kommentar' id='nodienstform'>
+          Um zu bestellen oder dein Gruppenkonto einzusehen, brauchst Du hier keinen Dienst auszuwählen.
+        </div>
+      <p>
+        <label class='login'>Dienst:</label>
+        <select size='1' name='dienst' id='dienst' 
+          onchange='set_dienstform();'>
+        ". optionen_dienste() . "  
+        </select>
+      </p>
     " );
-    open_div( 'newfield', '', 'Ich mache gerade...' );
-    open_table();
-      open_tr();
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='0'
-                 onclick='dienstform_off();' ";
-          echo ( $login_dienst ? '>' : 'checked>' );
-          echo ( $FC_acronym == 'LS' ? '<label>keine Aktion</label>' : '<label>keinen Dienst</label>' );
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='1'
-                 onclick='dienstform_on();' ";
-          echo ( $login_dienst == 1 ) ? ' checked>' : '>';
-          echo "<label title='Verteiler'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " I/II </label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='3'
-                 onclick='dienstform_on();' ";
-          echo ( $login_dienst == 3 ) ? ' checked>' : '>';
-          echo "<label title='Kellerdienst'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " III</label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='4'
-                 onclick='dienstform_on();' ";
-          echo ( $login_dienst == 4 ) ? ' checked>' : '>';
-          echo "<label title='Abrechnung'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " IV</label>";
-        open_td();
-          echo " <input class='checkbox' type='radio' name='dienst' value='5'
-              onclick='dienstform_on();' ";
-          echo ( $login_dienst == 5 ) ? ' checked>' : '>';
-          echo "<label title='Mitgliederverwaltung'>" . ( $FC_acronym == 'LS' ? 'Aktion' : 'Dienst' ) . " V</label>";
-    close_table();
-    open_div( 'kommentar', "id='nodienstform' style='display:" . ( $login_dienst ? 'none' : 'block' ) .";'" );
-      if( $FC_acronym == 'LS' ) {
-        echo "Wenn du nur bestellen oder dein Konto einsehen möchtest, brauchst Du hier keine Aktion auszuwählen.";
-      } else {
-        echo "Wenn du nur bestellen oder dein Gruppenkonto einsehen möchtest, brauchst Du hier keinen Dienst auszuwählen.";
-      }
-    close_div();
     open_div( '', "id='dienstform' style='display:" . ( $login_dienst ? 'block' : 'none' ) .";'" );
       open_div( 'kommentar', '', "
-        Wenn Du Dich für " . ( $FC_acronym == 'LS' ? 'eine Aktion' : 'einen Dienst' ) . " anmeldest,
-        kannst Du zusätzliche Funktionen der Foodsoft nutzen; außerdem wirst Du 
-        automatisch ins " . ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) . " eingetragen:
-      " );
+        Wenn Du Dich " . ( $FC_acronym == 'LS' ? 'für eine Aktion' : 'als diensthabend' ) . " anmeldest,
+        kannst Du zusätzliche Funktionen der Foodsoft nutzen." ."<br>" .
+        "Außerdem wirst Du automatisch ins " . ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) .
+        " eingetragen:" );
       open_fieldset( 'small_form', '', ( $FC_acronym == 'LS' ? 'Kontrollblatt' : 'Dienstkontrollblatt' ) );
         open_div( 'newfield' );
-          ?> <label>Dein Name:</label>
+          ?> 
+             <label>Dein Name:</label>
              <input type='text' size='20' name='coopie_name' value='<?php echo $coopie_name; ?>'>
              <label style='padding-left:4em;'>Telefon:</label>
              <input type='text' size='20' name='telefon' value='<?php $telefon; ?>'> <?php
@@ -290,34 +325,53 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
 close_form();
 
 open_javascript( "
-  function dienstform_on() {
-    document.getElementById('dienstform').style.display = 'block';
-    document.getElementById('nodienstform').style.display = 'none';
-  }
-  function dienstform_off() {
-    document.getElementById('dienstform').style.display = 'none';
-    document.getElementById('nodienstform').style.display = 'block';
+  function set_dienstform() {
+    const selected = \$('dienst').value;
+    const display = selected != 0
+      ? { dienst: 'block', nodienst: 'none'  }
+      : { dienst: 'none' , nodienst: 'block' };
+    \$('dienstform').style.display = display.dienst;
+    \$('nodienstform').style.display = display.nodienst;
+    const theme = selected != 0
+      ? 'dienst'
+      : 'normal';
+    document.documentElement.setAttribute('data-theme', theme);
   }
   \$('$login_form_id').onsubmit = pick_login_text;
   document.observe('dom:loaded', pick_login_text);
 " );
 
-function nur_fuer_dienst() {
+function optionen_dienste() {
+  global $dienstinfos, $login_dienst;
+  $optionen = "";
+  $dienste_ordered = [
+    DIENST_KEIN,
+    DIENST_VORBEREITEN_ABRECHNEN,
+    DIENST_ANNEHMEN,
+    DIENST_VERTEILEN,
+    DIENST_MITGLIEDER_DIENSTE
+  ];
+  foreach($dienste_ordered as $dienst) {
+    $selected = $login_dienst == $dienst ? 'selected' : '';
+    $label = $dienstinfos[$dienst]['label'];
+    $description = $dienstinfos[$dienst]['description'];
+    $optionen .= "<option value='$dienst' title='$description' $selected>$label</option>";
+  }
+  return $optionen;
+}
+
+function nur_fuer_dienst(...$dienste) {
   global $login_dienst;
-  for( $i = 0; $i < func_num_args(); $i++ ) {
-    if( $login_dienst == func_get_arg($i) )
-      return TRUE;
+  if ( in_array($login_dienst, $dienste) ) {
+    return TRUE;
   }
   div_msg( 'warn', 'Keine Berechtigung' );
   exit();
 }
-function hat_dienst() {
+
+function hat_dienst(...$dienste) {
   global $login_dienst;
-  for( $i = 0; $i < func_num_args(); $i++ ) {
-    if( $login_dienst == func_get_arg($i) )
-      return true;
-  }
-  return false;
+  return in_array($login_dienst, $dienste);
 }
 
 exit();

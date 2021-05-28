@@ -91,11 +91,18 @@ global
   $coopie_name,
   $dienstkontrollblatt_id,
   $login_dienst,
+  $login_dienstname,
   $login_gruppen_id,
   $login_gruppen_name,
-  $session_id;
+  $session_id,
+  $theme;
 
 $angemeldet = false;
+
+// Dienstlabel und -bechreibungen
+global
+  $dienstinfos;
+
 
 require_once('structure.php');
 require_once('code/views.php');
