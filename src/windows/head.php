@@ -29,6 +29,7 @@ open_tag( 'head' );
   <link rel='stylesheet' type='text/css' href='<?php echo $foodsoftdir; ?>/css/foodsoft.css'>
   <script src='<?php echo $foodsoftdir; ?>/js/lib/prototype.js'></script>
   <script src='<?php echo $foodsoftdir; ?>/js/foodsoft.js'></script>
+  <script>setTheme('<?php echo $theme; ?>');</script>
 <?php
 close_tag( 'head' );
 
@@ -50,9 +51,9 @@ open_div( $headclass, "id='header' style='padding:0.5ex 1em 0.5ex 1ex;margin:0pt
       open_td( '', "style='font-size:11pt;'" );
         if( $angemeldet ) {
           if( $login_dienst > 0 ) {
-            echo "$coopie_name ($login_gruppen_name) / Dienst $login_dienst";
+          echo "Dienst \"$login_dienstname\" | $coopie_name von $login_gruppen_name";
           } else {
-            echo "angemeldet: $login_gruppen_name";
+          echo "$login_gruppen_name";
           }
         }
         if( $readonly )
