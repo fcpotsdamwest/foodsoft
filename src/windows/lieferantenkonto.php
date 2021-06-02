@@ -5,7 +5,7 @@ assert($angemeldet) or exit();
 setWikiHelpTopic( 'foodsoft:lieferantenkonto' );
 setWindowSubtitle( 'Lieferantenkonto' );
 
-$editable = ( hat_dienst(4) and ! $readonly );
+$editable = ( hat_dienst(5) and ! $readonly );
 get_http_var( 'lieferanten_id', 'u', 0, true );
 
 ?> <h1>Lieferantenkonto</h1> <?php

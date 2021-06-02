@@ -105,7 +105,7 @@ open_form( '', 'action=save' );
         close_select();
       open_tr();
         open_td( 'right', "colspan='2'" );
-          if( $lieferanten_id > 0 )
+          if( $lieferanten_id > 0 and hat_dienst( 5 ) )
             echo fc_link( 'lieferantenkonto', "lieferanten_id=$lieferanten_id,text=Lieferantenkonto..." );
           qquad();
           if( $editable )

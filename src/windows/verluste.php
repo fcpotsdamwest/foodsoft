@@ -8,7 +8,7 @@ assert( $angemeldet ) or exit();
 setWikiHelpTopic( 'foodsoft:verluste' );
 setWindowSubtitle( 'Verluste' );
 
-$editable = ( hat_dienst(4) and ! $readonly );
+$editable = ( hat_dienst(5) and ! $readonly );
 // get_http_var( 'optionen', 'u', 0, true );
 
 get_http_var( 'detail', 'w', 0, true );

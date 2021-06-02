@@ -5,7 +5,7 @@ assert( $angemeldet ) or exit();
 setWindowSubtitle( 'Buchung edieren' );
 setWikiHelpTopic( 'foodsoft:buchung_edieren' );
 
-$editable = ( hat_dienst(4) and ! $readonly );
+$editable = ( hat_dienst(5) and ! $readonly );
 
 $msg = '';
 $problems = '';

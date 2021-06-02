@@ -5,7 +5,7 @@ $editable = ! $readonly;
  
 get_http_var( 'meinkonto', 'u', 0, true );
 get_http_var( 'gruppen_id', 'u', 0, true );
-if( ( ! hat_dienst(4,5) ) and ( $gruppen_id == $login_gruppen_id ) ) {
+if( ( ! hat_dienst(5) ) and ( $gruppen_id == $login_gruppen_id ) ) {
   $meinkonto = 1;
 }
 
@@ -68,7 +68,7 @@ if( $meinkonto ) {
   }
 
 } else { // kontoblatt-anzeige für dienste
-  nur_fuer_dienst(4,5);
+  nur_fuer_dienst(5);
   setWikiHelpTopic( 'foodsoft:kontoblatt' );
   ?> <h1>Kontoblatt</h1> <?php
 

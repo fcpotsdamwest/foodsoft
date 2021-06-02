@@ -161,7 +161,7 @@ if( $edit_pwd ) {
   close_fieldset();
 }
 
-if( hat_dienst(4,5) or ( $gruppen_id == $login_gruppen_id ) )
+if( hat_dienst(5) or ( $gruppen_id == $login_gruppen_id ) )
   open_div( 'smallskip right', '', fc_link( 'gruppenkonto', "gruppen_id=$gruppen_id,text=Gruppenkonto..." ) );
   
 medskip();

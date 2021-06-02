@@ -3,7 +3,7 @@ assert( $angemeldet ) or exit();
 
 setWindowSubtitle( 'Konto edieren' );
 setWikiHelpTopic( 'foodsoft:konto_edieren' );
-$editable = hat_dienst(4);
+$editable = hat_dienst(5);
 get_http_var( 'ro', 'u', 0, true );
 if( $ro or $readonly )
   $editable = false;

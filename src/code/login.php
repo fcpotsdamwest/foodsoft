@@ -59,8 +59,8 @@ $dienstinfos = [
     'comment'     => 'This is the former `Dienst 4`'
   ],
   DIENST_MITGLIEDER_DIENSTE => [
-    'label'       => 'Mitglieder/Dienste',
-    'description' => 'Mitgliederverwaltung, Dienstplanerstellung',
+    'label'       => 'Mitglieder/Dienste/Konto',
+    'description' => 'Mitgliederverwaltung, Dienstplanerstellung, Buchhaltung/Kontoführung',
     'wiki'        => 'fc:dienst_5',
     'comment'     => 'This is the former `Dienst 5`'
   ],

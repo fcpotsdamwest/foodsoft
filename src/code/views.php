@@ -1923,7 +1923,7 @@ function auswahl_konto( $selected = 0 ) {
     open_th('','','Saldo');
     open_th('','','Online-Banking');
     open_th('','','Kommentar');
-    if( hat_dienst(4) )
+    if( hat_dienst(5) )
       open_th('','','Aktionen');
   foreach( sql_konten() as $row ) {
     open_tr( ( $row['id'] == $selected ) ? 'active' : '' );
@@ -1938,7 +1938,7 @@ function auswahl_konto( $selected = 0 ) {
         open_td( '', '', '-' );
       }
       open_td( '', '', $row['kommentar'] );
-      if( hat_dienst(4) )
+      if( hat_dienst(5) )
         open_td( '', '', fc_link( 'edit_konto', "class=edit,text=,konto_id={$row['id']}" ) );
   }
   close_table();

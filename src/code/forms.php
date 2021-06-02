@@ -139,7 +139,7 @@ function action_finish_transaction() {
     return;
 
   fail_if_readonly();
-  nur_fuer_dienst(4);
+  nur_fuer_dienst(5);
 
   $soll_id = -$transaction_id;
   $soll_transaction = sql_get_transaction( $soll_id );

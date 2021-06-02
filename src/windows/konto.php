@@ -4,7 +4,7 @@
 //
 
 assert( $angemeldet ) or exit();
-$editable = ( hat_dienst(4) and ! $readonly );
+$editable = ( hat_dienst(5) and ! $readonly );
 
 setWikiHelpTopic( 'foodsoft:kontoverwaltung' );
 

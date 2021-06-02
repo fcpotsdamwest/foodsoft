@@ -11,7 +11,7 @@ $msg="";
 get_http_var( 'optionen', 'u', 0, true );
 $show_member_details = $optionen & GRUPPEN_OPT_DETAIL;
 
-if( hat_dienst(4,5) ) {
+if( hat_dienst(5) ) {
   open_table('menu');
       open_th('', '', 'Optionen' );
     open_tr();
@@ -105,7 +105,7 @@ open_table('list');
   open_th( '','','Gruppenname' );
   open_th( '','','Kontostand' );
   open_th( '','','Mitgliederzahl' );
-  if( hat_dienst(4,5) ) {
+  if( hat_dienst(5) ) {
     open_th( '', 'title="Letzte Anmeldung der Gruppe in der Foodsoft"', 'letztes login' );
     open_th( '', 'title="Lieferdatum der letzten Bestellung, an der sich die Gruppe beteiligte"', 'letzte Bestellung' );
   }
@@ -118,7 +118,7 @@ open_table('list');
     $id = $gruppe['id'];
     if( in_array( $id, $specialgroups ) )
       continue;
-    if( hat_dienst(4,5) || ( $login_gruppen_id == $id ) ) {
+    if( hat_dienst(5) || ( $login_gruppen_id == $id ) ) {
       $kontostand = sprintf( '%10.2lf', kontostand( $gruppe['id'] ) );
       if( $optionen & GRUPPEN_OPT_SCHULDEN )
         if( $kontostand >= 0 )
@@ -139,10 +139,11 @@ open_table('list');
       open_td( '', '', $nr );
       open_td( '', '', $gruppe['name'] );
       open_td( 'number' );
-      if( hat_dienst(4,5) || ( $login_gruppen_id == $id ) )
+      if( hat_dienst(5) || ( $login_gruppen_id == $id ) ) {
         echo price_view( $kontostand );
+      }
       open_td( 'number', '', $gruppe['mitgliederzahl'] );
-      if( hat_dienst(4,5) ) {
+      if( hat_dienst(5) ) {
         $letztes_login = sql_gruppe_letztes_login( $id );
         if( $letztes_login )
           open_td( '', '', $letztes_login['time_stamp'] );
@@ -162,13 +163,13 @@ open_table('list');
 
       if( $gruppe['aktiv'] ) {
         echo fc_link( 'gruppenmitglieder', "gruppen_id=$id,title=Mitglieder,text=" );
-        if( hat_dienst(4,5) ) {
+        if( hat_dienst(5) ) {
           echo fc_link( 'gruppenkonto', "gruppen_id=$id,title=Kontoblatt,text=" );
         } elseif( $login_gruppen_id == $id ) {
           echo fc_link( 'gruppenkonto', "gruppen_id=$id,title=Kontoblatt,meinkonto=1,text=" );
         }
-        if( hat_dienst(4,5) || ( $login_gruppen_id == $id ) ) {
-          if( $offene_einzahlungen ) {
+        if( hat_dienst(5) || ( $login_gruppen_id == $id ) ) {
+          if( isset($offene_einzahlungen) ) {
             open_table('list');
                 open_th( '', "colspan='3'", 'ungebuchte Einzahlungen: ' . count($offene_einzahlungen) );
               foreach( $offene_einzahlungen as $trans ) {
@@ -212,7 +213,7 @@ open_table('list');
     }
   }
 
-  if( hat_dienst(4,5) ) {
+  if( hat_dienst(5) ) {
     open_tr('summe');
       open_td('right', "colspan='2'", 'Summe:' );
       open_td('number', '', price_view( $summe ) );
