@@ -29,7 +29,7 @@ get_http_var("startdatum_year",'U',0);
 get_http_var("dienstinterval","U",7) or $dienstinterval = 7;
 get_http_var("dienstanzahl","U",8) or $dienstanzahl = 8;
 get_http_var("personen_1","u",2) or $personen_1 = 2;
-get_http_var("personen_3","u",1) or $personen_3 = 1;
+get_http_var("personen_3","u",2) or $personen_3 = 2;
 get_http_var("personen_4","u",2) or $personen_4 = 2;
 
 if( $startdatum_day && $startdatum_month && $startdatum_year ) {
