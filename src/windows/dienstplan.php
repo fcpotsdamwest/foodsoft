@@ -23,14 +23,15 @@ if( $action ) {
   }
 }
 
-get_http_var("startdatum_day",'U',0);
-get_http_var("startdatum_month",'U',0);
-get_http_var("startdatum_year",'U',0);
-get_http_var("dienstinterval","U",7) or $dienstinterval = 7;
-get_http_var("dienstanzahl","U",8) or $dienstanzahl = 8;
-get_http_var("personen_1","u",2) or $personen_1 = 2;
-get_http_var("personen_3","u",2) or $personen_3 = 2;
-get_http_var("personen_4","u",2) or $personen_4 = 2;
+get_http_var("startdatum_day"  , 'U', 0);
+get_http_var("startdatum_month", 'U', 0);
+get_http_var("startdatum_year" , 'U', 0);
+get_http_var("dienstinterval"  , "U", 7) or $dienstinterval = 7;
+get_http_var("dienstanzahl"    , "U", 8) or $dienstanzahl = 8;
+get_http_var("personen_1"      , "u", 2) or $personen_1 = 2;
+get_http_var("personen_3"      , "u", 2) or $personen_3 = 2;
+get_http_var("personen_4"      , "u", 2) or $personen_4 = 2;
+get_http_var("useRotation"     , "u", 0);
 
 if( $startdatum_day && $startdatum_month && $startdatum_year ) {
   $startdatum = "$startdatum_year-$startdatum_month-$startdatum_day";
@@ -170,6 +171,12 @@ if( hat_dienst(5) ) {
             open_span( 'medskip', '', "{$dienstinfos[4]['label']}: " . int_view( $personen_4, "personen_4", 1 ) . " Personen<br>" );
             open_span( 'medskip', '', "{$dienstinfos[3]['label']}: " . int_view( $personen_3, "personen_3", 1 ) . " Personen<br>" );
             open_span( 'medskip', '', "{$dienstinfos[1]['label']}: " . int_view( $personen_1, "personen_1", 1 ) . " Personen<br>" );
+        open_tr();
+          open_td( 'qquad' );
+          smallskip();
+          echo
+            '<input type="checkbox" class="checkbox" name="useRotation" value="1">' .
+              'Rotationsplan für Vorschläge nutzen';
         open_tr();
           open_td( 'right', '' );
             smallskip();

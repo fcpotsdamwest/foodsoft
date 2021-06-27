@@ -757,19 +757,33 @@ function sql_change_rotationsplan( $mitglied_id, $dienst, $move_down ) {
 /**
  *  Legt Dienste-Einträge für einen Zeitraum (Dienstperiode) in der DB an.
  */
-function create_dienste( $start, $spacing, $zahl, $personenzahlen ) {
-  foreach( $personenzahlen as $dienstname => $personen ) {
-    $positionen[$dienstname] = 0;
-  }
+function create_dienste( $start, $spacing, $zahl, $personenzahlen, $useRotation = 0 ) {
+ 
+  $positionen = array_fill_keys( array_keys( $personenzahlen ), 0 );
+
   for( $n = 1; $n <= $zahl; $n++ ) {
     foreach( $personenzahlen as $dienstname => $personen ) {
       for( $i=1; $i <= $personen; $i++ ) {
-        $plan_position = sql_rotationsplan_next( $positionen[$dienstname], $dienstname );
-        sql_create_dienst( $start, $dienstname, sql_rotationsplan_mitglied( $plan_position ) );
+        
+        if( $useRotation ) {
+          $plan_position = sql_rotationsplan_next(
+            $positionen[$dienstname],
+            $dienstname
+          );
+          $mitglied_id = sql_rotationsplan_mitglied( $plan_position );
+          sql_create_dienst( $start, $dienstname, $mitglied_id );
         $positionen[$dienstname] = $plan_position;
+        } else {
+          /* create 'open' job entries */
+          $mitglied_id = 0;
+          sql_create_dienst( $start, $dienstname, $mitglied_id );
+        }
       }
     }
-    $start = sql_select_single_field( "SELECT adddate( '$start', $spacing ) AS date", 'date' );
+    $start = sql_select_single_field(
+      "SELECT ADDDATE( '$start', $spacing ) AS date",
+      'date'
+    );
   }
   //Wenn ein Dienst erzeugt wurde, rotationsplan umstellen:
   foreach( $positionen as $plan_position ) {
