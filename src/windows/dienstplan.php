@@ -291,7 +291,7 @@ open_table( 'list' );
               smallskip();
             $dienst = next( $dienste );
           }
-          if( hat_dienst(5) && ! $readonly && ! $dienst['historic'] ) {
+          if( hat_dienst(5) && ! $readonly && ! ($dienst && $dienst['historic']) ) {
             open_tr();
             open_td( 'smallskip center', '',
               fc_action(
