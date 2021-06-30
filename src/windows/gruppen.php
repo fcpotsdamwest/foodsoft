@@ -90,7 +90,7 @@ switch( $action ) {
     // echo "id: $gruppen_id, trans: $transaction_id <br>";
     $trans = sql_get_transaction( -$transaction_id );
     if( $trans['gruppen_id'] != $login_gruppen_id )
-      nur_fuer_dienst(4,5);
+      nur_fuer_dienst(5);
     need( $trans['konterbuchung_id'] == 0, 'bereits verbucht, kann nicht mehr gelöscht werden!' );
     doSql( "DELETE FROM gruppen_transaktion WHERE id=$transaction_id" );
     break;
