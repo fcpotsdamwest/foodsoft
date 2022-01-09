@@ -2236,7 +2236,7 @@ function catalogue_product_details( $catalogue_record ) {
           , $catalogue_record['herkunft']
           , 'hrk');
   join_details( $details
-          , '<span title="Verband">Vbd:</span> '
+          , '<span title="Qualität">Qlt:</span> '
           , $catalogue_record['verband']
           , 'vbd');
   join_details( $details
