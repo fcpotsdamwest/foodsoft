@@ -23,6 +23,8 @@ chmod 644 INSTALL
 chmod 644 README.md
 chmod 644 ToDo.txt
 chmod 644 apache.sample.conf
+chmod 644 composer.json
+chmod 644 composer.lock
 chmod 644 db/mwst.sql
 chmod 755 deploy.sh
 chmod 644 dev/.env.sample

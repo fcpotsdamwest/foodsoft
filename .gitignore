@@ -6,3 +6,4 @@ src/version.txt
 dev/dbdata
 dev/.env
 dev/wiki/config
+vendor
