@@ -97,6 +97,8 @@ chmod 644 src/phpinfo.php
 chmod 644 src/setup.php
 chmod 644 src/structure.php
 chmod 644 src/templates/bestellschein.html.tpl
+chmod 644 src/templates/hello.twig
+chmod 644 src/twiggie.php
 chmod 644 src/windows/abrechnung.php
 chmod 644 src/windows/abschluss.php
 chmod 644 src/windows/artikelsuche.php
