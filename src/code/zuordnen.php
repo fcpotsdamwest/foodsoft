@@ -4536,7 +4536,7 @@ function checkvalue( $val, $typ){
 // Create a global variable <name> and populate it with the GET or POST parameter
 // of the same name, using the <default> value if set.
 //
-// - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
+// - name: wenn $name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
 // - typ: definierte $typ argumente:
 //   d : ganze Zahl
 //   u : nicht-negative ganze Zahl
@@ -4550,6 +4550,10 @@ function checkvalue( $val, $typ){
 // - default:
 //   - wenn array erwartet wird, kann der default ein array sein.
 //   - wird kein array erwartet, aber default is ein array, so wird $default[$name] versucht
+// - is_self_field: ('POST'|FALSE|(truthy))
+//   - value 'POST' will set the key $name in $self_post_fields
+//   - value FALSE will add $name neither to $self_fields nor to $self_post_fields
+//   - any truthy value other than 'POST' will set the $name field in $self_fields
 //
 // per POST übergebene variable werden nur berücksichtigt, wenn zugleich eine
 // unverbrauchte transaktionsnummer 'itan' übergeben wird (als Sicherung
