@@ -21,56 +21,53 @@ get_http_var( 'window', 'w', 'menu', true );         // eigentlich: name des skr
 get_http_var( 'window_id', 'w', 'main', true );   // ID des browserfensters
 setWikiHelpTopic( "foodsoft:$window" );
 
-switch( $window_id ) {
-  case 'main':   // anzeige im hauptfenster des browsers
-    include('head.php');
-    switch( $window ) {
-      case "wiki":
-        reload_immediately( "$foodsoftdir/../wiki/doku.php?do=show" );
+if( $window_id == 'main' ) {
+  // anzeige im hauptfenster des browsers
+  include('head.php');
+  switch( $window ) {
+    case "wiki":
+      reload_immediately( "$foodsoftdir/../wiki/doku.php?do=show" );
+      break;
+    case 'menu':
+    case "bestellen":
+      if( dienst_liste( $login_gruppen_id, 'bestätigen lassen' ) )
         break;
-      case 'menu':
-      case "bestellen":
-        // if( hat_dienst(0) )
-          if( dienst_liste( $login_gruppen_id, 'bestätigen lassen' ) )
-            break;
-      default:
-        if( is_readable( "windows/$window.php" ) ) {
-          include( "windows/$window.php" );
-        } else {
-          div_msg( 'warn', "Ungültiger Bereich: $window" );
-          include('windows/menu.php');
-        }
-    }
-    open_table( 'footer', "width='100%'" );
-      open_td( '', '', "aktueller Server: <kbd>" .gethostname(). "</kbd>" );
+    default:
+      if( is_readable( "windows/$window.php" ) ) {
+        include( "windows/$window.php" );
+      } else {
+        div_msg( 'warn', "Ungültiger Bereich: $window" );
+        include('windows/menu.php');
+      }
+  }
+  open_table( 'footer', "width='100%'" );
+    open_td( '', '', "aktueller Server: <kbd>" .gethostname(). "</kbd>" );
       $version = "unknown";
       if (file_exists("version.txt")) {
         $version = file_get_contents("version.txt");
       }
-      open_td( '', '', "Version: <kbd>$version</kbd>");
-      open_td( 'right' );
-        echo $mysqljetzt;
-        if( $readonly ) {
-          echo "<span style='font-weight:bold;color:440000;'> --- !!! Datenbank ist schreibgeschützt !!!</span>";
-        }
-    close_table();
-    close_div(); // payload
-    open_div('layout', 'id="footbar" style="display: none;"');
-    close_div(); // layout: footbar
+    open_td( '', '', "Version: <kbd>$version</kbd>");
+    open_td( 'right' );
+      echo $mysqljetzt;
+      if( $readonly ) {
+        echo "<span style='font-weight:bold;color:440000;'> --- !!! Datenbank ist schreibgeschützt !!!</span>";
+      }
+  close_table();
+  close_div(); // payload
+  open_div('layout', 'id="footbar" style="display: none;"');
+  close_div(); // layout: footbar
 
-    $js_on_exit[] = "document.observe('dom:loaded', window.updateWindowHeight );";
-    $js_on_exit[] = "Event.observe(window, 'resize', window.updateWindowHeight );";
-    $js_on_exit[] = "window.scroller.register(document);";
-
-    break;
-  default:   // anzeige in einem unterfenster
-    require_once( 'windows/head.php' );
-    if( is_readable( "windows/$window.php" ) ) {
-      include( "windows/$window.php" );
-    } else {
-      div_msg( 'warn', "Ungültiger Bereich: $window" );
-    }
-    break;
+  $js_on_exit[] = "document.observe('dom:loaded', window.updateWindowHeight );";
+  $js_on_exit[] = "Event.observe(window, 'resize', window.updateWindowHeight );";
+  $js_on_exit[] = "window.scroller.register(document);";
+} else {
+  // anzeige in einem unterfenster
+  require_once( 'windows/head.php' );
+  if( is_readable( "windows/$window.php" ) ) {
+    include( "windows/$window.php" );
+  } else {
+    div_msg( 'warn', "Ungültiger Bereich: $window" );
+  }
 }
 
 // force new iTAN (this form must still be submittable after any other):

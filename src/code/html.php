@@ -273,7 +273,7 @@ function close_li() {
 // - $get/post_parameters can be arrays or strings (see parameters_explode() in inlinks.php!)
 //
 function open_form( $get_parameters = array(), $post_parameters = array() ) {
-  global $form_id, $input_event_handlers, $hidden_input, $self_fields;
+  global $form_id, $input_event_handlers, $hidden_input;
 
   if( is_string( $get_parameters ) )
     $get_parameters = parameters_explode( $get_parameters );

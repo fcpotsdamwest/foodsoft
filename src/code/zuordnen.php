@@ -4677,13 +4677,10 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
   if( ! $http_input_sanitized )
     sanitize_http_input();
 
-  // echo "get_http_var: $is_self_field";
-  if( substr( $name, -2 ) == '[]' ) {
-    $want_array = true;
-    $name = substr( $name, 0, strlen($name)-2 );
-  } else {
-    $want_array = false;
-  }
+  // check for array option and update $name accordingly
+  $want_array = substr($name, -2) == '[]';
+  if ( $want_array ) { $name = substr($name, 0, -2); }
+
   if( isset( $_GET[$name] ) ) {
     $arry = $_GET[$name];
   } elseif( isset( $_POST[$name] ) ) {
