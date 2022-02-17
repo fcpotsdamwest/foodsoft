@@ -2388,6 +2388,54 @@ function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0,
   return $r;
 }
 
+/** sql_gruppen_lieblings_produkte
+ * 
+ * TODO
+ * - make configurable
+ *   - time period taken into account: currently 6 months
+ *   - frequency threshold: currently 1
+ *   - ordering of the results: currently unordered
+ * 
+ * @param int $gruppen_id
+ * @param int $lieferanten_id
+ *   Query params for the product search 
+ * @return array
+ *   An (ordered?) array of the product
+ */
+function sql_gruppen_lieblings_produkte( $gruppen_id, $lieferanten_id ) {
+  $gruppen_id = 2032;
+  return mysql2array( doSql("
+    SELECT
+      produkt_id,
+      COUNT(*) AS freq
+    FROM
+      bestellzuordnung
+    WHERE
+      gruppenbestellung_id IN (
+      SELECT
+        id
+      FROM
+        `gruppenbestellungen`
+      WHERE
+        bestellgruppen_id = {$gruppen_id}
+      AND
+        gesamtbestellung_id IN (
+          SELECT
+            id
+          FROM
+            gesamtbestellungen
+          WHERE
+            lieferung BETWEEN DATE_SUB(NOW(), INTERVAL 24 MONTH) AND NOW()
+          AND
+            lieferanten_id = {$lieferanten_id}
+        )
+      )
+    GROUP BY produkt_id
+    HAVING freq > 2
+    ORDER BY produkt_id
+  " ), FALSE, 'produkt_id' );
+}
+
 
 /*  preisdaten setzen:
  *  berechnet und setzt einige weitere nützliche einträge einer 'produktpreise'-Zeile:
@@ -4389,6 +4437,7 @@ $foodsoft_get_vars = array(
   'detail' => 'w',
   'download' => 'w',
   'faxspalten' => 'u',
+  'filter' => 'u',
   'gruppen_id' => 'u',
   'id' => 'u',
   'id_to' => 'u',

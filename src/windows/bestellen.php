@@ -3,6 +3,8 @@ error_reporting(E_ALL);
 
 assert( $angemeldet ) or exit();
 
+define('FILTER_FAVORITES', 1);
+
 setWikiHelpTopic( "foodsoft:bestellen" );
 
 // the 'basarmodus' has only to be added to $self_fields when logged in as dienst 4
@@ -574,6 +576,16 @@ if( ! $readonly ) {
   close_div(); // submit div
 }
 
+get_http_var('filter', 'u', 0, TRUE);
+
+open_table('menu', "id='option_menu_table'");
+  open_th('', '', 'Anzeigeoptionen');
+    open_tr();
+      open_td();
+        option_checkbox('filter', FILTER_FAVORITES, 'nur meine Lieblingsprodukte anzeigen', '');
+close_table();
+medskip();
+
 /* --- order sheet: table header --- */
 
 open_table( 'list hfill' );
@@ -609,6 +621,18 @@ open_table( 'list hfill' );
       open_th( 'small tight', '', '' );
     else
       open_th( 'small tight', '', '(aktuell)' );
+
+/* --- order sheet: filtering --- */
+
+if( $filter & FILTER_FAVORITES ) {
+  $group_favorite_product_ids = sql_gruppen_lieblings_produkte( $gruppen_id, $lieferanten_id );
+  $produkte = array_filter(
+    $produkte,
+    function ($item) use ($group_favorite_product_ids) {
+      return in_array($item['produkt_id'], $group_favorite_product_ids);
+    }
+  );
+}
 
 /* --- prepare aggregating product groups --- */
 
