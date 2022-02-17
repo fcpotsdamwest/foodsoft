@@ -294,7 +294,7 @@ function adefault( $array, $index, $default ) {
  *   (This means 0 as key column won't work with this implementation)
  * @param bool $val
  *   Key-Value-Mode: The column index to use as value.
- *   Only evaluated if $key is truthy.
+ *   If $key is FALSE but $val not, numerical indices are used.
  * @param $result_type
  *   MYSQLI_ASSOC: return assoc array (column names as keys)
  *   MYSQLI_NUM: return array (column indices as keys)
@@ -313,6 +313,9 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
       need( isset( $row[$key] ) );
       need( isset( $row[$val] ) );
       $r[$row[$key]] = $row[$val];
+    } elseif( $val != FALSE ) {
+      need(isset($row[$val]));
+      $r[] = $row[$val];
     } else {
       $row['nr'] = $n++;
       $r[] = $row;
