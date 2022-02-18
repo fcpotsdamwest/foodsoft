@@ -70,7 +70,9 @@ function katalogabgleich(
   global $mwst_default;
 
   $preis_id = sql_aktueller_produktpreis_id( $produkt_id );
-  $artikel = sql_produkt( array( 'produkt_id' => $produkt_id, 'preis_id' => $preis_id ) );
+  $artikel = sql_produkt(
+    array( 'produkt_id' => $produkt_id, 'preis_id' => $preis_id )
+  );
   $neednewprice = false;
   $neednewbestellnummer = false;
 

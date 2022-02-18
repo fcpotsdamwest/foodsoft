@@ -1625,8 +1625,10 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
   if( ( $katalogformat == 'keins' ) || ( $katalogformat == '' ) ) {
     return 0;
   }
-  return sql_count( 'lieferantenkatalog'
-                  , "(lieferanten_id = $lieferanten_id) and (katalogformat = '$katalogformat')" );
+  return sql_count(
+    'lieferantenkatalog',
+    "(lieferanten_id = $lieferanten_id) and (katalogformat = '$katalogformat')"
+  );
 }
 
 
@@ -1647,23 +1649,27 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
 function query_produkte( $op, $keys = array(), $using = array(), $orderby = false ) {
   $have_price = false;
 
-  $selects = array();
   $filters = array();
-  $joins = need_joins_array( $using, array(
-    'produktgruppen' => 'produktgruppen.id = produkte.produktgruppen_id'
-  , 'lieferanten' => 'lieferanten.id = produkte.lieferanten_id'
-  ) );
+  $joins = need_joins_array(
+    $using,
+    [
+      'produktgruppen' => 'produktgruppen.id = produkte.produktgruppen_id',
+      'lieferanten'    => 'lieferanten.id = produkte.lieferanten_id',
+    ]
+  );
 
-  $selects[] = 'produkte.id as produkt_id';
-  $selects[] = 'produkte.artikelnummer';
-  $selects[] = 'produkte.name as name';
-  $selects[] = 'produkte.lieferanten_id';
-  $selects[] = 'produkte.produktgruppen_id';
-  $selects[] = 'produkte.notiz';
-  $selects[] = 'produkte.dauerbrenner';
-  $selects[] = 'produktgruppen.name as produktgruppen_name';
-  $selects[] = 'produktgruppen.id as produktgruppen_id';
-  $selects[] = 'lieferanten.name as lieferant_name';
+  $selects = [
+    'produkte.id as produkt_id',
+    'produkte.artikelnummer',
+    'produkte.name as name',
+    'produkte.lieferanten_id',
+    'produkte.produktgruppen_id',
+    'produkte.notiz',
+    'produkte.dauerbrenner',
+    'produktgruppen.name as produktgruppen_name',
+    'produktgruppen.id as produktgruppen_id',
+    'lieferanten.name as lieferant_name'
+  ];
 
   foreach( $keys as $key => $cond ) {
     switch( $key ) {
@@ -4716,7 +4722,10 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
  *   True if the request parameter is present.
  */
 function need_http_var( $name, $typ, $is_self_field = false ) {
-  need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );
+  need(
+    get_http_var( $name, $typ, NULL, $is_self_field ),
+    "variable $name nicht übergeben"
+  );
   return TRUE;
 }
 
