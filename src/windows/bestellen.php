@@ -434,9 +434,9 @@ if( ! $readonly ) {
     }
 
     /**
-     * Disable the button that allows for switching between basar order mode
-     * and group order mode. E.g. when there are already changes in the order
-     * sheet, it shouldn't be possible to toggle to ensure data consistency. 
+     * Disable the DOM element with the given ID
+     * 
+     * @param {string} elementId
      */
     function disableElementById( elementId ) {
       const element = document.getElementById( elementId );
@@ -584,7 +584,7 @@ open_table('menu', "id='option_menu_table'");
   open_th('', '', 'Anzeigeoptionen');
     open_tr();
       open_td();
-        option_checkbox('filter', FILTER_FAVORITES, 'nur meine Lieblingsprodukte anzeigen', '');
+        option_checkbox('filter', FILTER_FAVORITES, 'nur meine Lieblingsprodukte anzeigen', 'id="filterCheckboxFavorites"');
 close_table();
 medskip();
 
