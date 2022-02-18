@@ -697,20 +697,20 @@ foreach( $produkte as $produkt ) {
     } else {
       $katalogdaten = array();
       switch( katalogabgleich( $produkt_id, 0, 0, $katalogdaten ) ) {
-        case 0:
+        case CAT_AND_FS_ALIGNED:
           $class .= 'ok';
           $title = 'Preis aktuell und konsistent mit Lieferantenkatalog '. $katalogdaten['katalogname'];
           break;
-        case 3:
+        case NO_CAT_FOR_SUPPLIER:
           // kein Katalog erfasst: Abgleich nicht möglich!
           break;
-        case 4:
+        case ORDER_NR_MISMATCH:
           $bestellnummern_falsch[] = $n;
           $class .= 'alert';
           $title = 'Bestellnummer anders als in Lieferantenkatalog ' . $katalogdaten['katalogname'];
           break;
-        case 1:
-        case 2:
+        case CAT_PRICE_MISMATCH_OR_NO_FS_PRICE:
+        case CAT_SEARCH_FAILED:
         default:
           $preise_falsch[] = $n;
           $class .= 'warn';

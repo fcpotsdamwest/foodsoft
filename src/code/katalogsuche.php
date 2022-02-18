@@ -32,6 +32,11 @@ function katalogsuche( $produkt ) {
   return sql_select_single_row( "SELECT * FROM lieferantenkatalog $where " , true );
 }
 
+define("CAT_AND_FS_ALIGNED",                0);
+define("CAT_PRICE_MISMATCH_OR_NO_FS_PRICE", 1);
+define("CAT_SEARCH_FAILED",                 2);
+define("NO_CAT_FOR_SUPPLIER",               3);
+define("ORDER_NR_MISMATCH",                 4);
 
 /** katalogabgleich
  *
@@ -64,17 +69,17 @@ function katalogabgleich(
     if( $display_level >= 1 ) {
       div_msg( 'alert', 'Katalogsuche: kein Katalog dieses Lieferanten erfasst!' );
     }
-    return 3;
+    return NO_CAT_FOR_SUPPLIER;
   } else if( $katalogeintrag == 2 ) {
     if( $display_level >= 1 ) {
       div_msg( 'warn', 'Katalogsuche: Artikelnummer des Produktes fehlt --- Suche nicht möglich!' );
     }
-    return 2;
+    return CAT_SEARCH_FAILED;
   } else if( ! $katalogeintrag ) {
     if( $display_level >= 1 ) {
       div_msg( 'warn', 'Katalogsuche fehlgeschlagen oder ohne Treffer' );
     }
-    return 2;
+    return CAT_SEARCH_FAILED;
   }
 
   $katalog_datum = $katalogeintrag["katalogdatum"];
@@ -98,7 +103,7 @@ function katalogabgleich(
 
   if( ! ( list( $kan_liefermult, $kan_liefereinheit ) = kanonische_einheit( $katalog_einheit, false ) ) ) {
     div_msg( 'warn', "Katalogsuche: unbekannte Einheit: $katalog_einheit" );
-    return 2;
+    return CAT_SEARCH_FAILED;
   }
 
   $have_mwst = false; // ist die mwst im katalog gelisted? (terra ja, andere nicht!)
@@ -419,18 +424,18 @@ function katalogabgleich(
   }
 
   if( $neednewprice ) {
-    // inkonsistenz: sollte manuell ueberprueft werden:
-    return 1;
+    // Inkonsistenz: sollte manuell überprüft werden
+    return CAT_PRICE_MISMATCH_OR_NO_FS_PRICE;
   }
   if( $neednewbestellnummer ) {
     if( $kgueltig ) {
-      // automatisches update sollte unproblematisch sein:
-      return 4;
+      // automatisches update sollte unproblematisch sein
+      return ORDER_NR_MISMATCH;
     } else {
-      return 1;
+      return CAT_PRICE_MISMATCH_OR_NO_FS_PRICE;
     }
   }
-  return 0; // keine probleme
+  return CAT_AND_FS_ALIGNED;
 }
 
 /** update_preis
