@@ -1762,9 +1762,6 @@ function sql_produkt( $keys = array(), $allow_null = false ) {
   if( $p and isset( $p['preis_id'] ) ) {
     $p = preisdatenSetzen( $p );
   }
-  // foreach( $p as $k => $v ) {
-  //  open_div( '', '', "$k: [$v]" );
-  //}
   return $p;
 }
 
@@ -4058,7 +4055,6 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
     JOIN produkte ON produkte.id = produktpreise.produkt_id
     WHERE produkt_id= $produkt_id $zeitfilter
     ORDER BY zeitstart $order, IFNULL(zeitende,'9999-12-31') $order, id $order";
-  //  ORDER BY IFNULL(zeitende,'9999-12-31'), id";
   $result = mysql2array( doSql($query, LEVEL_ALL, "Konnte Produktpreise nich aus DB laden..") );
   foreach( $result as $key => $r ) {
     $result[ $key ] = preisdatenSetzen( $r );

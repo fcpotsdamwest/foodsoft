@@ -1,8 +1,5 @@
 <?php
 
-// if( ! isset( $foodsoftpath ) ) {
-//   $foodsoftpath = realpath( dirname( __FILE__ ) . '/../' );
-// }
 global $foodsoftdir;   // nötig wenn aufruf aus wiki
 if( ! isset( $foodsoftdir ) ) {
   $foodsoftdir = preg_replace( '#/[^/]+$#', '', $_SERVER['SCRIPT_NAME'] );
@@ -24,7 +21,6 @@ if( $allow_setup_from ) {
 }
 
 // lese low-level Funktionen, die keine Datenbankverbindung benötigen:
-//
 require_once('code/err_functions.php');
 require_once('code/html.php');
 
@@ -39,9 +35,6 @@ if(
 }
 
 // die restliche konfiguration können wir aus der leitvariablen-tabelle lesen
-// (skripte können dann persistente variable einfach speichern, ändern, und
-//  an slave (im keller) übertragen)
-//
 global $leitvariable;
 
 require_once('leitvariable.php');
