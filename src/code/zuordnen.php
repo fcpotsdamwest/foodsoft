@@ -136,6 +136,22 @@ function select_query( $table, $selects = '*', $joins = '', $filters = false, $o
 // }
 
 
+/** sql_select_single_row
+ *
+ * @param string $sql
+ * @param array|bool $allownull
+ *   - array that is returned if the result has 0 rows
+ *   - boolean: return NULL if true
+ * @param int $result_type
+ *   Will be passed on to mysqli_fetch_array
+ * @return array|null|never-return
+ *   Array representing the result row (if there was exactly one row in the result).
+ *   Otherwise:
+ *   - $allow_null (default result) if result empty and $allow_null is an array
+ *   - NULL if result empty and $allow_null is turhty
+ *   - (no return) if result empty and $allow_null is falsy
+ *   - (no return) if result has more than one rows
+ */
 function sql_select_single_row( $sql, $allownull = false, $result_type = MYSQLI_ASSOC ) {
   $result = doSql( $sql );
   $rows = mysqli_num_rows($result);
@@ -322,10 +338,9 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
 }
 
 
-/**
- * TBA
- * 
- * @param array $using
+/** need_joins_array
+ *
+ * @param array|str $using
  *   Tables
  * @param array $rules
  * need_joins: for scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
@@ -353,7 +368,8 @@ function need_joins_array( $using, $rules ) {
   return $joins;
 }
 
-/**
+/** need_joins
+ *
  * Generate a JOIN clause for embedding into a SQL statement.
  * 
  * @param array $using
@@ -380,9 +396,15 @@ function need_joins( $using, $rules ) {
   return $joins;
 }
 
-/*
- * use_filters: für skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
- *  erzeugt optionale filterausdrücke, die bereits verfügbare tabellen benutzen
+/** use_filters_array
+ *
+ * Erzeugt optionale filterausdrücke, die bereits verfügbare tabellen benutzen.
+ *
+ * Für skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z".
+ * @param array|string $using
+ * @param array $rules
+ * @return array
+ *   Array of filter expressions
  */
 function use_filters_array( $using, $rules ) {
   $filters = array();
@@ -395,7 +417,8 @@ function use_filters_array( $using, $rules ) {
   return $filters;
 }
 
-/**
+/** use_filters
+ *
  * TBA
  */
 function use_filters( $using, $rules ) {
@@ -1591,6 +1614,11 @@ function sql_lieferant_offene_bestellungen( $lieferanten_id ) {
   " ) );
 }
 
+/**
+ * @param int $lieferanten_id
+ * @return int
+ *   number of catalogues stored for the supplier
+ */
 function sql_lieferant_katalogeintraege( $lieferanten_id ) {
   $lieferant = sql_lieferant( $lieferanten_id );
   $katalogformat = $lieferant['katalogformat'];
@@ -1608,7 +1636,14 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
 //
 ////////////////////////////////////
 
-
+/** query_produkte
+ *
+ * @param str $op
+ * @param array $keys
+ * @param array $using
+ * @param orderby str|bool
+ * @return 
+ */
 function query_produkte( $op, $keys = array(), $using = array(), $orderby = false ) {
   $have_price = false;
 
@@ -1735,6 +1770,14 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
   return get_sql_query( $op, 'produkte', $selects, $joins, $filters, $orderby );
 }
 
+/** select_produkte
+ *
+ * @param array $keys
+ * @param array $using
+ * @param str|bool $orderby
+ * @return string
+ *   Generated SQL query
+ */
 function select_produkte( $keys = array(), $using = array(), $orderby = false ) {
   return query_produkte( 'SELECT', $keys, $using, $orderby );
 }
@@ -1755,6 +1798,16 @@ function sql_produkte(
   }
   return $r;
 }
+
+/** sql_produkt
+ * 
+ * @param int|array $keys
+ *   if int: a produkt_id
+ *   if array: an array of fields and values to search for
+ * @param bool $allow_null
+ * @return array
+ *   Assoc array representing details for one product
+ */
 function sql_produkt( $keys = array(), $allow_null = false ) {
   if( is_numeric( $keys ) )
     $keys = array( 'produkt_id' => $keys );
@@ -4036,6 +4089,17 @@ function references_produktpreis( $preis_id ) {
   return sql_count( 'bestellvorschlaege', "produktpreise_id=$preis_id" );
 }
 
+/** sql_produktpreise
+ * 
+ * @param int $produkt_id
+ * @param string|bool $zeitpunkt
+ *   Formatted datetime in a format accepted by the database,
+ *   or one of the special values:
+ *   TRUE: use current datetime
+ *   FALSE: don't use datetime filter at all
+ * @return array
+ *   Array of arrays, each element containing one entry of the product's price history
+ */
 function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
   if( $zeitpunkt === true )
     $zeitpunkt = $GLOBALS['mysqljetzt'];
@@ -4066,18 +4130,28 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
   return $result;
 }
 
-/* sql_aktueller_produktpreis:
- *  liefert aktuellsten preis zu $produkt_id,
- *  oder false falls es keinen gültigen preis gibt:
+/** sql_aktueller_produktpreis
+ *
+ * @param int $produkt_id
+ * @param string|bool $zeitpunkt
+ *   passed on to `sql_produktpreise`
+ * @return array|bool
+ *   Current price for $produkt_id,
+ *   FALSE if no valid price was found.
  */
 function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
   $preise = sql_produktpreise( $produkt_id, $zeitpunkt );
   return end( $preise );
 }
 
-/* sql_aktueller_produktpreis_id:
- *  liefert id des aktuellsten preises zu $produkt_id,
- *  oder 0 falls es NOW() keinen gültigen preis gibt:
+/** sql_aktueller_produktpreis_id
+ *
+ * @param int $produkt_id
+ * @param string|bool $zeitpunkt
+ *    passed on to `sql_aktueller_produktpreis`
+ * @return int
+ *   ID of current price for $produkt_id,
+ *   0 if no valuid price was found
  */
 function sql_aktueller_produktpreis_id( $produkt_id, $zeitpunkt = true ) {
   $row = sql_aktueller_produktpreis( $produkt_id, $zeitpunkt );
@@ -4630,8 +4704,16 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
   return TRUE;
 }
 
-/**
+/** need_http_var
  *
+ * @param string $name
+ *   name of the request parameter to check
+ * @param string $typ
+ *   type of the request parameter
+ * @param bool $is_self_field
+ *   passed on to get_http_var()
+ * @return bool
+ *   True if the request parameter is present.
  */
 function need_http_var( $name, $typ, $is_self_field = false ) {
   need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );

@@ -1,17 +1,22 @@
 <?php
 
-// katalogsuche: sucht im lieferantenkatalog nach $produkt (soweit für den Lieferanten implementiert)
-// 
-// !!! dieses Skript ist nur für den _internen_ katalogabgleich aufgrund der Artikelnummer zuständig!
-// !!! für die manuelle Suche ist windows/artikelsuche.php da!
-//
-// $produkt ist entweder eine produkt_id, oder das Ergebnis von sql_produkt().
-// mögliche rückgabewerte:
-//   1: kein Katalog vom Lieferanten vorhanden (ist kein Fehler)
-//   2: keine Artikelnummer - Suche nicht möglich
-//   0 / NULL: Suche ohne (eindeutigen) Treffer
-//   array(): enthält gefundenen Katalogeintrag
-//
+/** katalogsuche
+ *
+ * Sucht im lieferantenkatalog nach $produkt (soweit für den Lieferanten implementiert)
+ *
+ * !!! dieses Skript ist nur für den _internen_ katalogabgleich anhand der Artikelnummer zuständig!
+ * !!! für die manuelle Suche ist windows/artikelsuche.php da!
+ *
+ * @param int|array $produkt
+ *   (1) eine produkt_id
+ *   (2) das Ergebnis von sql_produkt()
+ *   - nur 'lieferanten_id' und 'artikelnummer' werden ausgewertet
+ * @return int|array
+ *   1: kein Katalog vom Lieferanten vorhanden (ist kein Fehler)
+ *   2: keine Artikelnummer - Suche nicht möglich
+ *   NULL: Suche ohne (eindeutigen) Treffer
+ *   array(): enthält gefundenen Katalogeintrag
+ */
 function katalogsuche( $produkt ) {
   if( is_numeric( $produkt ) ) {
     $produkt = sql_produkt( $produkt );
@@ -20,6 +25,7 @@ function katalogsuche( $produkt ) {
   $where = "WHERE ( lieferanten_id = {$produkt['lieferanten_id']} ) ";
 
   if( ! sql_lieferant_katalogeintraege( $produkt['lieferanten_id'] ) ) {
+    /* no catalogue stored for the supplier */
     return 1;
   }
   if( ( $artikelnummer = adefault( $produkt, 'artikelnummer', 0 ) ) )
@@ -35,22 +41,26 @@ function katalogsuche( $produkt ) {
 
 /** katalogabgleich
  *
+ * @param int $produkt_id
  * @param int $display_level
- *   0: garnix, 1: abweichungen, 2: voller katalogeintrag
+ *   0: garnix
+ *   1: abweichungen
+ *   2: voller katalogeintrag
  * @param bool $editable
- * @param &$preiseintrag_neu
+ * @param array &$preiseintrag_neu
+ *   aus Katalogeintrag Vorschlag für Preiseintrag generieren
  * @return int
- *  0: ok
- *  1: Katalogeintrag weicht ab (oder kein Preiseintrag in der Foodsoft-Datenbank)
- *  2: Katalogsuche fehlgeschlagen
- *  3: kein Katalog dieses Lieferanten erfasst
- *  4: Abweichung nur bei Bestellnummer (Terra.....)
+ *   0: ok
+ *   1: Katalogeintrag weicht ab (oder kein Preiseintrag in der Foodsoft-Datenbank)
+ *   2: Katalogsuche fehlgeschlagen
+ *   3: kein Katalog dieses Lieferanten erfasst
+ *   4: Abweichung nur bei Bestellnummer (Terra.....)
  */
 function katalogabgleich(
   $produkt_id,
   $display_level = 0,
   $editable = false,
-  & $preiseintrag_neu = array() // aus Katalogeintrag Vorschlag für Preiseintrag generieren
+  & $preiseintrag_neu = array()
 ) {
   global $mwst_default;
 
@@ -419,13 +429,11 @@ function katalogabgleich(
   }
 
   if( $neednewprice ) {
-    // inkonsistenz: sollte manuell ueberprueft werden:
-    return 1;
+    // Inkonsistenz: sollte manuell überprüft werden
   }
   if( $neednewbestellnummer ) {
     if( $kgueltig ) {
-      // automatisches update sollte unproblematisch sein:
-      return 4;
+      // automatisches update sollte unproblematisch sein
     } else {
       return 1;
     }
