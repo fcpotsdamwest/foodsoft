@@ -20,11 +20,11 @@ if( hat_dienst(5) ) {
     open_tr();
       open_td();
         option_checkbox( 'optionen', GRUPPEN_OPT_INAKTIV, 'inaktive Gruppen zeigen'
-            , 'Auch inaktive/gelöschte Gruppen anzeigen?' );
+            , 'title="Auch inaktive/gelöschte Gruppen anzeigen?"' );
     open_tr();
       open_td();
         option_checkbox( 'optionen', GRUPPEN_OPT_UNGEBUCHT, 'nur ungebuchte Einzahlungen'
-            , 'Nur Gruppen mit ungebuchten Einzahlungen anzeigen?' );
+            , 'title="Nur Gruppen mit ungebuchten Einzahlungen anzeigen?"' );
     open_tr();
       open_td();
         option_radio( 'optionen', 0, GRUPPEN_OPT_SCHULDEN | GRUPPEN_OPT_GUTHABEN, 'alle' );

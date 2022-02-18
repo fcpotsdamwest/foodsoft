@@ -438,9 +438,11 @@ if( ! $readonly ) {
      * and group order mode. E.g. when there are already changes in the order
      * sheet, it shouldn't be possible to toggle to ensure data consistency. 
      */
-    function disable_basar_toggle() {
-      const basarToggleButton = document.getElementById('basarToggleButton');
-      basarToggleButton.disabled = true;
+    function disableElementById( elementId ) {
+      const element = document.getElementById( elementId );
+      if( element ) {
+        element.disabled = true;
+      }
     }
 
     function reminder_on() {
@@ -453,7 +455,8 @@ if( ! $readonly ) {
       footbar.appendChild(reminder);
       
       set_footbar(true);
-      disable_basar_toggle();
+      disableElementById('basarToggleButton');
+      disableElementById('filterCheckboxFavorites');
       
       const id = document.getElementById('hinzufuegen');
       while( id.firstChild ) {
@@ -493,11 +496,10 @@ if( ! $readonly ) {
       const gebinde = Math.ceil( fest[produkt] / gebindegroesse[produkt] ) - 1;
       if( gebinde > 0 ) {
         fest[produkt] = gebinde * gebindegroesse[produkt];
-        zuteilung_berechnen( produkt, false );
       } else {
         fest[produkt] = 0;
-        zuteilung_berechnen( produkt, false );
       }
+      zuteilung_berechnen( produkt, false );
     }
 
     function toleranz_plus( produkt ) {

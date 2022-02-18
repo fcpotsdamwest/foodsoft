@@ -39,12 +39,12 @@ open_table( 'layout hfill' );
       open_tr();
         open_td();
           option_checkbox( 'options', PFAND_OPT_GRUPPEN_INAKTIV, 'auch inaktive Gruppen zeigen?'
-                           , 'Auch inaktive Gruppen in Pfandübersicht aufnehmen?' );
+                           , 'title="Auch inaktive Gruppen in Pfandübersicht aufnehmen?"' );
       if( $bestellung_name ) {
         open_tr();
           open_td();
            option_checkbox( 'options', PFAND_OPT_ALLE_BESTELLUNGEN, 'Summe aller Bestellungen anzeigen?'
-                           , "Pfandsumme ueber alle Bestellungen bei $lieferant_name anzeigen?" );
+                           , "title='Pfandsumme über alle Bestellungen bei {$lieferant_name} anzeigen?'" );
       }
     close_table();
   open_td();

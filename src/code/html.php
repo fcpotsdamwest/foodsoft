@@ -463,30 +463,44 @@ function close_select() {
   close_tag( 'select' );
 }
 
-// option_checkbox(): create <input type='checkbox'> element
-// when clicked, the current window will be reloaded, with $flag toggled in variable $fieldname in the URL
-//
-function option_checkbox( $fieldname, $flag, $text, $title = false ) {
+/** option_checkbox
+ *
+ * Create <input type='checkbox'> element.
+ * 
+ * When clicked, the current window will be reloaded,
+ * with $flag toggled in variable $fieldname in the URL.
+ * 
+ * @param string $attrs
+ *   String of HTML attributes to be inserted into the opening tag as is.
+ */
+function option_checkbox( $fieldname, $flag, $text, $attrs = '' ) {
   global $$fieldname;
-  echo '<input type="checkbox" class="checkbox" onclick="'
-         . fc_link('', array( $fieldname => ( $$fieldname ^ $flag ), 'context' => 'js' ) ) .'" ';
-  if( $title ) echo " title='$title' ";
-  if( $$fieldname & $flag ) echo " checked ";
-  echo ">$text";
+  if ($$fieldname & $flag) { $attrs .= " checked"; }
+  echo
+    "<input type='checkbox' class='checkbox' onclick=" .
+    '"' . fc_link('', array( $fieldname => ( $$fieldname ^ $flag ), 'context' => 'js' ) ) . '"' .
+    " {$attrs} >{$text}";
 }
 
-// option_radio(): similar to option_checkbox, but generate a radio button:
-// on click, reload current window with all $flags_on set and all $flags_off unset
-// in variable $fieldname in the URL
-//
-function option_radio( $fieldname, $flags_on, $flags_off, $text, $title = false ) {
+/** option_radio
+ *
+ * Similar to option_checkbox, but generate a radio button.
+ * 
+ * On click, reload current window with all $flags_on set and all $flags_off unset in
+ * variable $fieldname in the URL.
+ * 
+ * @param string $attrs
+ *   String of HTML attributes to be inserted into the opening tag as is.
+ */
+function option_radio( $fieldname, $flags_on, $flags_off, $text, $attrs = '' ) {
   global $$fieldname;
   $all_flags = $flags_on | $flags_off;
+  if( ( $$fieldname & $all_flags ) == $flags_on ) { $attrs .= " checked"; }
   $groupname = "{$fieldname}_{$all_flags}";
-  echo "<input type='radio' class='radiooption' name='$groupname' onclick=\""
-        . fc_link('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) .'"';
-  if( ( $$fieldname & $all_flags ) == $flags_on ) echo " checked ";
-  echo ">$text";
+  echo
+    "<input type='radio' class='radiooption' name='{$groupname}' onclick=" .
+    '"' . fc_link('', array( 'context' => 'js' , $fieldname => ( ( $$fieldname | $flags_on ) & ~ $flags_off ) ) ) . '"' .
+    " {$attrs} >{$text}";
 }
 
 // alternatives_radio(): create list of radio buttons to toggle on and of html elements

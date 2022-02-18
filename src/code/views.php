@@ -1265,14 +1265,14 @@ function bestellschein_view(
     open_option_menu_row();
       open_td( '', "colspan='2'" );
         option_checkbox( 'spalten', PR_ROWS_NICHTGELIEFERT, "$nichtgeliefert_header zeigen"
-                       , "$nichtgeliefert_header vorhanden; diese auch anzeigen?" );
+                       , "title='{$nichtgeliefert_header} vorhanden; diese auch anzeigen?'" );
     close_option_menu_row();
   }
   if( $option_nichtgefuellt && $haben_nichtgefuellt ) {
     open_option_menu_row();
       open_td( '', "colspan='2'" );
         option_checkbox( 'spalten', PR_ROWS_NICHTGEFUELLT, "nicht-volle Gebinde zeigen"
-                       , 'nicht gefuellte Gebinde vorhanden; diese auch anzeigen?' );
+                       , "title='nicht gefüllte Gebinde vorhanden; diese auch anzeigen?" );
     close_option_menu_row();
   }
 }
