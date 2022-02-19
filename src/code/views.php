@@ -5,10 +5,9 @@
 function number_selector($name, $min, $max, $selected, $format, $to_stdout = true ){
   global $input_event_handlers;
   $s = "<select name='$name' $input_event_handlers>";
-  for ($i=$min; $i <= $max; $i++) { 
-	       if ($i == $selected) $select_str="selected";
-     	       else $select_str = ""; 
-	       $s .= "<option value='".$i."' ".$select_str.">".sprintf($format,$i)."</option>\n";
+  for ($i=$min; $i <= $max; $i++) {
+    $select_str = $i == $selected ? "selected" : "";
+	  $s .= "<option value='".$i."' ".$select_str.">".sprintf($format,$i)."</option>\n";
   }
   $s .= "</select>";
   if( $to_stdout )
@@ -28,25 +27,32 @@ function number_selector($name, $min, $max, $selected, $format, $to_stdout = tru
  */
 function date_time_selector($sql_date, $prefix, $show_time=true, $to_stdout = true ) {
   echo "<!-- sql_date :$sql_date -->";
-	$datum = date_parse($sql_date);
+	[
+    'year'   => $jahr,
+    'month'  => $monat,
+    'day'    => $tag,
+    'hour'   => $stunde,
+    'minute' => $minute,
+
+  ] = date_parse($sql_date);
 
   $s = "
     <table class='inner'>
-                  <tr>
-                     <td><label>Datum:</label></td>
-                      <td style='white-space:nowrap;'>
-    ". date_selector($prefix."_tag", $datum['day'],$prefix."_monat", $datum['month'], $prefix."_jahr", $datum['year'], false) ."
-                   </td>
-       </tr>
+      <tr>
+        <td><label>Datum:</label></td>
+        <td style='white-space:nowrap;'>".
+          date_selector( $prefix . "_tag", $tag, $prefix . "_monat", $monat, $prefix . "_jahr", $jahr, false) .
+       "</td>
+      </tr>
   ";
   if( $show_time ) {
     $s .= "
-         <tr>
-                   <td><label>Zeit:</label></td>
-                           <td style='white-space:nowrap;'>
-      ". time_selector($prefix."_stunde", $datum['hour'],$prefix."_minute", $datum['minute'], false ) ."
-                           </td>
-                       </tr>
+      <tr>
+        <td><label>Zeit:</label></td>
+        <td style='white-space:nowrap;'>" .
+          time_selector($prefix . "_stunde", $stunde, $prefix."_minute", $minute, false ) .
+       "</td>
+      </tr>
     ";
   }
   $s .= "</table>";
@@ -115,6 +121,13 @@ function mult_view( $mult, $fieldname = false, $transmit = true, $edit_if_fieldn
     return "<span class='number' $id>$mult</span>";
 }
 
+/** gebindegroesse_view
+ *
+ * @param array $pr
+ *   A row from the table `produktpreise`
+ * @return string
+ *   Generated HTML snippet
+*/
 function gebindegroesse_view( $pr /* a row from table produktpreise */ ) {
    $s = "{$pr['gebindegroesse']} ". MULTIPLY_CHAR . " {$pr['verteileinheit_anzeige']}";
    if( $pr['verteileinheit_anzeige'] != $pr['liefereinheit_anzeige'] ) {
@@ -136,7 +149,7 @@ function ean_view( $ean, $length = 20, $fieldname = false, $attr = '', $with_lin
   global $input_event_handlers;
   if ( $fieldname )
     return "<input type='text' class='ean' size='$length' name='$fieldname' value='$ean' $attr $input_event_handlers>";
-  
+
   $s = "<span class='ean'>$ean</span> ";
   if ($with_links)
     $s .= ean_links ($ean);
@@ -246,23 +259,25 @@ function lieferant_view( $lieferant_id, $fieldname = '', $option_0 = '' ) {
 }
 
 /**
- *  Zeigt einen Dienst um in mit einem Dienstkontrollblatt-Eintrag zu 
- *  verknüpfen (Als Abschluss sozusagen). 
+ *  Zeigt einen Dienst um in mit einem Dienstkontrollblatt-Eintrag zu
+ *  verknüpfen (Als Abschluss sozusagen).
  */
 function dienst_view3($row){
-	echo("<p>".$row['lieferdatum'].", Dienst ".$row['dienst'].": ".$row['vorname']."Geleistet (ja/nein); Auswahl Logbucheintrag; ggf. neuer Logbucheintrag </p>");
+	echo(
+    "<p>" . $row['lieferdatum'] . ", Dienst " . $row['dienst'] . ": " .
+    $row['vorname'] . "Geleistet (ja/nein); Auswahl Logbucheintrag; ggf. neuer Logbucheintrag </p>");
 	$kontrollblatt = sql_dienstkontrollblatt(0,0,$row['gruppen_id'], $row['dienst']);
   open_form( sprintf( 'aktion=akzeptieren_%u', $row["id"] ) );
   ?>
-       <select name="kontrollblatt" >
-     <option value='new'>Kein passender Eintrag</option>
+    <select name="kontrollblatt" >
+      <option value='new'>Kein passender Eintrag</option>
   <?php
 	foreach($kontrollblatt as $eintrag){
 		printf( "<option value='%u'>%s %s</option>", $eintrag['id'], $eintrag['datum'], $eintrag['notiz'] );
 	}	
   ?>
-               </select>
-	       <br> Notiz: <input type="text"  size="30" name="notiz">  
+    </select>
+    <br> Notiz: <input type="text"  size="30" name="notiz">
   <?php
   submission_button( 'Dienst abschliessen' );
   close_form();
@@ -532,8 +547,6 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
   }
 
   open_table( 'smallskip list' );
-    $gruppennummer = sql_gruppennummer( $gruppen_id );
-    $gruppenname = sql_gruppenname( $gruppen_id );
     foreach( $show_dienste as $dienst ) {
       open_tr();
       open_th( 'wide', '', $dienst['lieferdatum'] );
@@ -557,11 +570,8 @@ function dienst_liste( $gruppen_id, $rueckbestaetigen_lassen = 0 ) {
     else
       open_div( 'warn', '', 'Bitte bald abklären!' );
   }
-  
-  if( $reconfirmation_muted )
-    return false;
-  
-  return true;
+
+  return !$reconfirmation_muted;
 }
 
 
@@ -573,7 +583,6 @@ function areas_in_menu($area){
     open_td('', '', fc_link( $area['area'], array(
       'window_id' => 'main', 'text' => $area['title'], 'title' => $area['hint'] , 'class' => 'bigbutton'
     ) ) );
-    // open_td( 'small middle', '', $area['hint'] );
 }
 
 function areas_in_head($area){
@@ -587,27 +596,25 @@ function areas_in_head($area){
   }
 }
 
-
 function basar_view( $bestell_id = 0, $order = 'produktname', $editAmounts = false ) {
   global $muell_id, $input_event_handlers;
 
   if( $editAmounts ) {
     $form_id = open_form( '', 'action=basarzuteilung' );
     $cols=15;
-    
-    open_javascript();
 ?>
+<script>
 function pick_group_dropdown() {
   var source = $('gruppen_id');
   var text = $('gruppen_id_text');
-  
+
   text.value = source.value % 1000;
 }
 
 function pick_group_text() {
   var source = $('gruppen_id_text');
   var dropdown = $('gruppen_id');
-  
+
   var options = dropdown.options;
   var group_id = 0;
   for (var i = 0; i < options.length; ++i) {
@@ -618,8 +625,8 @@ function pick_group_text() {
   }
   dropdown.value = group_id;
 }
+</script>
 <?php
-    close_javascript();
   } else {
     $cols=13;
   }
@@ -678,6 +685,7 @@ function pick_group_text() {
   $fieldcount = 0;
   $gesamtwert = 0;
   $output = '';
+  $rowspan = 1;
   foreach( $basar as $basar_row ) {
     list( $kan_verteilmult, $kan_verteileinheit ) = kanonische_einheit( $basar_row['verteileinheit'] );
     $menge = $basar_row['basarmenge'];
@@ -699,7 +707,7 @@ function pick_group_text() {
          'bestell_id' => $basar_row['gesamtbestellung_id'], 'text' => $basar_row['bestellung_name'], 'class' => 'href'
        ) ) . "</td>"
     , "<td>{$basar_row['lieferung']}</td>"
-    , "<td class='mult_factor'>" 
+    , "<td class='mult_factor'>"
         . fc_link( 'produktdetails', array(
             'class' => 'href', 'produkt_id' => $basar_row['produkt_id']
           , 'text' => sprintf( "%.2lf", $basar_row['nettolieferpreis'] )
@@ -805,7 +813,7 @@ define( 'PR_FAXOPTIONS'
 
 /**
  * Generate a list of ordered products
- * 
+ *
  * Can only be invoked beginning with 'STATUS_LIEFERANT'.
  * If order status is STATUS_BESTELLEN, it will display ordered values,
  * after delivery delivered amounts.
@@ -932,7 +940,7 @@ function bestellschein_view(
         $option_nichtgefuellt = true;
       } else {
         $col[PR_COL_LIEFERMENGE] = array(
-          'title' => "vom Lieferanten gelieferte Menge", 'header' => "L-Menge", 'cols' => ( $editAmounts ? 4 : 3 ) 
+          'title' => "vom Lieferanten gelieferte Menge", 'header' => "L-Menge", 'cols' => ( $editAmounts ? 4 : 3 )
         );
         $col[PR_COL_LIEFERGEBINDE] = array(
           'title' => "vom Lieferanten gelieferte Gebinde", 'header' => "L-Gebinde", 'cols' => 2
@@ -1281,7 +1289,7 @@ function bestellschein_view(
 /**
  * Generate the table of orders for printing and sending to the supplier
  * (priner-friendly HTML)
- * 
+ *
  * @param int|string $bestell_id
  *   Order ID
  * @param int $spalten
@@ -1386,7 +1394,7 @@ function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
     }
     if( $spalten & PR_COL_NETTOSUMME ) {
       $zeile .=
-        '<td class="right">' . 
+        '<td class="right">' .
           sprintf( '%.2lf', $nettogesamtpreis ) .
         '</td>';
     }
@@ -1414,7 +1422,7 @@ function bestellfax_html( $bestell_id, $spalten = 0xfffff ) {
 /**
  * Generate a list of products that are in the db
  * but not in the order with the given ID
- * 
+ *
  * This is used in the context of correcting the order list,
  * e.g. to add a product which was delivered instead of an
  * ordered (but not available) other product (accounting)
@@ -1423,7 +1431,7 @@ function select_products_not_in_list( $bestell_id ) {
   $bestellung = sql_bestellung( $bestell_id );
   $lieferanten_id = $bestellung['lieferanten_id'];
   $produkte = sql_produkte( array( 'lieferanten_id' => $lieferanten_id ) );
-  
+
   ?> Produkt: <?php
   open_select( 'produkt_id' );
     echo "<option value='0' selected>(Bitte Produkt wählen)</option>";
@@ -1492,7 +1500,6 @@ function distribution_view( $status, $bestell_id, $produkt_id, $editable = false
   global $js_on_exit;
   global $input_event_handlers;
   global $form_id;
-  
 
   $form_event_handlers = $input_event_handlers;
 
@@ -1505,13 +1512,13 @@ function distribution_view( $status, $bestell_id, $produkt_id, $editable = false
   $magicCalculator = "window.magicCalculator_{$bestell_id}_{$produkt_id}";
   $js_on_exit[] = "$magicCalculator = new MagicCalculator($bestell_id, $produkt_id, $verteilmult, $endpreis);";
   $js_on_exit[] = "\$('form_$form_id').observe('form:afterReset', function(event) { $magicCalculator.handleChangedDistribution(); });";
-  
+
   $magic_style = "magic_{$bestell_id}_{$produkt_id}";
-  
+
   open_tag('style', '', "id='${magic_style}_style' type='text/css'");
   echo(".$magic_style { display: none; }");
   close_tag('style');
-  
+
   $input_event_handlers = textfield_on_change_handler("on_change($form_id); $magicCalculator.handleChangedDistribution();");
   open_tr('summe');
     if( $status < STATUS_LIEFERANT ) {
@@ -1526,7 +1533,7 @@ function distribution_view( $status, $bestell_id, $produkt_id, $editable = false
       if ($editable) {
         open_td(
           "right $magic_style",
-          "colspan='2' id='magic_{$bestell_id}_{$produkt_id}_apply'", 
+          "colspan='2' id='magic_{$bestell_id}_{$produkt_id}_apply'",
           alink("javascript:$magicCalculator.applyResult(); on_change($form_id);", 'button', '&larr; OK' )
         );
       }
@@ -1539,7 +1546,7 @@ function distribution_view( $status, $bestell_id, $produkt_id, $editable = false
   $basar_toleranzmenge = 0;
   $basar_verteilmenge = sql_basarmenge( $bestell_id, $produkt_id ) * $verteilmult;
   $muellmenge = 0;
-  
+
   foreach( sql_gruppen( array( 'bestell_id' => $bestell_id, 'produkt_id' => $produkt_id ) ) as $gruppe ) {
     $gruppen_id = $gruppe['id'];
     $mengen = sql_select_single_row( select_bestellung_produkte( $bestell_id, $produkt_id, $gruppen_id ), true );
@@ -1590,7 +1597,6 @@ function distribution_view( $status, $bestell_id, $produkt_id, $editable = false
         open_td( "unit $magic_style", '', $verteileinheit );
         $js_on_exit[] = "$magicCalculator.setTrashField('{$bestell_id}_{$produkt_id}_{$muell_id}');";
       }
-  
     close_tr();
   }
 
@@ -1655,10 +1661,10 @@ function abrechnung_overview( $abrechnung_id, $bestell_id_current = 0 ) {
 }
 
 /** bestellung_overview
- * 
+ *
  * Create an HTML table with the basic metadata for an order
  * (label, supplier, order period, fc surcharge, status)
- * 
+ *
  * plus (maybe not too coherent) some group information
  */
 function bestellung_overview( $bestell_id, $gruppen_id = 0 ) {
@@ -1790,6 +1796,69 @@ function buchung_kurzinfo( $id ) {
   }
 }
 
+/** produktpreise_konsistenztest_problem_view
+ *
+ * Render UI output for $probleme representing issues with the price history of a
+ * product.
+ *
+ * @param array $probleme
+ *   Structure of items:
+ *   - 'error':
+ *      1: two price intervals overlap
+ *      2: price interval not current, but also not finished
+ *      3: no currently valid entry present
+ *      4: currently valid price won't be valid at delivery date anymore ("läuft aus")
+ *      5: no price for product available
+ *   - 'produktpreis_id1'
+ *   - 'produktpreis_id2'
+ *   - 'vorschlag_ende'
+ * @param bool $editable
+ * @return void
+ *   Side-effect: HTML output
+ */
+function produktpreise_konsistenztest_problem_view( $problems, $editable = false ) {
+  foreach( $problems as $problem ) {
+    $show_button = FALSE;
+    if( $problem['error'] == 1 ) {
+      echo "<div class='warn'>FEHLER: Überlappende Einträge in Preishistorie: {$problem['produktpreis_id1']} und {$problem['produktpreis_id2']}.</div>";
+      $show_button = TRUE;
+    } elseif( $problem['error'] == 2 ) {
+      echo "<div class='warn'>FEHLER: Preisintervall {$problem['produktpreis_id1']} nicht aktuell, aber nicht abgeschlossen.</div>";
+      $show_button = TRUE;
+    }
+    if( $editable && $show_button ) {
+      [
+        'year'  => $jahr,
+        'month' => $monat,
+        'day'   => $tag
+      ] = date_parse( $problem['vorschlag_ende'] );
+      div_msg(
+        'warn',
+        fc_action(
+          [
+            'text'  => "Eintrag {$problem['produktpreis_id1']} zum $jahr-$monat-$tag enden lassen",
+            'title' => "Eintrag {$problem['produktpreis_id1']} zum $jahr-$monat-$tag enden lassen"
+          ],
+          [
+            'action'   => 'zeitende_setzen',
+            'vortag'   => '1',
+            'preis_id' => $problem['produktpreis_id1'],
+            'day'      => "$tag",
+            'month'    => "$monat",
+            'year'     => "$jahr"
+          ]
+        )
+      );
+    }
+    if( $problem['error'] == 3 ) {
+      div_msg( 'alert', 'HINWEIS: kein aktuell gültiger Preiseintrag für diesen Artikel vorhanden!' );
+    } elseif( $problem['error'] == 4 ) {
+      div_msg( 'alert', 'HINWEIS: aktueller Preis läuft aus!' );
+    } elseif ( $problem['error'] == 5 ) {
+      div_msg( 'alert', 'HINWEIS: kein Preiseintrag für diesen Artikel vorhanden!' );
+    }
+  }
+}
 
 // preishistorie_view:
 //  - kann preishistorie anzeigen
@@ -2014,12 +2083,10 @@ function auswahl_bestellung( $bestell_id = 0 ) {
  */
 function dienst_selector($pre_select, $id=""){
   $s = "<select name='dienst_$id'>";
-	    
-	  //var_dump($_SESSION['DIENSTEINTEILUNG']);
-	  foreach ($_SESSION['DIENSTEINTEILUNG'] as $key => $i) { 
-	       if ($i == $pre_select) $select_str="selected";
-     	       else $select_str = ""; 
-	       $s .= "<option value='".$i."' ".$select_str.">".$i."</option>\n"; } 
+  foreach ($_SESSION['DIENSTEINTEILUNG'] as $key => $i) {
+    $select_str = ($i == $pre_select) ? "selected" : "";
+    $s .= "<option value='".$i."' ".$select_str.">".$i."</option>\n";
+  }
   $s .= "</select>";
   return $s;
 }
@@ -2056,7 +2123,7 @@ function membertable_view( $gruppen_id, $editable = FALSE, $super_edit = FALSE, 
         open_th( '', 'Notiz' );
       }
     }
-  
+
     foreach( sql_gruppe_mitglieder( $gruppen_id ) as $row ) {
       open_tr();
         $id = $row['gruppenmitglieder_id'];
@@ -2064,7 +2131,7 @@ function membertable_view( $gruppen_id, $editable = FALSE, $super_edit = FALSE, 
         open_td( '', '', string_view( $row['name'], 16, $editable ? "name_$id" : false ) );
         open_td( '', '', string_view( $row['email'], 20, $editable ? "email_$id" : false ) );
         open_td( '', '', string_view( $row['telefon'], 12, $editable ? "telefon_$id" : false ) );
-  
+
         if($super_edit){
           open_td( '', '', dienst_selector( $row['diensteinteilung'], $id ) );
           open_td( '', '', price_view( $row['sockeleinlage'] ) );
@@ -2183,7 +2250,7 @@ function memberform_view( $gruppen_id, $editable = FALSE, $super_edit = FALSE) {
     }
 
   close_fieldset();
-  
+
   if( $editable or $super_edit )
     close_form();
 }
@@ -2204,19 +2271,31 @@ function avatar_view( $member_row ) {
       close_tag( 'a' );
     open_div('small', '', "Dienst {$member_row['diensteinteilung']}");
     open_div('small italic', 'style="width:150px;"', $slogan);
-  close_div(); 
+  close_div();
 
 }
 
-function join_details( &$details, $prefix, $value, $context = false ) {
-  if ( $value )
-  {
-    if ( $context && $acronym_details = current(sql_catalogue_acronym($context, $value))) {
-      if ($acronym_details['url']) {
-        $value = "<a rel='external noopener noreferrer' target='_blank' title='$value' "
-            . "href='{$acronym_details['url']}'>{$acronym_details['definition']}</a>";
-      } else {
-        $value = "<span title='$value'>{$acronym_details['definition']}</span>";
+function join_details(
+  &$details,
+  $prefix,
+  $value,
+  $context = false,
+  $catalogue_record = []
+) {
+  if( $value ) {
+    if( $context ) {
+      $acronym_details = unalias_columns( $catalogue_record, $context );
+      if( !$acronym_details ) {
+        $acronym_details = current(sql_catalogue_acronym($context, $value));
+      }
+      if( $acronym_details ) {
+        if( $acronym_details['url'] ) {
+          $value =
+            "<a rel='external noopener noreferrer' target='_blank' title='$value' " .
+            "href='{$acronym_details['url']}'>{$acronym_details['definition']}</a>";
+        } else {
+          $value = "<span title='$value'>{$acronym_details['definition']}</span>";
+        }
       }
     }
     $details[] = "$prefix$value";
@@ -2227,7 +2306,7 @@ function join_details( &$details, $prefix, $value, $context = false ) {
 function catalogue_product_details( $catalogue_record ) {
   if( !is_array($catalogue_record) || empty($catalogue_record) )
     return '';
-  
+
   $details = array();
 
   join_details( $details, '', $catalogue_record['bemerkung']);
@@ -2244,7 +2323,7 @@ function catalogue_product_details( $catalogue_record ) {
           , $catalogue_record['hersteller']
           , 'hst');
   join_details( $details
-          , '<span title="European Article Number">EAN</span> ', 
+          , '<span title="European Article Number">EAN</span> ',
           ean_links($catalogue_record['ean_einzeln']));
 
   return join('; ', $details);
@@ -2252,10 +2331,10 @@ function catalogue_product_details( $catalogue_record ) {
 
 function catalogue_acronym_view( $editable ) {
   global $input_event_handlers, $foodsoftdir;
-  
+
   $acronyms = mysql2array( doSql ("SELECT * from catalogue_acronyms "
           . "ORDER BY context, acronym") );
-  
+
   // $decoder = function($string) { return html_entity_decode($string, ENT_QUOTES, 'UTF-8' ); };
   $acronyms_decoded = null;
   foreach( $acronyms as $n => $row )
@@ -2263,7 +2342,7 @@ function catalogue_acronym_view( $editable ) {
       $acronyms_decoded[ $n ][ $name ] = html_entity_decode( $val, ENT_QUOTES, 'UTF-8' );
 
   open_javascript(toJavaScript("var acronymParameters", $acronyms_decoded ));
-  
+
   $ui_form = open_form();
     $input_event_handlers = '';
     open_fieldset('small_form', '', 'Auswahl');
@@ -2321,38 +2400,37 @@ function catalogue_acronym_view( $editable ) {
       }
     close_fieldset();
   close_form();
-  
+
   $update_form = open_form('action=update');
     floating_submission_button();
     hidden_input('changes', '', "id='changes'");
-    /* ?><textarea name='changes' id='changes' rows=10 cols=80></textarea> <?php */
   close_form();
-  
-  ?><script src='<?php echo $foodsoftdir; ?>/js/Acronyms.js'></script><?php
-  open_javascript();
+
   ?>
+  <script src='<?php echo $foodsoftdir; ?>/js/Acronyms.js'></script>
+  <script>
 
   var acronyms;
   var changes;
-  
+
   var updateFormIndex = <?php echo $update_form; ?>;
   var uiFormId = <?php echo $ui_form; ?>;
   var editable = <?php echo $editable ? 'true' : 'false'; ?>;
-   
+
   var acronymSelect = $('acronymSelect');
   var searchableSelect = new SearchableSelect(acronymSelect, $('search'));
-  
+
   var acronymInput = $('acronym');
   var contextInput = $('context');
   var definitionInput = $('definition');
   var commentInput = $('comment');
   var urlInput = $('url');
-  
+
   disableAutocomplete(acronymInput);
   disableAutocomplete(definitionInput);
   disableAutocomplete(commentInput);
   disableAutocomplete(urlInput);
-  
+
   var currentEditData = null;
 
   function reset() {
@@ -2362,7 +2440,7 @@ function catalogue_acronym_view( $editable ) {
     changes = new AcronymChanges($('changes'), updateFormIndex);
     changes.setOriginalData(acronyms);
     searchableSelect.setEntries(acronyms);
-    
+
     currentEditData = null;
     displayEditData();
     changes.publish();
@@ -2371,7 +2449,7 @@ function catalogue_acronym_view( $editable ) {
   function readEditData() {
     if (currentEditData === null)
       return;
-      
+
     currentEditData.set(
         currentEditData.id,
         contextInput.value,
@@ -2379,34 +2457,34 @@ function catalogue_acronym_view( $editable ) {
         definitionInput.value,
         commentInput.value,
         urlInput.value);
-    
+
     currentEditDataChanged();
   }
-  
+
   function currentEditDataChanged() {
     searchableSelect.updateEntry(currentEditData);
     changes.check(currentEditData);
   }
-  
+
   function selectAcronym(data) {
     if (editable)
       readEditData();
 
     if (data.id === undefined)
       data = null;
-    
+
     currentEditData = data;
-    
+
     displayEditData();
   }
-  
+
   function setField(element, value) {
     if (editable)
       element.value = value;
     else
       element.textContent = value;
   }
-  
+
   function setDisplayContext(value) {
     if (editable)
       contextInput.value = value;
@@ -2419,7 +2497,7 @@ function catalogue_acronym_view( $editable ) {
       contextInput.textContent = value;
     }
   }
-  
+
   function displayEditData() {
     if (currentEditData !== null) {
       setField(acronymInput, currentEditData.acronym);
@@ -2429,15 +2507,12 @@ function catalogue_acronym_view( $editable ) {
       setField(urlInput, currentEditData.url);
     } else {
       setField(acronymInput, '');
-      <?php 
-      // leave for new acronym
-      // setField(contextInput, ''); ?>
       setField(definitionInput, '');
       setField(commentInput, '');
       setField(urlInput, '');
     }
   }
-    
+
   function addAcronym() {
     var a = Acronym.makeNew();
     if (currentEditData !== null)
@@ -2448,7 +2523,7 @@ function catalogue_acronym_view( $editable ) {
     searchableSelect.select(a);
     acronymInput.select();
   }
-  
+
   function deleteAcronym() {
     if (currentEditData === null)
       return;
@@ -2466,11 +2541,11 @@ function catalogue_acronym_view( $editable ) {
     currentEditDataChanged();
     displayEditData();
   }
-    
+
   function resetEditData() {
     if (currentEditData === null)
       return;
-      
+
     if (currentEditData.isDeleted()) {
       changes.remove(currentEditData.id);
       currentEditData.unmarkDeleted();
@@ -2479,7 +2554,7 @@ function catalogue_acronym_view( $editable ) {
     currentEditDataChanged();
     displayEditData();
   }
-  
+
   function onFieldChange(enterPressed) {
     if (!editable)
       return;
@@ -2493,7 +2568,6 @@ function catalogue_acronym_view( $editable ) {
     }
     readEditData();
     if (enterPressed) {
-      <?php // addAcronym(); ?>
       currentEditData = null;
       displayEditData();
       acronymInput.select();
@@ -2501,35 +2575,31 @@ function catalogue_acronym_view( $editable ) {
       acronymSelect.scrollTop = acronymSelect.scrollHeight;
     }
   }
-  
+
   function updownHandler(event) {
     if (event.target == contextInput)
       return;
-  
+
     var delta = 0;
     if (event.keyCode === Event.KEY_UP)
       delta = -1;
     else if (event.keyCode === Event.KEY_DOWN)
       delta = 1;
-      
+
     if (!delta)
       return;
-      
+
     event.stop();
     searchableSelect.moveSelection(delta);
   }
 
   reset();
-  
+
   $('edit').on('keypress', updownHandler);
   acronymSelect.observe('option:selected', function(event) { selectAcronym(event.memo); });
   installTextFieldChangeHandler($('edit'), onFieldChange);
-  $('form_'+updateFormIndex).on('form:afterReset', reset);  
-
+  $('form_'+updateFormIndex).on('form:afterReset', reset);
+  </script>
   <?php
-  close_javascript();
-  
   return $update_form;
-}  
-
-?>
+}

@@ -80,13 +80,14 @@ function cond2filter( $key, $cond ) {
 
 /**
  * Generate a generic SQL query from the provided parameters.
- * 
+ *
  * @param string $op
  *   Operation to execute, e.g. INSERT, DELETE etc:
  * @param string|array $selects
  *   Columns to select
  * @param string|array $joins
- *   
+ * @param string|array|bool $filters
+ *   One or several expressions for the WHERE clause, or FALSE as default if none given.
  * @return string
  *   Generated SQL query
  */
@@ -107,23 +108,25 @@ function get_sql_query( $op, $table, $selects = '*', $joins = '', $filters = fal
     $join_string = need_joins( array(), $joins );
   }
   $query = "$op $select_string FROM $table $join_string";
-  if( $filters ) {
-    if( is_string( $filters ) ) {
-      $query .= " WHERE ( $filters ) ";
-    } else {
-      $and = 'WHERE';
-      foreach( $filters as $key => $cond ) {
-        $query .= " $and (". cond2filter( $key, $cond ) .") ";
-        $and = 'AND';
-      }
+
+  if( is_string( $filters ) && $filters != '' ) {
+    $query .= " WHERE ( $filters ) ";
+  } elseif( is_array( $filters ) && !empty( $filters ) ) {
+    $and = 'WHERE';
+    foreach( $filters as $key => $cond ) {
+      $query .= " $and (". cond2filter( $key, $cond ) .") ";
+      $and = 'AND';
     }
   }
+
   if( $groupby ) {
     $query .= " GROUP BY $groupby ";
   }
+
   if( $orderby ) {
     $query .= " ORDER BY $orderby ";
   }
+
   return $query;
 }
 
@@ -186,7 +189,7 @@ function sql_count( $table, $where ) {
 
 function sql_update( $table, $where, $values, $escape_and_quote = true ) {
   global $db_handle;
-  
+
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -239,7 +242,7 @@ function sql_update( $table, $where, $values, $escape_and_quote = true ) {
  */
 function sql_insert( $table, $values, $update_cols = false, $escape_and_quote = true ) {
   global $db_handle;
-  
+
   switch( $table ) {
     case 'leitvariable':
     case 'transactions':
@@ -299,9 +302,9 @@ function adefault( $array, $index, $default ) {
 
 /**
  * Convert a SQL query result into a simple PHP array.
- * 
+ *
  * Supports tables that are designed as a key-value-sructure
- * 
+ *
  * @param mysqli_result|array
  *   A query result to be converted.
  * @param bool|int $key
@@ -346,10 +349,10 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
  * need_joins: for scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
  *    erzeugt aus $rules JOIN-anweisungen für benötigte tabellen; in $using können
  *    tabellen übergeben werden, die bereits verfügbar sind
- * 
+ *
  * Example:
  * TBA
- * 
+ *
  * @return array
  *   TBA
  */
@@ -371,9 +374,8 @@ function need_joins_array( $using, $rules ) {
 /** need_joins
  *
  * Generate a JOIN clause for embedding into a SQL statement.
- * 
+ *
  * @param array $using
- *   
  * @param array $rules
  *   Assoc array with conditions for ON clauses
  * @return string
@@ -497,7 +499,7 @@ function sql_dienste_tauschmoeglichkeiten( $dienst_id ) {
 
 /**
  *  Dienst Akzeptieren (oder auch bestätigen)
- */ 
+ */
 function sql_dienst_akzeptieren( $dienst_id, $abgesprochen = false, $status_neu = 'Akzeptiert' ) {
   global $login_gruppen_id;
 
@@ -657,9 +659,9 @@ function sql_delete_dienst( $dienst_id ) {
 }
 
 function sql_dienst_mute_reconfirmation( $session_id ) {
-    sql_update( 'sessions' 
+    sql_update( 'sessions'
       , $session_id
-      , array( 
+      , array(
           'muteReconfirmation_timestamp' => 'NOW()' )
       , false );
 }
@@ -797,13 +799,13 @@ function sql_change_rotationsplan( $mitglied_id, $dienst, $move_down ) {
  *  Legt Dienste-Einträge für einen Zeitraum (Dienstperiode) in der DB an.
  */
 function create_dienste( $start, $spacing, $zahl, $personenzahlen, $useRotation = 0 ) {
- 
+
   $positionen = array_fill_keys( array_keys( $personenzahlen ), 0 );
 
   for( $n = 1; $n <= $zahl; $n++ ) {
     foreach( $personenzahlen as $dienstname => $personen ) {
       for( $i=1; $i <= $personen; $i++ ) {
-        
+
         if( $useRotation ) {
           $plan_position = sql_rotationsplan_next(
             $positionen[$dienstname],
@@ -847,67 +849,103 @@ function create_dienste( $start, $spacing, $zahl, $personenzahlen, $useRotation 
  * they are performing
  */
 function possible_areas(){
-  global $exportDB;
 
   $areas = array();
 
-   $areas[] = array("area" => "bestellen",
-     "hint" => "Hier können ihr euch an den laufenden Bestellung beteiligen",
-     "title" => "Bestellen");
+  $areas[] = array(
+    "area"  => "bestellen",
+    "hint"  => "Hier können ihr euch an den laufenden Bestellung beteiligen",
+    "title" => "Bestellen"
+  );
 
-   if( hat_dienst(0) ) {
-    $areas[] = array("area" => "meinkonto", 
-             "hint"  => "Hier könnt ihr euer Gruppenkonto einsehen", 
-       "title" => "Mein Konto" );
-   }
-     $areas[] = array("area" => "gruppen",
-     "hint" => "Hier kann man die Bestellgruppen und deren Konten verwalten...",
-     "title" => "Gruppen");
-
-   $areas[] = array("area" => "bestellungen",
-     "hint" => "Übersicht aller Bestellungen (laufende und abgeschlossene)",
-     "title" => "Alle Bestellungen");
-
-   if( hat_dienst(3,4) ) {
-     $areas[] = array("area" => "basar",
-     "hint" => "Produkte im Basar an Gruppen verteilen",
-     "title" => "Basar");
-   } else {
-     $areas[] = array("area" => "basar",
-     "hint" => "Waren im Basar auflisten",
-     "title" => "Basar");
-   }
-
-   $areas[] = array("area" => "bilanz",
-     "hint" => "Finanzen der FC: Überblick und Verwaltung",
-     "title" => "Bilanz");
-
-   if( hat_dienst(4) ){
-     $areas[] = array("area" => "produkte",
-     "hint" => "Neue Produkte eingeben ... Preise verwalten ... Bestellung online stellen","title" => "Produkte");	 
-     $areas[] = array("area" => "konto",
-     "hint" => "Hier könnt ihr die Bankkonten verwalten...",
-     "title" => "Konten");
-     $areas[] = array("area" => "lieferanten",
-     "hint" => "Hier kann man die LieferantInnen verwalten...",
-     "title" => "LieferantInnen");
-   } else {
-     $areas[] = array("area" => "produkte",
-     "hint" => "Produktdatenbank und Kataloge einsehen","title" => "Produkte");	 
-     $areas[] = array("area" => "konto",
-     "hint" => "Hier könnt ihr die Kontoauszüge der Bankkonten einsehen...",
-     "title" => "Konten");
-     $areas[] = array("area" => "lieferanten",
-     "hint" => "Hier könnt ihr die LieferantInnen einsehen...",
-     "title" => "LieferantInnen");
+  if( hat_dienst(0) ) {
+    $areas[] = array(
+      "area"  => "meinkonto",
+      "hint"  => "Hier könnt ihr euer Gruppenkonto einsehen",
+      "title" => "Mein Konto"
+    );
   }
 
-  $areas[] = array("area" => "dienstkontrollblatt",
-    "hint" => "Hier kann man das Dienstkontrollblatt einsehen...",
+  $areas[] = array(
+    "area"  => "gruppen",
+    "hint"  => "Hier kann man die Bestellgruppen und deren Konten verwalten...",
+    "title" => "Gruppen"
+  );
+
+  $areas[] = array(
+    "area"  => "bestellungen",
+    "hint"  => "Übersicht aller Bestellungen (laufende und abgeschlossene)",
+    "title" => "Alle Bestellungen"
+  );
+
+  if( hat_dienst(3,4) ) {
+    $areas[] = array(
+      "area"  => "basar",
+      "hint"  => "Produkte im Basar an Gruppen verteilen",
+      "title" => "Basar"
+    );
+  } else {
+    $areas[] = array(
+      "area"  => "basar",
+      "hint"  => "Waren im Basar auflisten",
+      "title" => "Basar"
+    );
+  }
+
+  $areas[] = array(
+    "area"  => "bilanz",
+    "hint"  => "Finanzen der FC: Überblick und Verwaltung",
+    "title" => "Bilanz"
+  );
+
+  if( hat_dienst(4) ){
+    array_push(
+      $areas,
+      [
+        "area"  => "produkte",
+        "hint"  => "Neue Produkte eingeben ... Preise verwalten ... Bestellung online stellen",
+        "title" => "Produkte"
+      ],
+      [
+        "area"  => "konto",
+        "hint"  => "Hier könnt ihr die Bankkonten verwalten...",
+        "title" => "Konten"
+      ],
+      [
+        "area"  => "lieferanten",
+        "hint"  => "Hier kann man die LieferantInnen verwalten...",
+        "title" => "LieferantInnen"
+      ]
+    );
+  } else {
+    array_push(
+      $areas,
+      [
+        "area"  => "produkte",
+        "hint"  => "Produktdatenbank und Kataloge einsehen",
+        "title" => "Produkte"
+      ],
+      [
+        "area"  => "konto",
+        "hint"  => "Hier könnt ihr die Kontoauszüge der Bankkonten einsehen...",
+        "title" => "Konten"
+      ],
+      [
+        "area"  => "lieferanten",
+        "hint"  => "Hier könnt ihr die LieferantInnen einsehen...",
+        "title" => "LieferantInnen"
+      ]
+    );
+  }
+
+  $areas[] = array(
+    "area"  => "dienstkontrollblatt",
+    "hint"  => "Hier kann man das Dienstkontrollblatt einsehen...",
     "title" => "Dienstkontrollblatt");
 
-   $areas[] = array("area" => "dienstplan", 
-     "hint"  => "Eigene Dienste anschauen, Dienste übernehmen, ...", 
+   $areas[] = array(
+     "area"  => "dienstplan",
+     "hint"  => "Eigene Dienste anschauen, Dienste übernehmen, ...",
      "title" => "Dienstplan" );
 
    return $areas;
@@ -1108,7 +1146,7 @@ function sql_gruppenmitglieder( $filter = 'true', $orderby = 'gruppennummer' ) {
   return mysql2array( doSql( select_gruppenmitglieder() . " WHERE ( $filter ) ORDER BY $orderby " ) );
 }
 
-function sql_gruppe_mitglieder( $gruppen_id, $filter = 'gruppenmitglieder.aktiv' ) { 
+function sql_gruppe_mitglieder( $gruppen_id, $filter = 'gruppenmitglieder.aktiv' ) {
   return sql_gruppenmitglieder( "(bestellgruppen.id = $gruppen_id) and ($filter) " );
 }
 
@@ -1254,7 +1292,7 @@ function sql_gruppe_offene_bestellungen( $gruppen_id ) {
 
 /**
  * Create group options list.
- * 
+ *
  * @param int $selected
  *   the selected indeX
  * @param array $keys
@@ -1643,8 +1681,9 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
  * @param str $op
  * @param array $keys
  * @param array $using
- * @param orderby str|bool
- * @return 
+ * @param str|bool $orderby
+ * @return string
+ *   pass on return value of `get_sql_query`
  */
 function query_produkte( $op, $keys = array(), $using = array(), $orderby = false ) {
   $have_price = false;
@@ -1806,7 +1845,7 @@ function sql_produkte(
 }
 
 /** sql_produkt
- * 
+ *
  * @param int|array $keys
  *   if int: a produkt_id
  *   if array: an array of fields and values to search for
@@ -1996,7 +2035,7 @@ function sql_change_bestellung_status( $bestell_id, $state ) {
 
 /**
  * Query `gesamtbestellungen`.
- * 
+ *
  * @param string $filter
  *   valid SQL where clause, not including the WHERE keyword (optional)
  * @param string $orderby
@@ -2025,7 +2064,7 @@ function sql_bestellungen(
 
 /**
  * Get total order record for given order ID.
- * 
+ *
  * @param int|string $bestell_id
  *   order ID to query
  * @return array
@@ -2080,13 +2119,13 @@ function sql_update_bestellung( $name, $startzeit, $endzeit, $lieferung, $bestel
 }
 
 /** sql_insert_bestellvorschlag
- * 
+ *
  * @param int $produkt_id
  * @param int $gesamtbestellung_id
  * @param int $preis_id
  * @param int $gruppen_id
- * 
- * @return 
+ *
+ * @return int
  */
 function sql_insert_bestellvorschlag( $produkt_id , $gesamtbestellung_id, $preis_id = 0, $gruppen_id = 0 ) {
   fail_if_readonly();
@@ -2118,7 +2157,7 @@ function sql_insert_bestellvorschlag( $produkt_id , $gesamtbestellung_id, $preis
  *
  * Remove a product from the order sheet during ordering period.
  * Clean up all existing allocations of the product.
- * 
+ *
  * @param int $produkt_id
  * @param int $bestell_id
  *   Params used for WHERE clause - product/bestell_id to remove
@@ -2136,7 +2175,7 @@ function sql_delete_bestellvorschlag( $produkt_id, $bestell_id ) {
 function sql_references_gesamtbestellung( $bestell_id ) {
   return sql_select_single_field( " SELECT (
      ( SELECT count(*) FROM bestellvorschlaege WHERE gesamtbestellung_id = $bestell_id )
-   + ( SELECT count(*) FROM gruppenbestellungen WHERE gesamtbestellung_id = $bestell_id ) 
+   + ( SELECT count(*) FROM gruppenbestellungen WHERE gesamtbestellung_id = $bestell_id )
   ) as count
   " , 'count'
   );
@@ -2428,7 +2467,7 @@ function select_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id =
  *   ORDER BY parameter, omitting the 'ORDER BY' keyword itself
  * @return array
  *   result records
- *   
+ *
  */
 function sql_bestellung_produkte( $bestell_id, $produkt_id = 0, $gruppen_id = 0, $orderby = '' ) {
   $result = doSql(
@@ -3315,7 +3354,7 @@ function sql_pfandzuordnung_lieferant( $bestell_id, $verpackung_id, $anzahl_voll
     , true
     );
   } else {
-    doSql( "DELETE FROM lieferantenpfand WHERE bestell_id=$bestell_id AND verpackung_id=$verpackung_id" ); 
+    doSql( "DELETE FROM lieferantenpfand WHERE bestell_id=$bestell_id AND verpackung_id=$verpackung_id" );
   }
 }
 
@@ -3333,7 +3372,7 @@ function sql_pfandzuordnung_gruppe( $bestell_id, $gruppen_id, $anzahl_leer ) {
     , true
     );
   } else {
-    return doSql( "DELETE FROM gruppenpfand  WHERE bestell_id=$bestell_id AND gruppen_id=$gruppen_id" ); 
+    return doSql( "DELETE FROM gruppenpfand  WHERE bestell_id=$bestell_id AND gruppen_id=$gruppen_id" );
   }
 }
 
@@ -3939,9 +3978,9 @@ function sockeleinlagen( $gruppen_id = 0 ) {
                 AND gruppenmitglieder.gruppen_id = bestellgruppen.id
             )
       ) as soll
-    FROM (".select_gruppen( array( 'aktiv' => 'true' ) ).") AS bestellgruppen 
+    FROM (".select_gruppen( array( 'aktiv' => 'true' ) ).") AS bestellgruppen
     $where
-  ", 'soll' 
+  ", 'soll'
   );
 }
 
@@ -4093,7 +4132,7 @@ function references_produktpreis( $preis_id ) {
 }
 
 /** sql_produktpreise
- * 
+ *
  * @param int $produkt_id
  * @param string|bool $zeitpunkt
  *   Formatted datetime in a format accepted by the database,
@@ -4121,7 +4160,7 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
          , year(produktpreise.zeitstart) as jahr_start
          , date(produktpreise.zeitende) as datum_ende
          , produkte.notiz
-    FROM produktpreise 
+    FROM produktpreise
     JOIN produkte ON produkte.id = produktpreise.produkt_id
     WHERE produkt_id= $produkt_id $zeitfilter
     ORDER BY zeitstart $order, IFNULL(zeitende,'9999-12-31') $order, id $order";
@@ -4331,7 +4370,7 @@ $masseinheiten = array(
 );
 
 // kanonische_einheit: zerlegt $einheit in kanonische einheit und maßzahl:
-// 
+//
 function kanonische_einheit( $einheit, $die_on_error = true ) {
   global $masseinheiten;
   $kan_einheit = NULL;
@@ -4433,7 +4472,7 @@ function sql_katalogname( $katalog_id, $allow_null = false ) {
 }
 
 function sql_catalogue_acronym( $context, $acronym ) {
-  return mysql2array( doSql( 
+  return mysql2array( doSql(
             "SELECT * from `catalogue_acronyms` "
           . "WHERE `context`='$context' AND `acronym`='$acronym'") );
 }
@@ -4490,7 +4529,7 @@ $http_input_sanitized = false;
 
 /**
  * Check HTTP request parameters
- * 
+ *
  * - are there unexpected variables or variables with invalid values?
  * - for POST requests: was a valid and unused iTAN in the request
  *   (protection against submitting a form multiple times)
@@ -4547,7 +4586,7 @@ function checkvalue( $val, $typ){
         $pattern = '/^\d*[1-9]\d*$/';
         break;
       case 'u':
-        //FIXME: zahl sollte als zahl zurückgegeben 
+        //FIXME: zahl sollte als zahl zurückgegeben
         //werden, zur Zeit String
         $val = trim($val);
         // eventuellen nachkommateil (und sonstigen Müll) abschneiden:
@@ -4735,9 +4774,9 @@ function self_field( $name, $default = NULL ) {
 
 /**
  * Database migration to the neXt version
- * 
+ *
  * This function contains all changes in the DB schema across foodsoft versions.
- * 
+ *
  * @param int $version
  *   Current version that should be updated
  * @return
@@ -5015,7 +5054,7 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 21 ) );
       logger( 'update_database: update to version 21 successful' );
-      
+
     case 21:
       logger( 'starting update_database: from version 21' );
 
@@ -5025,7 +5064,7 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 22 ) );
       logger( 'update_database: update to version 22 successful' );
-  
+
     case 22:
       logger( 'starting update_database: from version 22' );
 
@@ -5033,10 +5072,10 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 23 ) );
       logger( 'update_database: update to version 23 successful' );
-      
+
     case 23:
       logger( 'starting update_database: from version 23' );
-      
+
       doSql( "CREATE TABLE `catalogue_acronyms` ("
               . "  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY"
               . ", `context` VARCHAR(10) NOT NULL"
@@ -5049,7 +5088,7 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 24 ) );
       logger( 'update_database: update to version 24 successful' );
-   
+
     case 24:
       logger( 'starting update_database: from version 24' );
 
@@ -5072,7 +5111,7 @@ function update_database( $version ) {
       logger( 'starting update_database: from version 25' );
 
       doSql( "ALTER TABLE `gruppenmitglieder`
-                ADD COLUMN `slogan` text not null 
+                ADD COLUMN `slogan` text not null
               , ADD COLUMN `url` text not null
               , ADD COLUMN `photo_url` mediumtext not null
       " );
@@ -5091,7 +5130,7 @@ function update_database( $version ) {
       sql_insert( 'leitvariable', array(
         'name' => 'member_showcase_title'
       , 'value' => '<b>Ein paar von uns</b>'
-      , 'comment' => 'Titel über Mitgliedern, die auf der Startseite angezeigt werden (neben Schwarzem Brett)'  
+      , 'comment' => 'Titel über Mitgliedern, die auf der Startseite angezeigt werden (neben Schwarzem Brett)'
       ) );
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 27 ) );
@@ -5104,17 +5143,17 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 28 ) );
       logger( 'update_database: update to version 28 successful' );
-      
+
     case 28:
       logger( 'starting update_database: from version 28' );
       sql_insert( 'leitvariable', array(
         'name' => 'exportDB'
       , 'value' => '0'
-      , 'comment' => 'Flag: export des Datenbankinhalts erlauben'  
+      , 'comment' => 'Flag: export des Datenbankinhalts erlauben'
       ) );
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 29 ) );
       logger( 'update_database: update to version 29 successful' );
-      
+
     case 29:
       logger( 'starting update_database: from version 29' );
 
@@ -5130,7 +5169,7 @@ function update_database( $version ) {
 
       sql_update( 'leitvariable', array( 'name' => 'database_version' ), array( 'value' => 31 ) );
       logger( 'update_database: update to version 31 successful' );
-    
+
     case 31:
       /* Version 1032: add config items for VAT to the `leitvariable` table
        ` (as we are out of sync with upstream here, we use a different version count)
@@ -5226,19 +5265,19 @@ function get_itan( $force_new = false ) {
 
 /**
  * Generate HTML options elements for values with one option selected.
- * 
+ *
  * Each value may be a scalar or a tuple with 2 or 3 elements.
  * In the tuple case, the items are mapped to options attributes:
  * - [0] => value
  * - [1] => text label
  * - [2] => title (optional)
- * 
+ *
  * @param array $values
  * @param mixed $selected
- * 
+ *
  * @return string
  *   generated HTML
- * 
+ *
  */
 function optionen( $values, $selected ) {
   $output = '';
