@@ -32,12 +32,8 @@ global $db_handle;
   while( $row = mysqli_fetch_array( $bestellungen ) ) {
     $n1 = sql_select_single_field( "SELECT count(*) as count FROM bestellvorschlaege WHERE gesamtbestellung_id = $id", 'count' );
     $n2 = sql_select_single_field( "SELECT count(*) as count FROM gruppenbestellungen WHERE gesamtbestellung_id = $id", 'count' );
-    if( 
-    
+    if(
 
-  
-  
-  
   $bestell_id = false;
   if( get_http_var('bestell_id') ) {
     $self = "$self&bestell_id=$bestell_id";
@@ -127,7 +123,7 @@ global $db_handle;
     echo "</table><hr>";
     exit( $print_on_exit );
   }
-    
+
   $vorschlaege = mysqli_query(
     $db_handle,
     "SELECT * FROM bestellvorschlaege
@@ -135,7 +131,7 @@ global $db_handle;
   ) or error ( __LINE__, __FILE__, "Suche in Bestellvorschlägen fehlgeschlagen" );
   $vorschlag = mysqli_fetch_array( $vorschlaege )
     or error ( __LINE__, __FILE__, "Bestellvorschlag nicht gefunden" );
-  
+
   $produkte = mysqli_query(
     $db_handle,
     "SELECT * FROM produkte WHERE id='{$vorschlag['produkt_id']}'"

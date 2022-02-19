@@ -4326,12 +4326,12 @@ function select_current_productprice_id( $product_id, $timestamp = true ) {
 }
 
 /** produktpreise_konsistenztest
- * 
+ *
  * Check price history of a product for various consistency issues.
  * - all time intervals but the last must be closed
  * - time intervals mustn't overlap
  * - if there's no valid current price, issue a warning
- * 
+ *
  * @param int $lieferanten_id
  * @param int $produkt_id
  * @param bool $editable
@@ -4408,7 +4408,7 @@ function select_produktpreise_konsistenztest( $lieferanten_id = FALSE, $produkt_
 }
 
 /** sql_produktpreise_konsistenztest
- * 
+ *
  * @param int|bool $lieferanten_id
  * @param int|bool $produkt_id
  * @return array[]

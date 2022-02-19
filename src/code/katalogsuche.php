@@ -451,10 +451,10 @@ function katalogabgleich(
 }
 
 /** update_preis
- * 
+ *
  * aktuellen preiseintrag aus katalog automatisch erzeugen
  * (zur zeit: nur falsche bestellnummern werden automatisch korrigiert!)
- * 
+ *
  * @param int $produkt_id
  * @return int
  *  -1 : preis ist aktuell, kein neueintrag notwendig

@@ -13,7 +13,7 @@ parameterübergabe an skripte:
      - URLs mit GET-parametern sollten mehrfach aufrufbar sein und immer dieselbe Ansicht erzeugen
      - GET-parameter gehören meist in $self_fields (für reload derselben oder modifizierten Ansicht)
      - GET-parameter müssen in code/zuordnen.php in $foodsoft_get_vars deklariert werden
-  
+
    * URLs enthalten in der Regel mindestens die parameter
      $window (identifiziert das Skript) (default: Hauptmenü) und
      $window_id (Name des Anzeigefensters; default: 'main', also Hauptfenster des Browsers)

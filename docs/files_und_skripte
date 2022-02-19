@@ -24,7 +24,8 @@ Skripte und Dateien:
 
 - fcck.php: unfertig (ziel: check und reparatur der datenbankstruktur, garbage collection)
 
-- foodsoft.class.php: 
+- foodsoft.class.php:
+
     authentication backend fürs doku-wiki: damit gelten im doku-wiki die Benutzeraccounts der foodsoft
     (diese datei muss nach Installation des doku-wiki nach /wiki/inc/auth kopiert werden und wird aktiviert
      durch

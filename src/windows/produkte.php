@@ -119,7 +119,7 @@ open_table('list hfill');
     $produkt = $p;
     $references = array_key_exists('references', $p) ? $p['references'] : 0;
     $vormerkungen_menge = $p['bestellzuordnung_menge'];
-    
+
     $katalogeintrag = unalias_columns( $p, 'katalog' );
 
     open_tr( 'groupofrows_top' );
