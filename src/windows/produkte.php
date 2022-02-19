@@ -1,6 +1,6 @@
 <?PHP
 
-?> <h1>Produktdatenbank ....</h1> <?php
+?> <h1>Produktdatenbank</h1> <?php
 
 assert( $angemeldet ) or exit();
 
@@ -34,11 +34,6 @@ open_table('layout hfill' );
         open_td( '', '', fc_link( 'self', "class=bigbutton,text=Seite aktualisieren" ) );
       open_tr();
         open_td( '', '', fc_link( 'index', "class=bigbutton" ) );
-      // braucht nicht mehr optional zu sein - preise sollten immer konsistent sein!
-      // open_tr();
-      //   open_td();
-      //     option_checkbox( 'options', OPTION_PREISKONSISTENZTEST, 'Preiskonsistenztest'
-      //                   , 'Soll die Preishistorie aller Einträge auf Inkonsistenzen geprüft werden?' );
       if( $lieferanten_id && sql_lieferant_katalogeintraege( $lieferanten_id ) ) {
         open_tr();
           open_td();
