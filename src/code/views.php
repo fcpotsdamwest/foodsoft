@@ -1832,6 +1832,8 @@ function produktpreise_konsistenztest_problem_view( $problems, $editable = false
         'month' => $monat,
         'day'   => $tag
       ] = date_parse( $problem['vorschlag_ende'] );
+      $monat = sprintf("%02d", $monat);
+      $tag = sprintf("%02d", $tag);
       div_msg(
         'warn',
         fc_action(
@@ -1878,7 +1880,9 @@ function preishistorie_view( $produkt_id, $bestell_id = 0, $editable = false, $m
     $legend = "Preis-Historie";
   }
 
-  if( sql_aktueller_produktpreis_id( $produkt_id ) and ! $bestell_id ) {
+  $produktpreis_probleme = sql_produktpreise_konsistenztest( FALSE, $produkt_id )[$produkt_id];
+
+  if( sql_aktueller_produktpreis_id( $produkt_id ) and !$bestell_id and !$produktpreis_probleme ) {
     $initial = 'off';
   } else {
     $initial = 'on';
@@ -1949,7 +1953,7 @@ function preishistorie_view( $produkt_id, $bestell_id = 0, $editable = false, $m
   close_table();
   close_div();
 
-  produktpreise_konsistenztest( $produkt_id, $editable, 0 );
+  produktpreise_konsistenztest_problem_view( $produktpreis_probleme, $editable );
 
   close_fieldset();
 }
@@ -2313,15 +2317,18 @@ function catalogue_product_details( $catalogue_record ) {
   join_details( $details
           , '<span title="Herkunft">Hrk:</span> '
           , $catalogue_record['herkunft']
-          , 'hrk');
+          , 'hrk'
+          , $catalogue_record);
   join_details( $details
           , '<span title="Verband">Vbd:</span> '
           , $catalogue_record['verband']
-          , 'vbd');
+          , 'vbd'
+          , $catalogue_record);
   join_details( $details
           , '<span title="Hersteller">Hst:</span> '
           , $catalogue_record['hersteller']
-          , 'hst');
+          , 'hst'
+          , $catalogue_record);
   join_details( $details
           , '<span title="European Article Number">EAN</span> ',
           ean_links($catalogue_record['ean_einzeln']));

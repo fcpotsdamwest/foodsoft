@@ -180,9 +180,13 @@ function sql_select_single_field( $sql, $field, $allownull = false ) {
   return NULL;
 }
 
+function select_count( $table, $where ) {
+  return "SELECT COUNT(*) AS count FROM $table WHERE $where";
+}
+
 function sql_count( $table, $where ) {
   return sql_select_single_field(
-    "SELECT count(*) as count FROM $table WHERE $where"
+    select_count( $table, $where )
   , 'count'
   );
 }
@@ -1676,6 +1680,61 @@ function sql_lieferant_katalogeintraege( $lieferanten_id ) {
 //
 ////////////////////////////////////
 
+/** alias_columns
+ *
+ * Generate list of aliased columns
+ *
+ * @param array &$result
+ *   (modified) array to append the columns to
+ * @param string $table
+ *   original name of the table
+ * @param string $alias
+ *   table alias to use for naming the columns
+ * @param array $columns
+ *   columns to list
+ * @return void
+ */
+function alias_columns( array &$result, string $table, string $alias, array $columns ) {
+  foreach( $columns as $column ) {
+    $result[] = "`{$table}`.`{$column}` AS `{$alias}.{$column}`";
+  }
+}
+
+/** unalias_columns
+ *
+ * Select and unalias aliased columns (see `alias_columns()`).
+ *
+ * @param array $row
+ * @param string $alias
+ * @return array
+ *   unaliased results
+ *
+ * As an example:
+ * > unalias_columns(
+ * >   array(
+ * >    'unaliased' => 'v1',
+ * >    'aliased.col1' => 'v2',
+ * >    'aliased.col2' => 'v3',
+ * >    'other.col1' => 'v4',
+ * >   )
+ * >   , 'aliased')
+ * results in
+ * > array(
+ * >   'col1' => 'v2',
+ * >   'col2' => 'v3',
+ * > )
+*/
+function unalias_columns( array $row, string $alias ) {
+  $prefix = "{$alias}.";
+  $result = [];
+  foreach( $row as $key => $val ) {
+    if( strpos( $key, $prefix ) === 0 ) {
+      $result[substr( $key, strlen($prefix) )] = $val;
+    }
+  }
+  return $result;
+}
+
 /** query_produkte
  *
  * @param str $op
@@ -1692,8 +1751,20 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
   $joins = need_joins_array(
     $using,
     [
-      'produktgruppen' => 'produktgruppen.id = produkte.produktgruppen_id',
-      'lieferanten'    => 'lieferanten.id = produkte.lieferanten_id',
+      'produktgruppen'     => 'produktgruppen.id = produkte.produktgruppen_id',
+      'lieferanten'        => 'lieferanten.id = produkte.lieferanten_id',
+      'lieferantenkatalog' => 'LEFT OUTER JOIN lieferantenkatalog ' .
+        'ON (lieferantenkatalog.lieferanten_id = produkte.lieferanten_id ' .
+        'AND lieferantenkatalog.artikelnummer = produkte.artikelnummer)',
+      'hersteller_acro'    => 'LEFT OUTER JOIN catalogue_acronyms as hersteller_acro ' .
+        'ON (hersteller_acro.context = "hst" ' .
+        'AND hersteller_acro.acronym = lieferantenkatalog.hersteller COLLATE utf8mb3_general_ci)',
+      'verband_acro'       => 'LEFT OUTER JOIN catalogue_acronyms as verband_acro ' .
+        'ON (verband_acro.context = "vbd" ' .
+        'AND verband_acro.acronym = lieferantenkatalog.verband COLLATE utf8mb3_general_ci)',
+      'herkunft_acro'      => 'LEFT OUTER JOIN catalogue_acronyms as herkunft_acro ' .
+        'ON (herkunft_acro.context = "hrk" ' .
+        'AND herkunft_acro.acronym = lieferantenkatalog.herkunft COLLATE utf8mb3_general_ci)'
     ]
   );
 
@@ -1709,6 +1780,19 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
     'produktgruppen.id as produktgruppen_id',
     'lieferanten.name as lieferant_name'
   ];
+
+  alias_columns(
+    $selects,
+    'lieferantenkatalog',
+    'katalog',
+    [ 'ean_einzeln', 'bemerkung', 'hersteller', 'verband', 'herkunft' ]
+  );
+
+  $acronym_fields = [ 'definition', 'url', 'comment' ];
+
+  alias_columns( $selects, 'hersteller_acro', 'katalog.hst', $acronym_fields );
+  alias_columns( $selects, 'verband_acro', 'katalog.vbd', $acronym_fields );
+  alias_columns( $selects, 'herkunft_acro', 'katalog.hrk', $acronym_fields );
 
   foreach( $keys as $key => $cond ) {
     switch( $key ) {
@@ -1769,6 +1853,18 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
           $filters['produkte.id'] = "!= ALL ($order_products_select)";
         }
         break;
+      case 'references':
+        if( $cond ) {
+          $selects[] = count_references_produkt( 'produkte.id' ) . ' AS `references`';
+        }
+        break;
+      case 'bestellzuordnung_menge':
+        if( $cond ) {
+          $selects[] = '(' .
+            select_bestellzuordnung_menge( [ 'produkt_id' => 'produkte.id', 'art' => $cond ] ) .
+          ') AS `bestellzuordnung_menge`';
+        }
+        break;
       default:
           error( "undefined key: $key" );
     }
@@ -1796,6 +1892,10 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
           break;
         case 'lieferanten':
           $filters[] = 'produkte.lieferanten_id = lieferanten.id';
+          break;
+        case 'lieferantenkatalog':
+          $filters[] = 'produkte.lieferanten_id = lieferantenkatalog.lieferanten_id ' .
+            'AND produkte.artikelnummer = lieferantenkatalog.artikelnummer';
           break;
         default:
           error( "Sorry, I have no use for table $table" );
@@ -1867,9 +1967,19 @@ function sql_produkte_anzahl( $keys = array() ) {
   return sql_select_single_field( select_produkte_anzahl( $keys ), 'anzahl' );
 }
 
+function count_references_produkt( $produkt_id ) {
+  return '(' .
+    select_count( 'bestellvorschlaege', "produkt_id={$produkt_id}" ) .
+  ') + (' .
+    select_count( 'bestellzuordnung', "produkt_id={$produkt_id}" ) .
+  ')';
+}
+
 function references_produkt( $produkt_id ) {
-  return sql_count( 'bestellvorschlaege', "produkt_id=$produkt_id" )
-       + sql_count( 'bestellzuordnung', "produkt_id=$produkt_id" );
+  return sql_select_single_field(
+    'SELECT ' . count_references_produkt( $produkt_id ) . ' AS refcnt',
+    'refcnt'
+  );
 }
 
 function sql_delete_produkt( $produkt_id ) {
@@ -4215,50 +4325,109 @@ function select_current_productprice_id( $product_id, $timestamp = true ) {
       . "LIMIT 1";
 }
 
-// produktpreise_konsistenztest:
-//  - alle zeitintervalle bis auf das letzte müssen abgeschlossen sein
-//  - intervalle dürfen nicht ueberlappen
-//  - warnen, wenn kein aktuell gültiger preis vorhanden
-// rueckgabe: true, falls keine probleme, sonst false
-//
-function produktpreise_konsistenztest( $produkt_id, $editable = false, $mod_id = false ) {
+/** produktpreise_konsistenztest
+ * 
+ * Check price history of a product for various consistency issues.
+ * - all time intervals but the last must be closed
+ * - time intervals mustn't overlap
+ * - if there's no valid current price, issue a warning
+ * 
+ * @param int $lieferanten_id
+ * @param int $produkt_id
+ * @param bool $editable
+ * @param int|bool $mod_id
+ * @return string
+ *   Generated SQL query string
+ *
+ */
+function select_produktpreise_konsistenztest( $lieferanten_id = FALSE, $produkt_id = FALSE ) {
   global $mysqljetzt;
-  need( $produkt_id );
-  $rv = true;
-  $pr0 = FALSE;
-  foreach( sql_produktpreise( $produkt_id ) as $pr1 ) {
-    if( $pr0 ) {
-      $monat = $pr1['monat_start'];
-      $jahr = $pr1['jahr_start'];
-      $tag = $pr1['tag_start'];
-      $show_button = false;
-      if( $pr0['zeitende'] == '' ) {
-        echo "<div class='warn'>FEHLER: Preisintervall {$pr0['id']} nicht aktuell aber nicht abgeschlossen.</div>";
-        $show_button = true;
-        $rv = false;
-      } else if( $pr0['zeitende'] > $pr1['zeitstart'] ) {
-        echo "<div class='warn'>FEHLER: Ueberlapp in Preishistorie: {$pr0['id']} und {$pr1['id']}.</div>";
-        $show_button = true;
-        $rv = false;
-      }
-      if( $editable && $show_button )
-        div_msg( 'warn', fc_action(  array( 'text' => "Eintrag {$pr0['id']} zum $jahr-$monat-$tag enden lassen"
-                                          , 'title' => "Eintrag {$pr0['id']} zum $jahr-$monat-$tag enden lassen" )
-                                   , array(  'action' => 'zeitende_setzen', 'vortag' => '1', 'preis_id' => $pr0['id']
-                                          , 'day' => "$tag", 'month' => "$monat", 'year' => "$jahr" ) ) );
-    }
-    $pr0 = $pr1;
+
+  $where = '';
+  if( $produkt_id ) {
+    $where = "WHERE produkte.id = {$produkt_id}";
+  } elseif ( $lieferanten_id ) {
+    $where = "WHERE produkte.lieferanten_id = {$lieferanten_id}";
   }
-  if( ! $pr0 ) {
-    div_msg( 'alert', 'HINWEIS: kein Preiseintrag für diesen Artikel vorhanden!' );
-  } else if ( $pr0['zeitende'] != '' ) {
-    if ( $pr0['zeitende'] < $mysqljetzt ) {
-        div_msg( 'alert', 'HINWEIS: kein aktuell gültiger Preiseintrag für diesen Artikel vorhanden!' );
+
+  $query = "
+    WITH pr AS (
+      SELECT
+        ROW_NUMBER() OVER(
+          PARTITION BY produkt_id
+          ORDER BY zeitstart, IFNULL(zeitende, '9999-12-31'), id
+        ) AS irow,
+        produkte.id AS produkt_id,
+        produktpreise.id,
+        produktpreise.zeitstart,
+        produktpreise.zeitende
+      FROM produkte
+        LEFT JOIN produktpreise ON produktpreise.produkt_id = produkte.id
+      {$where}
+    )
+    SELECT
+      pr0.produkt_id,
+      IFNULL(
+        TIMESTAMPDIFF(SECOND, pr0.zeitende, pr1.zeitstart) < 0,
+        2
+      ) AS error,
+      pr0.id AS produktpreis_id1,
+      pr1.id AS produktpreis_id2,
+      pr1.zeitstart AS vorschlag_ende
+    FROM pr AS pr0
+    JOIN pr AS pr1
+      ON pr0.produkt_id = pr1.produkt_id
+        AND pr0.irow + 1 = pr1.irow
+    HAVING error
+    UNION
+    SELECT
+      produkt_id,
+      IF(
+        zeitende IS NULL,
+        0,
+        IF( zeitende < '{$mysqljetzt}', 3, 4 )
+      ) AS error,
+      id,
+      NULL,
+      NULL
+    FROM pr
+    WHERE irow = (SELECT MAX(pr1.irow) FROM pr AS pr1 WHERE pr1.produkt_id = pr.produkt_id)
+    HAVING error
+    UNION
+    SELECT
+      produkt_id,
+      IF( COUNT(DISTINCT id) > 0, 0, 5 ) AS error,
+      NULL,
+      NULL,
+      NULL
+    FROM pr
+    GROUP BY produkt_id
+    HAVING error;
+  ";
+  return $query;
+}
+
+/** sql_produktpreise_konsistenztest
+ * 
+ * @param int|bool $lieferanten_id
+ * @param int|bool $produkt_id
+ * @return array[]
+ *   Array of product ids with their corresponding consistency issues
+ */
+function sql_produktpreise_konsistenztest( $lieferanten_id = FALSE, $produkt_id = FALSE ) {
+  $result = [];
+  $problems = mysql2array(
+    doSql( select_produktpreise_konsistenztest( $lieferanten_id, $produkt_id ) )
+  );
+  foreach( $problems as $problem) {
+    $produkt_id = $problem['produkt_id'];
+    if( !array_key_exists( $produkt_id, $result ) ) {
+      $result[ $produkt_id ] = [ $problem ];
     } else {
-        div_msg( 'alert', 'HINWEIS: aktueller Preis läuft aus!' );
+      $result[ $produkt_id ][] = $problem;
     }
   }
-  return $rv;
+  return $result;
 }
 
 
