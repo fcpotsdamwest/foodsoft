@@ -177,7 +177,7 @@ switch( $status ){    // anzeigedetails abhängig vom Status auswählen
     }
     $title="Lieferschein";
     break;
-  default: 
+  default:
     div_msg( 'warn', 'Keine Detailanzeige verfügbar' );
     return;
 }

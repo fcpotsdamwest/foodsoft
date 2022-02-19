@@ -62,8 +62,8 @@ switch( $action ) {
       foreach( $lieferanten as & $l ) {
         $soll = sql_bestellungen_soll_lieferant( $l['id'], $bestell_id );
         $l['saldo'] += (
-                        
-        
+
+
 
       $bestellungen_abgeschlossen[] = $b['id'];
     }

@@ -47,7 +47,7 @@ Installation der Foodosoft:
       http://euer.server.name/foodsoft/setup.php
     aufrufen.
 
-(e) setup.php 
+(e) setup.php
     - testet die Verbindung zur Datenbank und
     - schlägt die Korrekturen vor, um die nötigen Tabellen in der
       Datenbank anzulegen.
@@ -72,7 +72,7 @@ Weitere FoodCoops installieren
 Wenn ihr die Foodsoft für mehr als eine FoodCoop auf demselben Server betreiben
 wollt:
 
-- Die erste installiert Ihr wie oben beschrieben; die Datenbankkonfiguration 
+- Die erste installiert Ihr wie oben beschrieben; die Datenbankkonfiguration
   schreibt ihr in die apache-Konfigurationdatei (siehe apache.sample.conf).
   Wir nehmen mal an, dass das schon geklappt hat.
 

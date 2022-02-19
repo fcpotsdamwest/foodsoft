@@ -1,5 +1,5 @@
 <?PHP
-  
+
 assert( $angemeldet ) or exit();
 // $_SESSION['LEVEL_CURRENT'] = LEVEL_IMPORTANT;
 
@@ -163,7 +163,7 @@ if( $edit_pwd ) {
 
 if( hat_dienst(5) or ( $gruppen_id == $login_gruppen_id ) )
   open_div( 'smallskip right', '', fc_link( 'gruppenkonto', "gruppen_id=$gruppen_id,text=Gruppenkonto..." ) );
-  
+
 medskip();
 
 memberform_view( $gruppen_id, $edit_names, $edit_dienst_einteilung );
@@ -177,7 +177,7 @@ if( hat_dienst(5) and ! $readonly ) {
         form_row_text( 'Name:', 'newName', 20 );
         form_row_text( 'Email:', 'newMail', 24 );
         form_row_text( 'Telefon:', 'newTelefon', 20 );
-        open_tr(); open_td( 'label', '', 'Diensteinteilung:'); open_td( 'kbd', '', dienst_selector('') ); 
+        open_tr(); open_td( 'label', '', 'Diensteinteilung:'); open_td( 'kbd', '', dienst_selector('') );
         open_tr(); open_td( 'right', "colspan='2'" ); submission_button();
       close_table();
     close_form();

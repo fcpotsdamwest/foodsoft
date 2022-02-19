@@ -235,7 +235,7 @@ foreach( $bestellungen as $bestellung ) {
           );
         }
         break;
-  
+
       case STATUS_LIEFERANT:
         $views[] = fc_link(
           'bestellschein',
@@ -246,7 +246,7 @@ foreach( $bestellungen as $bestellung ) {
           ]
         );
         if( $login_dienst > 0 )
-          $views[] = fc_link( 
+          $views[] = fc_link(
             'verteilliste',
             [
               'bestell_id' => $bestell_id,
@@ -254,7 +254,7 @@ foreach( $bestellungen as $bestellung ) {
             ]
           );
         if( hat_dienst(4) ) {
-          $actions[] = fc_link( 
+          $actions[] = fc_link(
             'edit_bestellung',
             [
               'text'       => 'Stammdaten ändern...',
@@ -300,10 +300,10 @@ foreach( $bestellungen as $bestellung ) {
             ]
           );
         break;
-  
+
       case STATUS_VERTEILT:
         $views[] = fc_link(
-          'lieferschein', 
+          'lieferschein',
           [
             'text'       => 'Lieferschein',
             'bestell_id' => $bestell_id,
@@ -374,7 +374,7 @@ foreach( $bestellungen as $bestellung ) {
           }
         }
         break;
-  
+
       case STATUS_ABGERECHNET:
         $views[] = fc_link(
           'lieferschein',
@@ -392,7 +392,7 @@ foreach( $bestellungen as $bestellung ) {
               'bestell_id' => $bestell_id,
             ]
           );
-  
+
         $views[] = fc_link(
           'abrechnung',
           [
@@ -402,7 +402,7 @@ foreach( $bestellungen as $bestellung ) {
             'class'         => 'href',
            ]
         );
-  
+
         if( $n == $abrechnung_set_count ) {
           if( $abrechnung_set_count > 1 ) {
             $combs[] = fc_link(
@@ -423,14 +423,14 @@ foreach( $bestellungen as $bestellung ) {
             );
           }
         }
-  
+
         break;
-  
+
       case STATUS_ARCHIVIERT:
       default:
         break;
     }
-  
+
     open_tr('',"id='row$bestell_id'" );
       open_td();
         open_div( '','', $row['name'] );
@@ -465,15 +465,15 @@ foreach( $bestellungen as $bestellung ) {
           if( $actions ) {
             open_ul('plain');
               foreach( $actions as $action )
-                open_li( '', '',  $action ); 
+                open_li( '', '',  $action );
             close_ul();
           } else {
             echo '-';
           }
       }
-  
+
       if( hat_dienst(4) ) {
-        $tdcls = 
+        $tdcls =
           ( ( $n == 1 ) ? '' : 'notop ' ) .
           ( ( $n == $abrechnung_set_count ) ? '' : ' nobottom' );
         open_td( $tdcls );

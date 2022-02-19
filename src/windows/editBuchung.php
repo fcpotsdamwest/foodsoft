@@ -17,7 +17,7 @@ if( get_http_var( 'transaktion_id', 'U', NULL, true ) )
 else
   need_http_var( 'buchung_id','U', true );
 
-$buchung = sql_get_transaction( $buchung_id ); 
+$buchung = sql_get_transaction( $buchung_id );
 $k_id = $buchung['konterbuchung_id'];
 if( ! $k_id ) {
   div_msg( 'kommentar', "
@@ -27,7 +27,7 @@ if( ! $k_id ) {
   return;
 }
 
-$k_buchung = sql_get_transaction( $k_id ); 
+$k_buchung = sql_get_transaction( $k_id );
 
 // wähle eine (hoffentlich) leicht verständliche / kanonische reihenfolge der beiden Buchungen:
 //

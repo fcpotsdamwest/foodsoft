@@ -71,7 +71,7 @@ open_table('list');
           $p['bestell_id'] = $bestell_id;
           $produktbestellungen[] = $p;
           break;
-        default: 
+        default:
           error( "internal error: unexpected count: " . count($r) );
       }
     }

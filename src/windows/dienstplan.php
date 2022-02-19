@@ -84,7 +84,7 @@ switch( $action ) {
     } else {
       open_div( 'warn' );
       ?> Dies müsste mit der andern Gruppe abgesprochen sein oder die Gruppe ist nach mehreren
-         Versuchen (Telefon und Email) nicht erreichbar 
+         Versuchen (Telefon und Email) nicht erreichbar
       <?php
       echo fc_action( 'class=button,text=Klar', sprintf( 'action=uebernehmen_%u,message=1', $id ) );
       close_div();
