@@ -20,8 +20,8 @@ if( $readonly ) {
   $payloadclass='payload';
 }
 
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
-open_tag( 'html' );
+echo "<!DOCTYPE html>\n";
+open_tag( 'html', '', 'lang="de"' );
 open_tag( 'head' );
 ?>
   <title id='title'><?php echo $title; ?></title>

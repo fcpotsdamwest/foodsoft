@@ -18,8 +18,8 @@ if( $readonly ) {
 
 $FC_acronym = adefault( $_SERVER, 'FC_acronym', '' );
 
-echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n";
-open_tag( 'html' );
+echo "<!DOCTYPE html>\n";
+open_tag( 'html', '', 'lang="de"' );
 open_tag( 'head' );
 ?>
   <title>Food Coop <?php echo $foodcoop_name; ?>  - Foodsoft</title>
