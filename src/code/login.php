@@ -236,8 +236,8 @@ setWikiHelpTopic( ':' );
 
 open_div( 'kommentar', '', $motd );
 
-open_javascript();
 ?>
+<script>
 function pick_login_dropdown() {
   var source = $('login_gruppen_id');
   var text = $('login_gruppen_id_text');
@@ -259,8 +259,8 @@ function pick_login_text() {
   }
   dropdown.value = group_id;
 }
+</script>
 <?php
-close_javascript();
 
 // we need $foodsoftdir in form action to allow login from DokuWiki:
 //
