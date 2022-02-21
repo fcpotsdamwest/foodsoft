@@ -139,6 +139,22 @@ function select_query( $table, $selects = '*', $joins = '', $filters = false, $o
 // }
 
 
+/** sql_select_single_row
+ *
+ * @param string $sql
+ * @param array|bool $allownull
+ *   - array that is returned if the result has 0 rows
+ *   - boolean: return NULL if true
+ * @param int $result_type
+ *   Will be passed on to mysqli_fetch_array
+ * @return array|null|never-return
+ *   Array representing the result row (if there was exactly one row in the result).
+ *   Otherwise:
+ *   - $allow_null (default result) if result empty and $allow_null is an array
+ *   - NULL if result empty and $allow_null is turhty
+ *   - (no return) if result empty and $allow_null is falsy
+ *   - (no return) if result has more than one rows
+ */
 function sql_select_single_row( $sql, $allownull = false, $result_type = MYSQLI_ASSOC ) {
   $result = doSql( $sql );
   $rows = mysqli_num_rows($result);
@@ -325,10 +341,9 @@ function mysql2array( $result, $key = false, $val = false, $result_type = MYSQLI
 }
 
 
-/**
- * TBA
- * 
- * @param array $using
+/** need_joins_array
+ *
+ * @param array|str $using
  *   Tables
  * @param array $rules
  * need_joins: for scalar subqueries as in "SELECT x , ( SELECT ... ) as y, z":
@@ -356,7 +371,8 @@ function need_joins_array( $using, $rules ) {
   return $joins;
 }
 
-/**
+/** need_joins
+ *
  * Generate a JOIN clause for embedding into a SQL statement.
  *
  * @param array $using
@@ -382,9 +398,15 @@ function need_joins( $using, $rules ) {
   return $joins;
 }
 
-/*
- * use_filters: für skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z":
- *  erzeugt optionale filterausdrücke, die bereits verfügbare tabellen benutzen
+/** use_filters_array
+ *
+ * Erzeugt optionale filterausdrücke, die bereits verfügbare tabellen benutzen.
+ *
+ * Für skalare subqueries wie in "SELECT x , ( SELECT ... ) as y, z".
+ * @param array|string $using
+ * @param array $rules
+ * @return array
+ *   Array of filter expressions
  */
 function use_filters_array( $using, $rules ) {
   $filters = array();
@@ -397,7 +419,8 @@ function use_filters_array( $using, $rules ) {
   return $filters;
 }
 
-/**
+/** use_filters
+ *
  * TBA
  */
 function use_filters( $using, $rules ) {
@@ -1629,6 +1652,12 @@ function sql_lieferant_offene_bestellungen( $lieferanten_id ) {
   " ) );
 }
 
+/** sql_lieferant_katalogeintraege
+ *
+ * @param int $lieferanten_id
+ * @return int
+ *   number of catalogues stored for the supplier
+ */
 function sql_lieferant_katalogeintraege( $lieferanten_id ) {
   $lieferant = sql_lieferant( $lieferanten_id );
   $katalogformat = $lieferant['katalogformat'];
@@ -1781,6 +1810,14 @@ function query_produkte( $op, $keys = array(), $using = array(), $orderby = fals
   return get_sql_query( $op, 'produkte', $selects, $joins, $filters, $orderby );
 }
 
+/** select_produkte
+ *
+ * @param array $keys
+ * @param array $using
+ * @param str|bool $orderby
+ * @return string
+ *   Generated SQL query
+ */
 function select_produkte( $keys = array(), $using = array(), $orderby = false ) {
   return query_produkte( 'SELECT', $keys, $using, $orderby );
 }
@@ -2903,6 +2940,21 @@ function nichtGeliefert( $bestell_id, $produkt_id ) {
   sql_change_liefermenge( $bestell_id, $produkt_id, 0 );
 }
 
+/** change_bestellmengen
+ *
+ * Update the order [and prebook] amount(s) for the given (order,group,product) tuple.
+ *
+ * To skip updating one of festmenge or toleranzmenge, a dummy value <0 can be used.
+ * Example: To update festmenge only, we set the toleranzmenge -1 param to -1
+ * change_bestellmengen($group, $order, $product, $fest, -1, $prebook)
+ *
+ * @param $gruppen_id
+ * @param $bestell_id
+ * @param $produkt_id
+ * @param int $festmenge
+ * @param int $toleranzmenge
+ * @param false $vormerken
+ */
 function change_bestellmengen( $gruppen_id, $bestell_id, $produkt_id, $festmenge = -1, $toleranzmenge = -1, $vormerken = false ) {
   need( sql_bestellung_status( $bestell_id ) == STATUS_BESTELLEN, "Bestellen bei dieser Bestellung nicht mehr möglich" );
   $gruppenbestellung_id = sql_insert_gruppenbestellung( $gruppen_id, $bestell_id );
@@ -4129,18 +4181,28 @@ function sql_produktpreise( $produkt_id, $zeitpunkt = false, $reverse = false ){
   return $result;
 }
 
-/* sql_aktueller_produktpreis:
- *  liefert aktuellsten preis zu $produkt_id,
- *  oder false falls es keinen gültigen preis gibt:
+/** sql_aktueller_produktpreis
+ *
+ * @param int $produkt_id
+ * @param string|bool $zeitpunkt
+ *   passed on to `sql_produktpreise`
+ * @return array|bool
+ *   Current price for $produkt_id,
+ *   FALSE if no valid price was found.
  */
 function sql_aktueller_produktpreis( $produkt_id, $zeitpunkt = true ) {
   $preise = sql_produktpreise( $produkt_id, $zeitpunkt );
   return end( $preise );
 }
 
-/* sql_aktueller_produktpreis_id:
- *  liefert id des aktuellsten preises zu $produkt_id,
- *  oder 0 falls es NOW() keinen gültigen preis gibt:
+/** sql_aktueller_produktpreis_id
+ *
+ * @param int $produkt_id
+ * @param string|bool $zeitpunkt
+ *    passed on to `sql_aktueller_produktpreis`
+ * @return int
+ *   ID of current price for $produkt_id,
+ *   0 if no valuid price was found
  */
 function sql_aktueller_produktpreis_id( $produkt_id, $zeitpunkt = true ) {
   $row = sql_aktueller_produktpreis( $produkt_id, $zeitpunkt );
@@ -4583,7 +4645,7 @@ function checkvalue( $val, $typ){
 // Create a global variable <name> and populate it with the GET or POST parameter
 // of the same name, using the <default> value if set.
 //
-// - name: wenn name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
+// - name: wenn $name auf [] endet, wird ein array erwartet (aus <input name='bla[]'>)
 // - typ: definierte $typ argumente:
 //   d : ganze Zahl
 //   u : nicht-negative ganze Zahl
@@ -4597,6 +4659,10 @@ function checkvalue( $val, $typ){
 // - default:
 //   - wenn array erwartet wird, kann der default ein array sein.
 //   - wird kein array erwartet, aber default is ein array, so wird $default[$name] versucht
+// - is_self_field: ('POST'|FALSE|(truthy))
+//   - value 'POST' will set the key $name in $self_post_fields
+//   - value FALSE will add $name neither to $self_fields nor to $self_post_fields
+//   - any truthy value other than 'POST' will set the $name field in $self_fields
 //
 // per POST übergebene variable werden nur berücksichtigt, wenn zugleich eine
 // unverbrauchte transaktionsnummer 'itan' übergeben wird (als Sicherung
@@ -4693,8 +4759,16 @@ function get_http_var( $name, $typ, $default = NULL, $is_self_field = false ) {
   return TRUE;
 }
 
-/**
+/** need_http_var
  *
+ * @param string $name
+ *   name of the request parameter to check
+ * @param string $typ
+ *   type of the request parameter
+ * @param bool $is_self_field
+ *   passed on to get_http_var()
+ * @return bool
+ *   True if the request parameter is present.
  */
 function need_http_var( $name, $typ, $is_self_field = false ) {
   need( get_http_var( $name, $typ, NULL, $is_self_field ), "variable $name nicht übergeben" );
