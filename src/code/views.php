@@ -2275,18 +2275,31 @@ function avatar_view( $member_row ) {
 
 }
 
-function join_details(&$details, $prefix, $value, $context = false)
+
+/** translate_catalogue_acronym
+ * 
+ * Generate HTML snippet from the given acronym using data from the
+ * `catalogue_acronyms` table.
+ *
+ * @param string $acronym
+ * @param string|null $context
+ * @return string
+ *   The translated acronym as HTML snippet, or
+ *   the unmodified acronym if not found in the DB.
+ */
+function translate_catalogue_acronym( $acronym, $context = null, $linkify = true )
 {
-  if ($value) {
-    if ($context && $acronym_details = current(sql_catalogue_acronym($context, $value))) {
-      if ($acronym_details['url']) {
+  if ($acronym) {
+    $value = $acronym;
+    if ($context && $acronym_details = current(sql_catalogue_acronym($context, $acronym))) {
+      if ($acronym_details['url'] && $linkify   ) {
         $value = "<a rel='external noopener noreferrer' target='_blank' title='$value' "
         . "href='{$acronym_details['url']}'>{$acronym_details['definition']}</a>";
       } else {
         $value = "<span title='$value'>{$acronym_details['definition']}</span>";
       }
     }
-    $details[] = "$prefix$value";
+    return $value;
   }
 }
 
@@ -2297,24 +2310,13 @@ function catalogue_product_details( $catalogue_record ) {
 
   $details = array();
 
-  join_details( $details, '', $catalogue_record['bemerkung']);
-  join_details( $details
-          , '<span title="Herkunft">Hrk:</span> '
-          , $catalogue_record['herkunft']
-          , 'hrk');
-  join_details( $details
-          , '<span title="Verband">Vbd:</span> '
-          , $catalogue_record['verband']
-          , 'vbd');
-  join_details( $details
-          , '<span title="Hersteller">Hst:</span> '
-          , $catalogue_record['hersteller']
-          , 'hst');
-  join_details( $details
-          , '<span title="European Article Number">EAN</span> ',
-          ean_links($catalogue_record['ean_einzeln']));
+  $catalogue_record['bemerkung'] && $details[] = $catalogue_record['bemerkung'];
+  $details[] = '<span title="Herkunft">Hrk:</span>&nbsp;' . translate_catalogue_acronym( $catalogue_record['herkunft'], 'hrk' );
+  $details[] = '<span title="Verband">Vbd:</span>&nbsp;' . translate_catalogue_acronym( $catalogue_record['verband'], 'vbd' );
+  $details[] = '<span title="Hersteller">Hst:</span>&nbsp;' . translate_catalogue_acronym( $catalogue_record['hersteller'], 'hst');
+  $details[] = '<span title="European Article Number">EAN</span>&nbsp;' . ean_links($catalogue_record['ean_einzeln']);
 
-  return join('; ', $details);
+  return join(';&nbsp;', $details);
 }
 
 function catalogue_acronym_view( $editable ) {
