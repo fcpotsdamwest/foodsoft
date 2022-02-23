@@ -41,12 +41,19 @@ switch( $katalogformat ) {
     break;
   default:
   case 'keins':
+    $lieferant_linked = fc_link(
+      'edit_lieferant',
+      array(
+        'text' => $lieferant_name,
+        'class' => 'href',
+        'lieferanten_id' => $lieferanten_id)
+    );
     medskip();
     open_div( 'warn' );
       medskip();
-      echo "Artikelsuche: für Lieferant ";
-      echo fc_link( 'edit_lieferant', array( 'text' => $lieferant_name, 'class' => 'href', 'lieferanten_id' => $lieferanten_id ) );
-      echo " ist das Katalogformat [$katalogformat] eingestellt; dieses wird leider (noch) nicht unterstuetzt!";
+      echo
+        "Artikelsuche: für Lieferant {$lieferant_linked} ist das Katalogformat [$katalogformat] eingestellt; " .
+        "dieses wird leider (noch) nicht unterstützt!";
       medskip();
     close_div();
     return;
