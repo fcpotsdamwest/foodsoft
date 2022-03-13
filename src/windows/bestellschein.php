@@ -106,7 +106,7 @@ switch( $action ) {
   case 'update':
     nur_fuer_dienst(4);
     need( $status == STATUS_VERTEILT );
-    foreach( sql_bestellung_produkte($bestell_id ) as $produkt ) {
+    foreach( sql_bestellung_produkte( ['bestell_id' => $bestell_id] ) as $produkt ) {
       $produkt_id = $produkt['produkt_id'];
       if( get_http_var( 'liefermenge'.$produkt_id, 'f' ) ) {
         $lv_faktor = $produkt['lv_faktor'];
