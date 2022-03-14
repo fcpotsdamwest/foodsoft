@@ -5422,7 +5422,8 @@ function update_database( $version ) {
 
     case 31:
       /* Version 1032: add config items for VAT to the `leitvariable` table
-       ` (as we are out of sync with upstream here, we use a different version count)
+         (as we are out of sync with upstream here, we use a different version count)
+         (guteluise: 36 >> 37)
        */
       logger( 'starting update_database: from version 31' );
 
@@ -5448,7 +5449,25 @@ function update_database( $version ) {
       );
 
       logger( 'update_database: update to version 1032 successful' );
-	}
+    case 1032:
+      /* Version 1033: add index on produkt_id column to `bestellvorschlaege`
+         (as we are out of sync with upstream here, we use a different version count)
+         (guteluise: 37 >> 38)
+       */
+      logger( 'starting update_database: from version 1032' );
+
+      doSql(
+        "ALTER TABLE `bestellvorschlaege` ADD INDEX `by_produkt_id` (`produkt_id`)"
+      );
+
+      sql_update(
+        'leitvariable',
+        [ 'name' => 'database_version' ],
+        [ 'value' => 1033 ]
+      );
+
+      logger( 'update_database: update to version 1033 successful' );
+  }
 }
 
 function wikiHref( $topic ) {

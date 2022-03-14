@@ -207,7 +207,8 @@ $tables = array(
       )
     )
     , 'indices' => array(
-        'PRIMARY' => array( 'unique' => 1, 'collist' => 'gesamtbestellung_id, produkt_id' )
+        'PRIMARY'       => array( 'unique' => 1, 'collist' => 'gesamtbestellung_id, produkt_id' )
+      , 'by_produkt_id' => ['unique' => 0, 'collist' => 'produkt_id']
     )
   )
 , 'bestellzuordnung' => array(
