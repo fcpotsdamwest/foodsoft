@@ -26,15 +26,15 @@ function sql_selects( $table, $prefix = false ) {
   $selects = array();
   foreach( $cols as $name => $type ) {
     if( $name == 'id' ) {
-      if( isstring( $prefix ) )
+      if( is_string( $prefix ) )
         $selects[] = "$table.id as {$prefix}id";
       else
-        $selects[] = "$table.id as $table_id";
+        $selects[] = "$table.id as ${table}_id";
     } else {
-      if( isstring( $prefix ) )
+      if( is_string( $prefix ) )
         $selects[] = "$table.$name as $prefix$name";
       else if( $prefix )
-        $selects[] = "$table.$name as $table_$name";
+        $selects[] = "$table.$name as ${table}_$name";
       else
         $selects[] = "$table.$name as $name";
     }
@@ -79,6 +79,26 @@ function cond2filter( $key, $cond ) {
 }
 
 /**
+ * Generate a SQL compound expression to be used in WHERE or similar statements
+ */
+  function get_sql_filter($filters = NULL) {
+    if ( is_null($filters) ) {
+      return "TRUE";
+    }
+
+    if( is_string($filters) ) {
+      return $filters;
+    }
+
+    $expressions = []; 
+
+    foreach ($filters as $key => $cond) {
+      $expressions[] = "(" . cond2filter($key, $cond) . ")";
+    }
+    return implode(" AND ", $expressions);
+  }
+
+/**
  * Generate a generic SQL query from the provided parameters.
  *
  * @param string $op
@@ -109,15 +129,7 @@ function get_sql_query( $op, $table, $selects = '*', $joins = '', $filters = fal
   }
   $query = "$op $select_string FROM $table $join_string";
 
-  if( is_string( $filters ) && $filters != '' ) {
-    $query .= " WHERE ( $filters ) ";
-  } elseif( is_array( $filters ) && !empty( $filters ) ) {
-    $and = 'WHERE';
-    foreach( $filters as $key => $cond ) {
-      $query .= " $and (". cond2filter( $key, $cond ) .") ";
-      $and = 'AND';
-    }
-  }
+  $query .= 'WHERE ' . get_sql_filter( $filters );
 
   if( $groupby ) {
     $query .= " GROUP BY $groupby ";
@@ -1383,7 +1395,7 @@ function check_new_group_nr( $newNummer, & $problems ){
  * Sockelbetrag entsprechend
  */
 function sql_delete_group_member( $gruppenmitglieder_id ) {
-  global $problems, $msg, $mysqlheute;
+  global $db_handle, $problems, $msg, $mysqlheute;
 
   need( hat_dienst(5), "Nur Dienst 5 darf Personen löschen");
 
@@ -1465,7 +1477,14 @@ function sql_delete_group_member( $gruppenmitglieder_id ) {
  * Vorname, Name, Mail, Telefon und Diensteinteilung des Neumitgliedes
  */
 function sql_insert_group_member($gruppen_id, $newVorname, $newName, $newMail, $newTelefon, $newDiensteinteilung){
-  global $problems, $msg, $sockelbetrag_mitglied, $sockelbetrag_gruppe, $muell_id, $mysqlheute;
+  global
+    $db_handle,
+    $msg,
+    $muell_id,
+    $mysqlheute,
+    $problems,
+    $sockelbetrag_mitglied,
+    $sockelbetrag_gruppe;
   need( isset( $sockelbetrag_mitglied ), "leitvariable sockelbetrag_mitglied nicht gesetzt!" );
   need( isset( $sockelbetrag_gruppe ), "leitvariable sockelbetrag_gruppe nicht gesetzt!" );
 
@@ -2426,8 +2445,7 @@ function sql_bestellzuordnung_menge( $keys = array() ) {
 }
 
 
-/**
- * select_bestellung_produkte
+/** select_bestellung_produkte
  *
  * Retrieves for one or several products within an order (GROUP BY produkt):
  * - product data and price
@@ -2453,7 +2471,12 @@ function select_bestellung_produkte( $keys = array(), $orderby = '' ) {
   $basar_id = sql_basar_id();
   $muell_id = sql_muell_id();
 
-  $mit_katalog = $keys['mit_katalog'] ?? false;
+  $gruppen_id = $keys['gruppen_id'] ?? FALSE;
+  $gesamt = $keys['gesamt'] ?? FALSE;
+  $brauche_alle_gruppen = !($gruppen_id) || $gesamt;
+  $mit_gruppenspalten = $gruppen_id && $gesamt;
+
+  $mit_katalog = $keys['mit_katalog'] ?? FALSE;
 
   $selects = [];
   $filters = [];
@@ -2493,7 +2516,9 @@ function select_bestellung_produkte( $keys = array(), $orderby = '' ) {
         $filters['gesamtbestellungen.id'] = $value;
         break;
       case 'gruppen_id':
-        $filters['gruppenbestellungen.bestellgruppen_id'] = $value;
+        if( !$brauche_alle_gruppen ) {
+          $filters['gruppenbestellungen.bestellgruppen_id'] = $value;
+        }
         break;
       case 'produkt_id':
         $filters['produkte.id'] = $value;
@@ -2502,7 +2527,6 @@ function select_bestellung_produkte( $keys = array(), $orderby = '' ) {
   }
 
   need($bestell_id = $keys['bestell_id']);
-  $gruppen_id = $keys['gruppen_id'];
 
   $state = sql_bestellung_status( $bestell_id );
 
@@ -2603,6 +2627,20 @@ function select_bestellung_produkte( $keys = array(), $orderby = '' ) {
   $selects[] = "( $toleranzbestellmenge_expr ) AS toleranzbestellmenge";
   $selects[] = "( $verteilmenge_expr ) AS verteilmenge";
   $selects[] = "( $muellmenge_expr ) AS muellmenge";
+  if( $mit_gruppenspalten ) {
+    $gruppen_keys = ['gruppenbestellungen.bestellgruppen_id' => $gruppen_id];
+    foreach( [
+      'gruppe.fest'       => BESTELLZUORDNUNG_ART_FESTBESTELLUNG,
+      'gruppe.toleranz'   => BESTELLZUORDNUNG_ART_TOLERANZBESTELLUNG,
+      'gruppe.vormerkung' => BESTELLZUORDNUNG_ART_VORMERKUNGEN,
+    ] as $name => $art
+    ) {
+      $selects[] =
+        'IFNULL(SUM(IF(' .
+          get_sql_filter($gruppen_keys + ['bestellzuordnung.art' => $art]) .
+        ', bestellzuordnung.menge, 0) ), 0) AS `' . $name . '`'; 
+    }
+  }
   $selects[] = "IF( abs($firstorder_expr) > 0, 0, 1 ) AS menge_ist_null";
 
   return get_sql_query('SELECT', 'bestellvorschlaege', $selects, $joins, $filters, $orderby, 'produkte.id');
