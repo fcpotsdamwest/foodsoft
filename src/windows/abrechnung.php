@@ -8,13 +8,9 @@
  * @param int $bestell_id
  * @param int $extra_soll
  * @param int $extra_text
- * @param int $bestell_id
  * @param int $rechnung_abschluss
+ *   one of (reopen|yes) to indicate if balancing is finished
  * @param int $rechnungsnummer
- * @param int $bestell_id
- * @param int $bestell_id
- * @param int $bestell_id
- * @param int $bestell_id
  *
  */
 
@@ -26,8 +22,8 @@ global
 assert( $angemeldet ) or exit();
 
 // flags:
-//   $teil_abrechnung: nur teil einer abrechnung mehrerer verbundener rechnungen: nicht edierbar!
-//   $gesamt_abrechnung: gesamtsicht ueber mehr als eine teil-abrechnung
+//   $teil_abrechnung: nur teil einer abrechnung mehrerer verbundener rechnungen: nicht änderbar!
+//   $gesamt_abrechnung: gesamtsicht über mehr als eine teil-abrechnung
 
 need_http_var( 'abrechnung_id', 'u', true );
 $teil_abrechnung = false;
@@ -101,11 +97,11 @@ if( $action === 'save' ) {
     need_http_var( 'extra_soll', 'f' );
     foreach( $bestell_id_set as $b_id ) {
       if( $b_id === $abrechnung_id ) {
-        sql_update( 'gesamtbestellungen', $b_id, array(
-          'rechnungsnummer' => $rechnungsnummer
-        , 'extra_text' => $extra_text
-        , 'extra_soll' => $extra_soll
-        ) );
+        sql_update( 'gesamtbestellungen', $b_id, [
+          'rechnungsnummer' => $rechnungsnummer,
+          'extra_text'      => $extra_text,
+          'extra_soll'      => $extra_soll,
+        ]);
       } else {
         sql_update( 'gesamtbestellungen', $b_id, array(
           'rechnungsnummer' => $rechnungsnummer

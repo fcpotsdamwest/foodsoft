@@ -64,7 +64,7 @@ $telefon ='';
 $name ='';
 $notiz ='';
 
-// pruefen, ob schon eingeloggt:
+// prüfen, ob schon eingeloggt:
 //
 if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 1 ) ) {
   sscanf( $_COOKIE['foodsoftkeks'], "%u_%s", $session_id, $cookie );
@@ -74,7 +74,7 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
   } elseif( $cookie != $row['cookie'] ) {
     $problems .= "<div class='warn'>Fehler im Keks: nicht angemeldet</div>";
   } else {
-    // anmeldung ist gueltig:
+    // anmeldung ist gültig:
     $login_gruppen_id = $row['login_gruppen_id'];
     $login_dienst = $row['dienst'];
     $dienstkontrollblatt_id = $row['dienstkontrollblatt_id'];
@@ -95,7 +95,7 @@ if( isset( $_COOKIE['foodsoftkeks'] ) && ( strlen( $_COOKIE['foodsoftkeks'] ) > 
   }
   if( ! $problems ) {  // login ok, weitermachen...
     $angemeldet = TRUE;
-  } else {  // irgendwas war falsch... zurueck auf los:
+  } else {  // irgendwas war falsch... zurück auf los:
     logout();
   }
 }

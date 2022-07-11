@@ -316,7 +316,7 @@ if( ! $readonly ) {
       // anzeige gruppe aktualisieren:
       //
       s = fest[produkt] * verteilmult[produkt];
-      var toleranzNode = document.getElementById('t_'+produkt);
+      const toleranzNode = document.getElementById('t_'+produkt);
       
       // also show when tolerance changed for marking change by color
       if( toleranz[produkt] > 0 || toleranz_alt[produkt] != toleranz[produkt] ) {
@@ -326,16 +326,16 @@ if( ! $readonly ) {
         toleranzNode.firstChild.nodeValue = ' ';
       }
       
-      var festNode = document.getElementById('f_'+produkt);
+      const festNode = document.getElementById('f_'+produkt);
       festNode.firstChild.nodeValue = s;
       
       // highlight changes
       if (!init) {
-        set_class(festNode, 'changed', fest[produkt] != fest_alt[produkt]);
+        set_class(festNode, 'changed', fest[produkt] !== fest_alt[produkt]);
         set_class(
             toleranzNode, 
             'changed', 
-            fest[produkt] + toleranz[produkt] != fest_alt[produkt] + toleranz_alt[produkt]);
+            fest[produkt] + toleranz[produkt] !== fest_alt[produkt] + toleranz_alt[produkt]);
       }
 
       // update order form fields

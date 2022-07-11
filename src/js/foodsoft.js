@@ -7,7 +7,7 @@ function checkAll( form_id ) {
   const o = document.forms[ 'form_'+form_id ].elements;
   if (o) {
     for (let i=0; i<o.length; i++) {
-      if (o[i].type == 'checkbox')
+      if (o[i].type === 'checkbox')
         o[i].checked = 1;
     }
   }	
@@ -22,7 +22,7 @@ function uncheckAll( form_id ) {
   const o = document.forms[ 'form_'+form_id ].elements;
   if (o){
     for (let i=0; i<o.length; i++) {
-      if (o[i].type == 'checkbox')
+      if (o[i].type === 'checkbox')
         o[i].checked = 0;
     }
   }	
@@ -100,14 +100,7 @@ function post_action( action, message ) {
 
 function set_footbar( enabled ) {
   const footbar = document.getElementById( 'footbar' );
-  if (enabled)
-  {
-    footbar.style.display="block";
-  }
-  else
-  {
-    footbar.style.display="none";
-  }
+  footbar.style.display = enabled ? 'block' : 'none';
   updateWindowHeight();
 }
 
@@ -123,54 +116,54 @@ function updateWindowHeight() {
 
 function set_class( node, className, enabled ) {
   if (enabled) {
-    if (node.className.match(RegExp('\\b'+className+'\\b')))
-      return;
-    node.className += ' ' + className;
-    return;
+    node.classList.add(className);
+  } else {
+    node.classList.remove(className);
   }
-  // removal
-  node.className = node.className.replace(RegExp(' *\\b'+className+'\\b *'), ' ');
 }
 
 function handleTextFieldKeyPress(event, onEnter) {
-    if (event.keyCode != Event.KEY_RETURN) {
+    if (event.key !== 'Enter') {
       return;
     }
     event.stop(); // no submit
-    event.findElement().select();
+    event.target.select();
     onEnter(true);
 }
 
 function installTextFieldChangeHandler(element, handler, captureEnter) {
+  // FIXME: Why not just set 'true' as default value in the signature?
   captureEnter = typeof captureEnter === 'undefined' ? true : captureEnter;
-  element.on('change', function() {handler(false);} );
+  element.on('change', () => handler(false) );
   if (captureEnter)
     element.on(
         'keypress', 
-        function(event) {handleTextFieldKeyPress(event, handler);});
+        (event) => handleTextFieldKeyPress(event, handler)
+    );
 }
 
-var Scroller = Class.create({
-  initialize: function() {
+class Scroller {
+  constructor() {
     this.mPageHeight = window.innerHeight;
     this.mKeyState = Scroller.UP;
-    this.mKeyCode = 0;
-    // generate closures
-    var self = this;
-    this.mKeyPressHandler = function(event) {self.handleKey(event, Scroller.PRESS);};
-    this.mKeyDownHandler = function(event) {self.handleKey(event, Scroller.DOWN);};
-    this.mKeyUpHandler = function(event) {self.handleKey(event, Scroller.UP);};
-  },
-  setPageHeight: function(pageHeight) {
+    this.mKey = 0;
+    this.mKeyPressHandler = this.handleKey.bind(this, Scroller.PRESS);
+    this.mKeyDownHandler = this.handleKey.bind(this, Scroller.DOWN);
+    this.mKeyUpHandler = this.handleKey.bind(this, Scroller.UP);
+  }
+
+  setPageHeight(pageHeight) {
     this.mPageHeight = pageHeight;
-  },
-  scrollPage: function(direction) {
+  }
+
+  scrollPage(direction) {
     window.scrollBy(0, direction * this.mPageHeight);
-  },
-  handleKey: function(event, what) {
+  }
+
+  handleKey(what, event) {
     // capture only page up / down
-    if (event.keyCode !== Event.KEY_PAGEUP 
-        && event.keyCode !== Event.KEY_PAGEDOWN
+    if (event.key !== 'PageUp'
+        && event.key !== 'PageDown'
         || event.altKey || event.ctrlKey || event.shiftKey) {
       return;
     }
@@ -182,7 +175,7 @@ var Scroller = Class.create({
 
     event.stop();
     
-    if (this.mKeyCode === event.keyCode 
+    if (this.mKey === event.key
         && this.mKeyState === Scroller.DOWN
         && what === Scroller.PRESS) {
       // discard first press after down:
@@ -193,31 +186,34 @@ var Scroller = Class.create({
     }
     
     this.mKeyState = what;
-    this.mKeyCode = event.keyCode;
+    this.mKey = event.key;
     
     if (what === Scroller.UP) {
       return;
     }
 
-    this.scrollPage(event.keyCode === Event.KEY_PAGEUP ? -1 : 1);
-  },
-  register: function(element) {
+    this.scrollPage(event.key === 'PageUp' ? -1 : 1);
+  }
+
+  register(element) {
     if (element === null) {
       element = document;
     }
     Event.observe(element, 'keypress', this.mKeyPressHandler);
     Event.observe(element, 'keydown', this.mKeyDownHandler);
     Event.observe(element, 'keyup', this.mKeyUpHandler);
-  },
-  unregister: function(element) {
+  }
+
+  unregister(element) {
     if (element === null) {
       element = document;
     }
     Event.stopObserving(element, 'keypress', this.mKeyPressHandler);
     Event.stopObserving(element, 'keydown', this.mKeyDownHandler);
     Event.stopObserving(element, 'keyup', this.mKeyUpHandler);
-  },
-  isInNestedScrollview: function(node) {
+  }
+
+  isInNestedScrollview(node) {
     switch(node) {
       case null:
       case document.documentElement: // firefox
@@ -235,7 +231,7 @@ var Scroller = Class.create({
     }
     return this.isInNestedScrollview(node.parentNode);
   }
-});
+}
 
 Scroller.UP = 0;
 Scroller.DOWN = 1;
@@ -243,17 +239,16 @@ Scroller.PRESS = 2;
 
 window.scroller = new Scroller();
 
-var MagicCalculator = Class.create(
-{
-  initialize: function(orderId, productId, distMult, endPrice) 
+class MagicCalculator {
+  constructor(orderId, productId, distMult, endPrice)
   {
     this.mOrderId = orderId;
     this.mProductId = productId;
     this.mDistMult = distMult;
     this.mEndPrice = endPrice;
-    this.mGroupFields = new Array();
-    this.mGroupValues = new Array();
-    this.mResultGroupValues = new Array();
+    this.mGroupFields = [];
+    this.mGroupValues = [];
+    this.mResultGroupValues = [];
     this.mTrashField = '';
     this.mTrashValue = 0;
     this.mBazaarField = '';
@@ -262,100 +257,109 @@ var MagicCalculator = Class.create(
     this.mTotal = 0;
     this.mUiEnabled = false;
     this.mNotInteger = false;
-  },
-  addGroupField: function(id) 
+  }
+
+  addGroupField(id)
   {
     this.mGroupFields.push(id);
-  },
-  setTrashField: function(id)
+  }
+
+  setTrashField(id)
   {
     this.mTrashField = id;
-  },
-  setBazaarField: function(id)
+  }
+
+  setBazaarField(id)
   {
     this.mBazaarField = id;
-  },
-  parseValue: function(string) {
-    var resultInt = parseInt(string, 10);
-    var resultFloat = parseFloat(string);
+  }
+  parseValue(string) {
+    const resultInt = parseInt(string, 10);
+    const resultFloat = parseFloat(string);
     if (isNaN(resultInt) || resultInt !== resultFloat || string.indexOf('.') >= 0) {
       this.mNotInteger = true;
       return Math.round(resultFloat*1000)/1000;
     }
     return resultInt;
-  }, 
-  fetchValues: function()
+  }
+
+  fetchValues()
   {
     this.mNotInteger = false;
-    this.mTotal = this.parseValue($('liefermenge_' + this.mOrderId + '_' + this.mProductId).value);
+    const deliveredQuantity = document.getElementById('liefermenge_' + this.mOrderId + '_' + this.mProductId);
+    this.mTotal = this.parseValue(deliveredQuantity.value);
     this.mGroupValues.length = this.mGroupFields.length;
-    for (var i = 0; i < this.mGroupFields.length; ++i)
+    for (let i = 0; i < this.mGroupFields.length; ++i)
     {
-      this.mGroupValues[i] = this.parseValue($('menge_' + this.mGroupFields[i]).value);
+      let el = document.getElementById('menge_' + this.mGroupFields[i]);
+      this.mGroupValues[i] = this.parseValue(el.value);
     }
+
     this.mResultGroupValues = this.mGroupValues;
-    this.mTrashValue = this.parseValue($('menge_' + this.mTrashField).value);
-    this.mBazaarValue = parseFloat($('menge_' + this.mBazaarField).textContent);
-    this.mBazaarTarget = this.parseValue($('magic_' + this.mBazaarField).value);
-  },
-  recalcCurrentBazaar: function() {
+    const trashQuantity = document.getElementById('menge_' + this.mTrashField).value;
+    this.mTrashValue = this.parseValue(trashQuantity);
+    const bazaarQuantity = document.getElementById('menge_' + this.mBazaarField).textContent;
+    this.mBazaarValue = parseFloat(bazaarQuantity);
+    const bazaarTarget = document.getElementById('magic_' + this.mBazaarField).value;
+    this.mBazaarTarget = this.parseValue(bazaarTarget);
+  }
+
+  recalcCurrentBazaar() {
     this.mBazaarValue = this.mTotal;
-    for (var i = 0; i < this.mGroupValues.length; ++i)
+    for (let i = 0; i < this.mGroupValues.length; ++i)
     {
       this.mBazaarValue -= this.mGroupValues[i];
     }
     this.mBazaarValue -= this.mTrashValue;
-  },
-  formatNumber: function(number, precision) {
-    var string = number.toFixed(precision);
-    return string.replace(/\.?0+$/, '');
-  },
-  publishCurrentBazaar: function() {
-    $('menge_' + this.mBazaarField).textContent = this.formatNumber(this.mBazaarValue, 3);
-  },
-  calculate: function()
+  }
+
+  formatNumber(raw, precision) {
+    return raw.toFixed(precision).replace(/\.?0+$/, '');
+  }
+
+  publishCurrentBazaar() {
+    const bazaarQuantityEl = document.getElementById('menge_' + this.mBazaarField);
+    bazaarQuantityEl.textContent = this.formatNumber(this.mBazaarValue, 3);
+  }
+
+  calculate()
   {
     if (isNaN(this.mBazaarTarget)) {
       return;
     }
     
-    var fixPointFactor = (this.mNotInteger) ? 1000 : 1;
-    
-    var groupsSum = 0;
-    this.mGroupValues.each(function(x) {groupsSum += x});
-    var groupsTarget = this.mTotal - this.mBazaarTarget - this.mTrashValue;
-    var ratio = groupsTarget / groupsSum;
+    const fixPointFactor = (this.mNotInteger) ? 1000 : 1;
+    let groupsSum = this.mGroupValues.reduce((partial, x) => partial + x, 0);
+    const groupsTarget = this.mTotal - this.mBazaarTarget - this.mTrashValue;
+    const ratio = groupsTarget / groupsSum;
     groupsSum = 0;
-    var groupValuesExact = this.mGroupValues.collect(function(x) {
-      return x * ratio;
-    });
-    this.mResultGroupValues = groupValuesExact.collect(function(x) { 
-      var newX = Math.round(x*fixPointFactor) / fixPointFactor; 
+    const groupValuesExact = this.mGroupValues.map(x => x * ratio);
+    this.mResultGroupValues = groupValuesExact.map(x => {
+      const newX = Math.round(x * fixPointFactor) / fixPointFactor;
       groupsSum += newX;
       return newX; 
     });
-    
-    
+
     // in case of decimals, do the rounding on 1e-3, scale up, do it in integer, then scale down
     this.mBazaarValue = Math.round((this.mTotal - this.mTrashValue - groupsSum) * fixPointFactor);
     this.mBazaarTarget = Math.round(this.mBazaarTarget * fixPointFactor);
     // rounding fix-up: make array with same length initialized to zero
-    var roundingDistribution = this.mGroupValues.collect(function(x) {return 0;});
-    while (this.mBazaarValue != this.mBazaarTarget) {
+    let roundingDistribution = this.mGroupValues.map(() => 0);
+    while (this.mBazaarValue !== this.mBazaarTarget) {
       // bazaar rest from rounding
       // direction +1: need to distribute more to groups
-      var direction = (this.mBazaarValue - this.mBazaarTarget > 0) ? 1 : -1;
-      var minBadness;
-      var iMinBadness = 0;
-      for (var i = 0; i < this.mGroupValues.length; ++i) {
-        if (this.mGroupValues[i] == 0) {
+      const direction = (this.mBazaarValue - this.mBazaarTarget > 0) ? 1 : -1;
+      let minBadness;
+      let iMinBadness = 0;
+      for (let i = 0; i < this.mGroupValues.length; ++i) {
+        if (this.mGroupValues[i] === 0) {
           // do not involve new groups
           continue;
         }
-        var badness = Math.abs(
+        const badness = Math.abs(
             (this.mResultGroupValues[i] + (roundingDistribution[i] + direction)/fixPointFactor - groupValuesExact[i]) 
                 / groupValuesExact[i]);
-        if (i == 0) {
+        if (i === 0) {
           minBadness = badness;
           continue;
         }
@@ -368,59 +372,77 @@ var MagicCalculator = Class.create(
       this.mBazaarValue -= direction;
     }
     
-    for (var i = 0; i < this.mGroupValues.length; ++i) {
+    for (let i = 0; i < this.mGroupValues.length; ++i) {
       this.mResultGroupValues[i] += roundingDistribution[i] / fixPointFactor;
     }
     this.mBazaarTarget /= fixPointFactor;
     this.mBazaarValue /= fixPointFactor;
-  },
-  setUi: function(enabled) {
-    $('magic_' + this.mOrderId + '_' + this.mProductId + '_style').sheet.cssRules[0].style.display = enabled ? '' : 'none';
+  }
+
+  setUi(enabled) {
+    const magicEl = document.getElementById('magic_' + this.mOrderId + '_' + this.mProductId + '_style');
+    magicEl.sheet.cssRules[0].style.display = enabled ? '' : 'none';
     this.mUiEnabled = enabled;
-  },
-  displayResult: function() {
-    for (var i = 0; i < this.mGroupFields.length; ++i) {
-      $('magic_' + this.mGroupFields[i]).textContent = this.formatNumber(this.mResultGroupValues[i], 3);
+  }
+
+  displayResult() {
+    for (let i = 0; i < this.mGroupFields.length; ++i) {
+      let groupField = document.getElementById('magic_' + this.mGroupFields[i]);
+      groupField.textContent = this.formatNumber(this.mResultGroupValues[i], 3);
     }
-    $('magic_' + this.mTrashField).textContent = this.formatNumber(this.mTrashValue, 3);
-  },
-  applyResult: function() {
+    let magicTrash = document.getElementById('magic_' + this.mTrashField);
+    magicTrash.textContent = this.formatNumber(this.mTrashValue, 3);
+  }
+
+  applyResult() {
     this.setUi(false);
-    for (var i = 0; i < this.mGroupFields.length; ++i) {
-      $('menge_' + this.mGroupFields[i]).value = this.formatNumber(this.mResultGroupValues[i], 3);
+    for (let i = 0; i < this.mGroupFields.length; ++i) {
+      let groupField = document.getElementById('menge_' + this.mGroupFields[i]);
+      groupField.value = this.formatNumber(this.mResultGroupValues[i], 3);
     }
     this.handleChangedDistribution();
-  },
-  initUi: function() {
+  }
+
+  initUi() {
     this.fetchValues();
     this.recalcCurrentBazaar();
     this.publishCurrentBazaar();
     this.mBazaarTarget = this.mBazaarValue;
-    $('magic_' + this.mBazaarField).value = this.formatNumber(this.mBazaarTarget, 3);
+    let magicBazaar = document.getElementById('magic_' + this.mBazaarField);
+    magicBazaar.value = this.formatNumber(this.mBazaarTarget, 3);
     this.calculate();
     this.displayResult();
     this.setUi(true);
-  },
-  updateUi: function() {
+  }
+
+  updateUi() {
     this.fetchValues();
     this.calculate();
     this.displayResult();
-  },
-  calcPrice: function(amount) {
+  }
+
+  calcPrice(amount) {
     return this.mEndPrice * amount / this.mDistMult;
-  },
-  formatPrice: function(price) {
+  }
+
+  formatPrice(price) {
     return price.toFixed(2);
-  },
-  recalcAndShowPrices: function() {
-    $('preis_' + this.mOrderId + '_' + this.mProductId).textContent = this.formatPrice(this.calcPrice(this.mTotal));
-    for (var i = 0; i < this.mGroupFields.length; ++i) {
-      $('preis_' + this.mGroupFields[i]).textContent = this.formatPrice(this.calcPrice(this.mGroupValues[i]));
+  }
+
+  recalcAndShowPrices() {
+    let priceTotalEl = document.getElementById('preis_' + this.mOrderId + '_' + this.mProductId);
+    priceTotalEl.textContent = this.formatPrice(this.calcPrice(this.mTotal));
+    for (let i = 0; i < this.mGroupFields.length; ++i) {
+      let priceFieldEl = document.getElementById('preis_' + this.mGroupFields[i]);
+      priceFieldEl.textContent = this.formatPrice(this.calcPrice(this.mGroupValues[i]));
     }
-    $('preis_' + this.mTrashField).textContent = this.formatPrice(this.calcPrice(this.mTrashValue));
-    $('preis_' + this.mBazaarField).textContent = this.formatPrice(this.calcPrice(this.mBazaarValue));
-  },
-  handleChangedDistribution: function() {
+    let priceTrashEl = document.getElementById('preis_' + this.mTrashField);
+    priceTrashEl.textContent = this.formatPrice(this.calcPrice(this.mTrashValue));
+    let priceBazaarEl = document.getElementById('preis_' + this.mBazaarField);
+    priceBazaarEl.textContent = this.formatPrice(this.calcPrice(this.mBazaarValue));
+  }
+
+  handleChangedDistribution() {
     this.fetchValues();
     this.recalcCurrentBazaar();
     this.publishCurrentBazaar();
@@ -430,7 +452,7 @@ var MagicCalculator = Class.create(
       this.displayResult();
     }
   }
-});
+}
 
 function bound(min, x, max) {
   x = x < min ? min : x;
@@ -438,9 +460,9 @@ function bound(min, x, max) {
   return x;
 }
 
-var SearchableSelect = Class.create({
-  initialize: function(selectElement, searchInput) {
-    var self = this;
+class SearchableSelect {
+  constructor(selectElement, searchInput) {
+    const self = this;
     this.mSelectElement = selectElement;
     this.mSearchInput = searchInput;
     this.mListEntries = [];
@@ -449,19 +471,22 @@ var SearchableSelect = Class.create({
     
     installTextFieldChangeHandler(
         this.mSearchInput, 
-        function() {self.filterList();});
-    this.mSelectElement.on('change', function() {self.emitSelection();});
-  },
-  updateText: function(entry) {
+        () => self.filterList()
+    );
+    this.mSelectElement.on('change', () => self.emitSelection());
+  }
+
+  updateText(entry) {
     entry.data.setOption(entry.option);
     entry.option.memo = entry.data;
     if (this.mCaseSensitive)
       entry.searchText = entry.option.text;
     else
       entry.searchText = entry.option.text.toLowerCase();
-  },
-  setEntries: function(entries) {
-    var self = this;
+  }
+
+  setEntries(entries) {
+    const self = this;
     this.mListEntries = entries.collect(function(entry) {
       return { 
         data: entry,
@@ -473,36 +498,40 @@ var SearchableSelect = Class.create({
     });
     this.mVisibleEntries = this.mListEntries.clone();
     this.updateSelectElement();
-  },
-  appendEntry: function(entry) {
-    var newListEntry = {
+  }
+
+  appendEntry(entry) {
+    const newListEntry = {
       data: entry,
       option: document.createElement('option')
     };
     this.mListEntries.push(newListEntry);
     this.updateText(newListEntry);
     this.filterList();
-  },
-  remove: function(entry) {
-    var listEntry = this.mListEntries.detect(function(it) {
+  }
+
+  remove(entry) {
+    const listEntry = this.mListEntries.detect(function(it) {
       return it.data === entry;
     });
     this.mListEntries = this.mListEntries.without(listEntry);
     this.mVisibleEntries = this.mVisibleEntries.without(listEntry);
-    var i = this.mSelectElement.selectedIndex;
+    let i = this.mSelectElement.selectedIndex;
     this.updateSelectElement();
     i = bound(0, i, this.mSelectElement.options.length - 1);
     this.selectIndex(i);
-  },
-  selectIndex: function(index) {
+  }
+
+  selectIndex(index) {
     if (index === this.mSelectElement.selectedIndex)
       return;
     this.mSelectElement.selectedIndex = index;
     this.emitSelection();
-  },
-  select: function(entry) {
-    var self = this;
-    var found = false;
+  }
+
+  select(entry) {
+    const self = this;
+    let found = false;
     this.mVisibleEntries.each(function (listEntry, index) {
       if (listEntry.data === entry) {
         self.selectIndex(index);
@@ -530,10 +559,11 @@ var SearchableSelect = Class.create({
       });
       */
     }
-  },
-  moveSelection: function(delta) {
-    var oldIndex = this.mSelectElement.selectedIndex;
-    var newIndex = bound(
+  }
+
+  moveSelection(delta) {
+    const oldIndex = this.mSelectElement.selectedIndex;
+    const newIndex = bound(
         0,
         oldIndex + delta,
         this.mSelectElement.options.length - 1);
@@ -543,25 +573,28 @@ var SearchableSelect = Class.create({
       return true;
     }
     return false;
-  },
-  updateEntry: function(entry) {
-    var listEntry = this.mListEntries.detect(function (x) {
+  }
+
+  updateEntry(entry) {
+    const listEntry = this.mListEntries.detect(function (x) {
       return x.data === entry;
     })
     this.updateText(listEntry);
-  },
-  filterList: function() {
-    var searchText = this.mSearchInput.value;
+  }
+
+  filterList() {
+    let searchText = this.mSearchInput.value;
     if (!this.mCaseSensitive)
       searchText = searchText.toLowerCase();
     this.mVisibleEntries = this.mListEntries.findAll(function(entry) {
       return ! (searchText.length && entry.searchText.indexOf(searchText) < 0);
     });
     this.updateSelectElement();
-  },
-  updateSelectElement: function() {
+  }
+
+  updateSelectElement() {
     var self = this;
-    var currentMemo = this.currentMemo();
+    const currentMemo = this.currentMemo();
     this.mSelectElement.innerHTML = '';
     this.mVisibleEntries.each(function(entry) {
       self.mSelectElement.appendChild(entry.option);
@@ -571,17 +604,19 @@ var SearchableSelect = Class.create({
         self.emitSelection();
       }
     });
-  },
-  currentMemo: function() {
-    var selectedIndex = this.mSelectElement.selectedIndex;
+  }
+
+  currentMemo() {
+    const selectedIndex = this.mSelectElement.selectedIndex;
     return selectedIndex < 0 
         ? null 
         : this.mSelectElement.options[selectedIndex].memo;
-  },
-  emitSelection: function() {
+  }
+
+  emitSelection() {
     this.mSelectElement.fire('option:selected', this.currentMemo());
   }
-});
+}
 
 function disableAutocomplete(element) {
   element.setAttribute('autocomplete', 'off');
