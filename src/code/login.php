@@ -162,9 +162,6 @@ switch( $login ) {
 
     if( $dienst != 0 ) {
       get_http_var( 'coopie_name', 'H', '' );
-      if( ! $coopie_name || ( strlen( $coopie_name ) < 2 ) ) {
-        $errors[] = "kein Name angegeben";
-      }
       get_http_var( 'telefon', 'H', '' );
       get_http_var( 'notiz', 'H', '' );
     }
@@ -276,8 +273,7 @@ open_form( "url=$foodsoftdir/index.php", 'login=login' );
     open_div( 'newfield', '', "
       <p>
         <label class='login'> ". ( $FC_acronym == 'LS' ? 'Kunde:' : 'Gruppe:' ) ."</label>
-        <input type='text' size='12' name='login_gruppen_id_text' id='login_gruppen_id_text' value=''
-          onkeyup='pick_login_text();'>
+        <input type='text' size='12' name='login_gruppen_id_text' id='login_gruppen_id_text' value=''>
         <select size='1' name='login_gruppen_id' id='login_gruppen_id'
           onchange='pick_login_dropdown();'>
         ". optionen_gruppen() ."
@@ -340,8 +336,12 @@ close_form();
       : 'normal';
     document.documentElement.setAttribute('data-theme', theme);
   }
-  $('$login_form_id').onsubmit = pick_login_text;
+  $('<?php echo $login_form_id ?>').onsubmit = pick_login_text;
   document.observe('dom:loaded', pick_login_text);
+  document.getElementById('login_gruppen_id_text').addEventListener(
+    'input',
+    (event) => { pick_login_text(); }
+  );
 </script>
 <?php
 
