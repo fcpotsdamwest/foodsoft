@@ -216,7 +216,7 @@ open_table('list');
       /* TODO: use status < 40 as indicator for uncleared orders and adjust display style! */
       $status = (int) $vert_row['gesamtbestellung_status'];
       $not_cleared_yet = $status < STATUS_ABGERECHNET;
-      $row_css_class = $not_cleared_yet ? 'tobecleared' : '';
+      $row_css_class = $not_cleared_yet ? 'orderstatus_tobecleared' : '';
       open_tr(
         $row_css_class,
         'title="Bestellung noch nicht fertig abgerechnet, angezeigte Werte vorläufig (evtl. sind Liefer-/Verteilabweichungen noch nicht berücksichtigt)"',
