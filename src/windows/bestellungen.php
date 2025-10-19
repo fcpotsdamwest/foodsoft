@@ -8,7 +8,7 @@ if ( $since === -1 ) {
   // show last 2 years by default, or the datetime of the last unfinished order (if older)
   $oldest_unfinished = sql_bestellung_oldest_unfinished_timestamp();
   $two_years_ago = (new DateTime())->modify('-2 years')->getTimestamp(); 
-  $since = min($oldest_unfinished, $two_years_ago);
+  $since = is_null($oldest_unfinished) ? $two_years_ago : min($oldest_unfinished, $two_years_ago);
 }
 $sinceDate = (new DateTime())->setTimestamp($since)->format("Y-m-d");
 

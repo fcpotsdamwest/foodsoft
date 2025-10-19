@@ -2104,6 +2104,8 @@ function sql_bestellung( $bestell_id ) {
 
 /**
  * Returns the timestamp of the oldest order that is not yet cleared
+ * 
+ * Returns NULL if *all* orders are cleared
  */
 function sql_bestellung_oldest_unfinished_timestamp() {
   return sql_select_single_field(
@@ -2113,7 +2115,10 @@ function sql_bestellung_oldest_unfinished_timestamp() {
     WHERE `rechnungsstatus` < " . STATUS_ABGERECHNET . " 
     ORDER BY `lieferung` ASC
     LIMIT 1
-    ", 'unfinished');
+    ",
+    'unfinished',
+    TRUE
+  );
 }
 
 
